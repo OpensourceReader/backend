@@ -54,7 +54,7 @@ subprojects {
     }
 }
 
-tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+tasks.named<BootJar>("bootJar") {
     enabled = false
 }
 
@@ -68,7 +68,7 @@ spotless {
     java {
         removeUnusedImports()
         googleJavaFormat()
-        importOrder("java", "javax", "")
+        importOrder("java", "javax", "org.springframework", "", "lombok")
         indentWithSpaces()
         trimTrailingWhitespace()
     }
