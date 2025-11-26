@@ -39,14 +39,10 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-validation")
         implementation("org.springframework.boot:spring-boot-starter-web")
         compileOnly("org.projectlombok:lombok")
-        implementation("com.h2database:h2")
         annotationProcessor("org.projectlombok:lombok")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("com.h2database:h2")
-        // developmentOnly("org.springframework.boot:spring-boot-devtools")
-//        testImplementation("org.springframework.security:spring-security-test")
-//        implementation("org.springframework.boot:spring-boot-starter-security")
     }
 
     tasks.withType<Test> {
