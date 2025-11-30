@@ -1,8 +1,9 @@
 package com.opensourcereader.api.security.jwt;
 
+import org.springframework.stereotype.Service;
+
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
@@ -11,5 +12,4 @@ public class JwtService {
 
   private Algorithm algorithm;
   private JWTVerifier jwtVerifier;
-
 }

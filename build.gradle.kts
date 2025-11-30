@@ -28,10 +28,33 @@ allprojects {
     }
 }
 
+allprojects {
+    apply(plugin = "com.diffplug.spotless")
+
+    spotless {
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
+
+        java {
+            removeUnusedImports()
+            googleJavaFormat()
+            importOrder("java", "javax", "org.springframework", "", "lombok")
+            indentWithSpaces()
+            trimTrailingWhitespace()
+        }
+
+        kotlinGradle {
+            target("*.gradle.kts")
+            ktlint()
+
+            indentWithSpaces()
+            trimTrailingWhitespace()
+        }
+    }
+}
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "org.springframework.boot")
-    apply(plugin = "com.diffplug.spotless")
     apply(plugin = "io.spring.dependency-management")
 
     dependencies {
@@ -56,24 +79,4 @@ tasks.named<BootJar>("bootJar") {
 
 tasks.named<Jar>("jar") {
     enabled = false
-}
-
-spotless {
-    lineEndings = com.diffplug.spotless.LineEnding.UNIX
-
-    java {
-        removeUnusedImports()
-        googleJavaFormat()
-        importOrder("java", "javax", "org.springframework", "", "lombok")
-        indentWithSpaces()
-        trimTrailingWhitespace()
-    }
-
-    kotlinGradle {
-        target("*.gradle.kts")
-        ktlint()
-
-        indentWithSpaces()
-        trimTrailingWhitespace()
-    }
 }

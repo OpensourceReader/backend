@@ -1,9 +1,11 @@
 package com.opensourcereader.core.user.service;
 
-import com.opensourcereader.core.user.entity.User;
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
+
+import com.opensourcereader.core.user.entity.User;
 
 @Service
 public interface UserService {
