@@ -1,9 +1,11 @@
 package com.opensourcereader.api.controller.user;
 
-import com.opensourcereader.api.facade.user.UserFacadeService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.opensourcereader.api.facade.user.UserFacadeService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -11,5 +13,4 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserFacadeService userFacadeService;
-
 }
