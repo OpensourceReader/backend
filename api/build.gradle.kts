@@ -1,8 +1,12 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-dependencies{
+dependencies {
     implementation(project(":core"))
     implementation("com.mysql:mysql-connector-j:8.0.33")
+
+    // auth
+    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
 tasks.named<BootJar>("bootJar") {

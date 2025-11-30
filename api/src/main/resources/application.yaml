@@ -16,6 +16,11 @@ spring:
         show_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  access-token-expiration: 600 # 10 분
+  refresh-token-expiration: 604800 # 7일
+
 logging:
   level:
     root: info
