@@ -1,8 +1,6 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-dependencies{
-
-
+dependencies {
 }
 
 tasks.named<BootJar>("bootJar") {
