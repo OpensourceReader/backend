@@ -6,6 +6,7 @@ dependencies {
 
     // auth
     implementation("com.auth0:java-jwt:4.4.0")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.springframework.boot:spring-boot-starter-security")
 }
 
