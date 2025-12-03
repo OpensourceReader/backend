@@ -8,6 +8,7 @@ dependencies {
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }
 
 tasks.named<BootJar>("bootJar") {

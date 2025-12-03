@@ -78,3 +78,7 @@ tasks.named<BootJar>("bootJar") {
 tasks.named<Jar>("jar") {
     enabled = false
 }
+
+tasks.named("build") {
+    dependsOn("spotlessApply")
+}
