@@ -22,7 +22,7 @@ public class UserFacadeService {
   public UserDto getUser(final UserGetRequest req) {
     User user =
         userService
-            .getUser(req.nickname())
+            .findByNickname(req.nickname())
             .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
 
     return UserDto.of(user).build();

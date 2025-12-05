@@ -6,7 +6,7 @@ import com.opensourcereader.core.user.entity.User;
 
 public interface UserService {
 
-  Optional<User> getUser(final String nickname);
+  Optional<User> findByNickname(final String nickname);
 
   Optional<User> findByEmail(final String email);
 }

@@ -16,7 +16,7 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
 
   @Override
-  public Optional<User> getUser(String nickname) {
+  public Optional<User> findByNickname(String nickname) {
     return userRepository.findFirstByNickname(nickname);
   }
 
