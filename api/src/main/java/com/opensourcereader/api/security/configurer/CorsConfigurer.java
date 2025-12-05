@@ -1,4 +1,4 @@
-package com.opensourcereader.api.security;
+package com.opensourcereader.api.security.configurer;
 
 import java.util.List;
 
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.opensourcereader.api.security.SecurityConfigurer;
 
 /** CORS(Cross-Origin Resource Sharing, 교차 출처 리소스 공유)에 대한 설정 */
 @Component
