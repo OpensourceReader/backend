@@ -2,7 +2,7 @@ package com.opensourcereader.core.security.entity;
 
 import java.time.Instant;
 
-import com.opensourcereader.core.BastEntity;
+import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken extends BastEntity {
+public class RefreshToken extends BaseEntity {
   @OneToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;

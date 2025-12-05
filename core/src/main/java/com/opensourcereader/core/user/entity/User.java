@@ -1,6 +1,6 @@
 package com.opensourcereader.core.user.entity;
 
-import com.opensourcereader.core.BastEntity;
+import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.Entity;
 
 import lombok.AccessLevel;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BastEntity {
+public class User extends BaseEntity {
 
   private String providerId;
 

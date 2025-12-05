@@ -64,6 +64,9 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("com.h2database:h2")
+
+        // auth
+        implementation("com.auth0:java-jwt:4.4.0")
     }
 
     tasks.withType<Test> {
