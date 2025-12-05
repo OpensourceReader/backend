@@ -28,6 +28,8 @@ public class RefreshTokenService {
   //  @Value("${jwt.refresh-token-expiration}")
   private long refreshTokenExpireSeconds = 604800;
 
+  public static final String REFRESH_TOKEN_NAME = "refresh_token";
+
   public RefreshToken createRefreshToken(String nickname) {
     User user =
         userRepository
@@ -56,5 +58,10 @@ public class RefreshTokenService {
             .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
 
     refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
+  }
+
+  @Transactional
+  public void deleteToken(String token) {
+    refreshTokenRepository.deleteRefreshTokenByToken(token);
   }
 }

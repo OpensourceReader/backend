@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.opensourcereader.api.security.UserConnection;
+import com.opensourcereader.core.security.dto.UserConnection;
 
 import lombok.Getter;
 
@@ -30,7 +30,7 @@ public class OSRUser implements UserDetails, OAuth2User {
 
   @Override
   public String getName() {
-    return userConnection.getNickname();
+    return userConnection.getEmail();
   }
 
   @Override
@@ -45,7 +45,7 @@ public class OSRUser implements UserDetails, OAuth2User {
 
   @Override
   public String getUsername() {
-    return userConnection.getEmail();
+    return userConnection.getNickname();
   }
 
   @Override

@@ -1,4 +1,4 @@
-package com.opensourcereader.api.security;
+package com.opensourcereader.core.security.dto;
 
 import java.time.Instant;
 
