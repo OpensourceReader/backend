@@ -9,7 +9,5 @@ import com.opensourcereader.core.user.entity.User;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-  Optional<RefreshToken> findByToken(String token);
-
-  void deleteRefreshTokenByUser(User user);
+  Optional<RefreshToken> findByUser(User user);
 }

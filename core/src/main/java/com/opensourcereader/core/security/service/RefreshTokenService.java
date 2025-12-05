@@ -1,7 +1,6 @@
 package com.opensourcereader.core.security.service;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -29,10 +28,6 @@ public class RefreshTokenService {
   //  @Value("${jwt.refresh-token-expiration}")
   private long refreshTokenExpireSeconds = 604800;
 
-  public Optional<RefreshToken> findByToken(String token) {
-    return refreshTokenRepository.findByToken(token);
-  }
-
   public RefreshToken createRefreshToken(String nickname) {
     User user =
         userRepository
@@ -54,12 +49,12 @@ public class RefreshTokenService {
   }
 
   @Transactional
-  public void deleteByUserId(Long userId) {
+  public void invalidate(String nickname) {
     User user =
         userRepository
-            .findById(userId)
+            .findFirstByNickname(nickname)
             .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
 
-    refreshTokenRepository.deleteRefreshTokenByUser(user);
+    refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
   }
 }
