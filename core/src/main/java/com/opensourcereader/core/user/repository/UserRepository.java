@@ -10,5 +10,7 @@ import com.opensourcereader.core.user.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-  Optional<User> findByProviderId(String providerId);
+  Optional<User> findFirstByEmail(String email);
+
+  Optional<User> findFirstByNickname(String nickname);
 }
