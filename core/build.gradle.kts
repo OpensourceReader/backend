@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 dependencies {
-    //auth
+    // auth
     implementation("com.auth0:java-jwt:4.4.0")
 }
 
