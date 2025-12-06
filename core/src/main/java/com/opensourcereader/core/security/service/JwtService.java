@@ -26,7 +26,7 @@ public class JwtService {
   private Algorithm algorithm;
   private JWTVerifier jwtVerifier;
 
-  private static final String CLAIM_NAME = "nickname";
+  private static final String CLAIM_NAME = "username";
 
   @PostConstruct
   public void init() {

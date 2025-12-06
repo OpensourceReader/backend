@@ -14,7 +14,7 @@ import com.opensourcereader.api.security.SecurityConfigurer;
 
 /** CORS(Cross-Origin Resource Sharing, 교차 출처 리소스 공유)에 대한 설정 */
 @Component
-@Order(0)
+@Order
 public class CorsConfigurer implements SecurityConfigurer {
 
   @Override

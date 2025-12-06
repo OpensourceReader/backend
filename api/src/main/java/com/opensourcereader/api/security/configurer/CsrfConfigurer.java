@@ -9,7 +9,7 @@ import com.opensourcereader.api.security.SecurityConfigurer;
 
 /** CSRF 보안 설정 */
 @Component
-@Order(0)
+@Order
 public class CsrfConfigurer implements SecurityConfigurer {
 
   @Override

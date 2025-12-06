@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.api.security.SecurityConfigurer;
 
 @Component
-@Order(100)
+@Order
 public class Oauth2SecurityConfigurer implements SecurityConfigurer {
 
   @Override
@@ -15,7 +15,7 @@ public class Oauth2SecurityConfigurer implements SecurityConfigurer {
     try {
       http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/user-info", true));
     } catch (Exception e) {
-      throw new RuntimeException("Oatuh2 Error", e);
+      throw new RuntimeException("Oauth2 Error", e);
     }
   }
 }
