@@ -7,8 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 
-@RestClientTest({GitTreeFetcher.class, RestTemplateConfig.class})
+@RestClientTest(GitTreeFetcher.class)
+@Import(RestTemplateConfig.class)
 class GitTreeFetcherTest {
 
   @Autowired
