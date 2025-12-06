@@ -1,7 +1,7 @@
 package com.opensourcereader.api.fetcher.analysis;
 
-import com.opensourcereader.api.config.RestTemplateConfig;
 import com.opensourcereader.api.dto.GitTreeResponse;
+import com.opensourcereader.core.config.RestTemplateConfig;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,16 +28,18 @@ public class OpensourceRepo {
   private String version;
 
   @OneToMany(mappedBy = "opensourceRepo")
-  private List<OpensourceRepoContent> opensourceRepoContents;
+  private List<OpensourceRepoContent> contents = new ArrayList<>();
 
   public OpensourceRepo(
       String name,
-      String version,
-      List<OpensourceRepoContent> opensourceRepoContents
+      String version
   ) {
     this.name = name;
     this.version = version;
-    this.opensourceRepoContents = opensourceRepoContents;
+  }
+
+  public void addContent(OpensourceRepoContent content) {
+    contents.add(content);
   }
 
 }

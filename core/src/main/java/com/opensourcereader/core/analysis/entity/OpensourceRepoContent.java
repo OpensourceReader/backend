@@ -1,6 +1,8 @@
 package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +30,8 @@ public class OpensourceRepoContent {
   private String url;
 
   @Column(name = "name", nullable = false)
-  private String name;
+  @Embedded
+  private OpensourceRepoContentName name;
 
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
@@ -40,18 +43,31 @@ public class OpensourceRepoContent {
   @JoinColumn(name = "opensource_repository_id", nullable = false)
   private OpensourceRepo opensourceRepo;
 
-  public OpensourceRepoContent(
+  public static OpensourceRepoContent of(
+      GitTreeFileInfo fileInfo,
+      String rawText,
+      OpensourceRepo opensourceRepo
+  ) {
+    return new OpensourceRepoContent(
+        fileInfo.path(),
+        fileInfo.url(),
+        fileInfo.type(),
+        rawText,
+        opensourceRepo
+    );
+  }
+
+  private OpensourceRepoContent(
       String path,
       String url,
-      String name,
-      ContentType contentType,
+      String fileInfoType,
       String rawText,
       OpensourceRepo opensourceRepo
   ) {
     this.path = path;
     this.url = url;
-    this.name = name;
-    this.contentType = contentType;
+    this.name = OpensourceRepoContentName.from(path);
+    this.contentType = ContentType.getContentType(fileInfoType);
     this.rawText = rawText;
     this.opensourceRepo = opensourceRepo;
   }

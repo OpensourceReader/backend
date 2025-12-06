@@ -1,4 +1,4 @@
-package com.opensourcereader.api.config;
+package com.opensourcereader.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
