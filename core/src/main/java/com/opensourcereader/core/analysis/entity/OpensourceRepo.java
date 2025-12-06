@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OpensourceRepository {
+public class OpensourceRepo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +26,17 @@ public class OpensourceRepository {
   @Column(name = "version", nullable = false)
   private String version;
 
-  @OneToMany(mappedBy = "opensourceRepository")
-  private List<RepositoryContent> repositoryContents;
+  @OneToMany(mappedBy = "opensourceRepo")
+  private List<OpensourceRepoContent> opensourceRepoContents;
 
-  public OpensourceRepository(String name, String version,
-      List<RepositoryContent> repositoryContents) {
+  public OpensourceRepo(
+      String name,
+      String version,
+      List<OpensourceRepoContent> opensourceRepoContents
+  ) {
     this.name = name;
     this.version = version;
-    this.repositoryContents = repositoryContents;
+    this.opensourceRepoContents = opensourceRepoContents;
   }
 
 }

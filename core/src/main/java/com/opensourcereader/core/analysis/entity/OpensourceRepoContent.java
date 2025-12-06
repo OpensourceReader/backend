@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RepositoryContent {
+public class OpensourceRepoContent {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +23,9 @@ public class RepositoryContent {
 
   @Column(name = "path", nullable = false)
   private String path;
+
+  @Column(name = "url", nullable = false)
+  private String url;
 
   @Column(name = "name", nullable = false)
   private String name;
@@ -35,20 +38,22 @@ public class RepositoryContent {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
-  private OpensourceRepository opensourceRepository;
+  private OpensourceRepo opensourceRepo;
 
-  public RepositoryContent(
-      String name,
+  public OpensourceRepoContent(
       String path,
+      String url,
+      String name,
       ContentType contentType,
       String rawText,
-      OpensourceRepository opensourceRepository
+      OpensourceRepo opensourceRepo
   ) {
-    this.name = name;
     this.path = path;
+    this.url = url;
+    this.name = name;
     this.contentType = contentType;
     this.rawText = rawText;
-    this.opensourceRepository = opensourceRepository;
+    this.opensourceRepo = opensourceRepo;
   }
 
 }
