@@ -23,7 +23,7 @@ public class BasicOpensourceRepoService implements OpensourceRepoService {
     List<GitTreeFileInfo> gitTreeFileInfos = gitTree.fileInfos();
 
     for (GitTreeFileInfo fileInfo : gitTreeFileInfos) {
-      String rawText = repoContentRawTextFetcher.fetchRepoContent(fileInfo.url());
+      String rawText = repoContentRawTextFetcher.fetchRepoContent(fileInfo);
       OpensourceRepoContent content = OpensourceRepoContent.of(fileInfo, rawText, opensourceRepo);
       opensourceRepo.addContent(content);
     }

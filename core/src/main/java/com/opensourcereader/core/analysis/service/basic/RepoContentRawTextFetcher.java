@@ -1,6 +1,8 @@
 package com.opensourcereader.core.analysis.service.basic;
 
 import com.opensourcereader.core.analysis.dto.GitTreeFileDetail;
+import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
+import com.opensourcereader.core.analysis.entity.ContentType;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,8 +14,14 @@ public class RepoContentRawTextFetcher {
 
   private final RestTemplate restTemplate;
 
-  public String fetchRepoContent(String fileInfoUrl) {
-    GitTreeFileDetail fileDetail = restTemplate.getForObject(fileInfoUrl, GitTreeFileDetail.class);
+  public String fetchRepoContent(GitTreeFileInfo fileInfo) {
+    if (ContentType.getContentType(fileInfo.type()).equals(ContentType.TREE)) {
+      return null;
+    }
+    GitTreeFileDetail fileDetail = restTemplate.getForObject(
+        fileInfo.url(),
+        GitTreeFileDetail.class
+    );
     if (fileDetail == null || fileDetail.content() == null) {
       throw new IllegalArgumentException("file info url is invalid");
     }
