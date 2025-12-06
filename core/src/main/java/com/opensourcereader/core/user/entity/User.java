@@ -32,15 +32,8 @@ public class User extends BaseEntity {
 
   private Boolean disabled;
 
-  public static UserBuilder of(
-      String username, String nickname, String email, String password, String avatarUrl) {
+  public static UserBuilder of(String nickname, String email, String password) {
 
-    return User.builder()
-        .username(username)
-        .nickname(nickname)
-        .email(email)
-        .password(password)
-        .avatarUrl(avatarUrl)
-        .disabled(false);
+    return User.builder().nickname(nickname).email(email).password(password).disabled(false);
   }
 }
