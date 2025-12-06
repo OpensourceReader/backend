@@ -1,0 +1,22 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+github:
+  personal-token: ${GITHUB_PERSONAL_TOKEN}
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  access-token-expiration: 600 # 10 분
+  refresh-token-expiration: 604800 # 7일
+
+logging:
+  level:
+    root: info

@@ -7,6 +7,10 @@ dependencies {
     // auth
     implementation("com.auth0:java-jwt:4.4.0")
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // testcontainer
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
 }
 
 tasks.named<BootJar>("bootJar") {

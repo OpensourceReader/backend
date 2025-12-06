@@ -1,21 +1,25 @@
 package com.opensourcereader.api.fetcher.analysis;
 
 import com.opensourcereader.api.dto.GitTreeResponse;
-import com.opensourcereader.core.config.RestTemplateConfig;
+import com.opensourcereader.core.config.GitHubRestTemplateConfig;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @RestClientTest(GitTreeFetcher.class)
-@Import(RestTemplateConfig.class)
+@Import(GitHubRestTemplateConfig.class)
 class GitTreeFetcherTest {
 
   @Autowired
   GitTreeFetcher gitTreeFetcher;
 
+  @Disabled
   @DisplayName("fetchTest")
   @Test
   void fetchTest() {

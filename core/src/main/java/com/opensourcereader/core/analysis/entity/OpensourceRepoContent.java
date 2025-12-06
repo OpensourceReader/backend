@@ -36,7 +36,7 @@ public class OpensourceRepoContent {
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
 
-  @Column(name = "content", nullable = false)
+  @Column(name = "content")
   private String rawText;
 
   @ManyToOne(fetch = FetchType.LAZY)
