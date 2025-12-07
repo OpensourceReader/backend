@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +24,7 @@ public class OpenSourceRepo {
 
   private String cloneUrl;
 
-  @OneToMany(mappedBy = "opensourceRepo")
+  @OneToMany(mappedBy = "opensourceRepo", cascade = CascadeType.PERSIST)
   @Column(name = "contents")
   private List<OpenSourceRepoContent> contents = new ArrayList<>();
 

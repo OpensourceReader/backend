@@ -40,9 +40,8 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
         throw new IllegalStateException("blob rawText 로드오류");
       }
     }
-    opensourceRepoRepository.save(opensourceRepo);
 
-    return opensourceRepo;
+    return opensourceRepoRepository.save(opensourceRepo);
   }
 
   @Override

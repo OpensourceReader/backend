@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,7 +34,8 @@ public class OpenSourceRepoContent {
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
 
-  @Column(name = "content")
+  @Lob
+  @Column(name = "content", columnDefinition = "LONGTEXT")
   private String rawText;
 
   @ManyToOne(fetch = FetchType.LAZY)
