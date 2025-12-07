@@ -3,7 +3,7 @@ package com.opensourcereader.api.facade.analysis;
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.entity.OpensourceRepo;
 import com.opensourcereader.core.analysis.service.OpensourceRepoService;
-import com.opensourcereader.core.analysis.service.basic.GitRepoLocalManageService;
+import com.opensourcereader.core.analysis.service.basic.LocalGitRepoService;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OpensourceRepoFacade {
 
-  private final GitRepoLocalManageService gitRepoLocalManageService;
+  private final LocalGitRepoService localGitRepoService;
   private final OpensourceRepoService opensourceRepoService;
 
   // response로 수정바람
   public OpensourceRepo create(String opensourceUri, String localPath, String repoReference) {
-    Repository repo = gitRepoLocalManageService.saveLocalToDirectory(opensourceUri, localPath);
-    GitTree treeOfRepo = gitRepoLocalManageService.getFlatTreeOfRepo(repo, repoReference);
+    Repository repo = localGitRepoService.saveLocalToDirectory(opensourceUri, localPath);
+    GitTree treeOfRepo = localGitRepoService.getFlatTreeOfRepo(repo, repoReference);
 
     return opensourceRepoService.create(treeOfRepo);
   }

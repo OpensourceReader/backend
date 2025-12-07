@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class GitRepoLocalManageService {
+public class LocalGitRepoService {
 
   public Repository saveLocalToDirectory(String opensourceUri, String localPath) {
     FileUtil.createDirectory(localPath);

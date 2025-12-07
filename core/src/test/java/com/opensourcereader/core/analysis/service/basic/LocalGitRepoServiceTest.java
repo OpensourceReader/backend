@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class GitRepoLocalManageServiceTest {
+class LocalGitRepoServiceTest {
 
-  GitRepoLocalManageService gitRepoLocalManageService = new GitRepoLocalManageService();
+  LocalGitRepoService localGitRepoService = new LocalGitRepoService();
 
   @Disabled
   @DisplayName("레포를 로컬 볼륨에 저장합니다.")
@@ -24,7 +24,7 @@ class GitRepoLocalManageServiceTest {
     String localPath = "./local-repos/hibernate-orm.git";
 
     // when
-    Repository repo = gitRepoLocalManageService.saveLocalToDirectory(opensourceUri, localPath);
+    Repository repo = localGitRepoService.saveLocalToDirectory(opensourceUri, localPath);
 
     // then
     assertThat(repo).isNotNull();
@@ -39,7 +39,7 @@ class GitRepoLocalManageServiceTest {
     String localPath = "./local-repos/hibernate-orm.git";
 
     // when
-    Repository repo = gitRepoLocalManageService.saveLocalToDirectory(opensourceUri, localPath);
+    Repository repo = localGitRepoService.saveLocalToDirectory(opensourceUri, localPath);
 
     // then
     assertThat(repo).isNotNull();
@@ -56,7 +56,7 @@ class GitRepoLocalManageServiceTest {
         .build();
 
     // when
-    GitTree treeOfRepo = gitRepoLocalManageService.getFlatTreeOfRepo(repo, reference);
+    GitTree treeOfRepo = localGitRepoService.getFlatTreeOfRepo(repo, reference);
 
     // then
     assertThat(treeOfRepo.fileInfos()).isNotNull();
