@@ -1,11 +1,13 @@
 package com.opensourcereader.core.analysis.dto;
 
+import com.opensourcereader.core.analysis.entity.ContentType;
+import org.eclipse.jgit.lib.ObjectId;
+
 public record GitTreeFileInfo(
     String path,
-    String mode,
-    String type,
-    Long size,
-    String url
+    ContentType type,
+    String url,
+    ObjectId blobId
 ) {
 
 }

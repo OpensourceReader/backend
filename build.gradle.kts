@@ -64,6 +64,7 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("com.h2database:h2")
+        implementation("org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r")
     }
 
     tasks.withType<Test> {

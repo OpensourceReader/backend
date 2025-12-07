@@ -21,21 +21,14 @@ public class OpensourceRepo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "name", nullable = false)
-  private String name;
-
-  @Column(name = "version", nullable = false)
-  private String version;
+  private String cloneUrl;
 
   @OneToMany(mappedBy = "opensourceRepo")
+  @Column(name = "contents")
   private List<OpensourceRepoContent> contents = new ArrayList<>();
 
-  public OpensourceRepo(
-      String name,
-      String version
-  ) {
-    this.name = name;
-    this.version = version;
+  public OpensourceRepo(String cloneUrl) {
+    this.cloneUrl = cloneUrl;
   }
 
   public void addContent(OpensourceRepoContent content) {

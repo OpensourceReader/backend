@@ -26,9 +26,6 @@ public class OpensourceRepoContent {
   @Column(name = "path", nullable = false)
   private String path;
 
-  @Column(name = "url", nullable = false)
-  private String url;
-
   @Column(name = "name", nullable = false)
   @Embedded
   private OpensourceRepoContentName name;
@@ -50,7 +47,6 @@ public class OpensourceRepoContent {
   ) {
     return new OpensourceRepoContent(
         fileInfo.path(),
-        fileInfo.url(),
         fileInfo.type(),
         rawText,
         opensourceRepo
@@ -59,15 +55,13 @@ public class OpensourceRepoContent {
 
   private OpensourceRepoContent(
       String path,
-      String url,
-      String fileInfoType,
+      ContentType contentType,
       String rawText,
       OpensourceRepo opensourceRepo
   ) {
     this.path = path;
-    this.url = url;
     this.name = OpensourceRepoContentName.from(path);
-    this.contentType = ContentType.getContentType(fileInfoType);
+    this.contentType = contentType;
     this.rawText = rawText;
     this.opensourceRepo = opensourceRepo;
   }

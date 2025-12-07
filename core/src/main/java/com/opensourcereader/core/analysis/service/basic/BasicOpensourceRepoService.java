@@ -8,8 +8,13 @@ import com.opensourcereader.core.analysis.repository.OpensourceRepoRepository;
 import com.opensourcereader.core.analysis.service.OpensourceRepoService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+@ConditionalOnProperty(
+    value = "opensource.ingest-mode",
+    havingValue = "github-api"
+)
 @Service
 @RequiredArgsConstructor
 public class BasicOpensourceRepoService implements OpensourceRepoService {
@@ -19,7 +24,7 @@ public class BasicOpensourceRepoService implements OpensourceRepoService {
 
   @Override
   public OpensourceRepo create(GitTree gitTree) {
-    OpensourceRepo opensourceRepo = new OpensourceRepo(gitTree.url(), "1.1");
+    OpensourceRepo opensourceRepo = new OpensourceRepo(gitTree.url());
     List<GitTreeFileInfo> gitTreeFileInfos = gitTree.fileInfos();
 
     for (GitTreeFileInfo fileInfo : gitTreeFileInfos) {

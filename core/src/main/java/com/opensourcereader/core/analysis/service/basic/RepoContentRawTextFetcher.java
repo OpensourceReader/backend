@@ -5,9 +5,14 @@ import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.ContentType;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@ConditionalOnProperty(
+    value = "opensource.ingest-mode",
+    havingValue = "github-api"
+)
 @Service
 @RequiredArgsConstructor
 public class RepoContentRawTextFetcher {
@@ -15,7 +20,7 @@ public class RepoContentRawTextFetcher {
   private final RestTemplate restTemplate;
 
   public String fetchRepoContent(GitTreeFileInfo fileInfo) {
-    if (ContentType.getContentType(fileInfo.type()).equals(ContentType.TREE)) {
+    if (fileInfo.type().equals(ContentType.TREE)) {
       return null;
     }
     GitTreeFileDetail fileDetail = restTemplate.getForObject(
