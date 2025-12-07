@@ -47,12 +47,13 @@ public class LocalOpensourceRepoService implements OpensourceRepoService {
 
   @Override
   public OpensourceRepo get(Long repositoryId) {
-    return null;
+    return opensourceRepoRepository.findById(repositoryId)
+        .orElseThrow(() -> new IllegalArgumentException("Repo not found: " + repositoryId));
   }
 
   @Override
   public void delete(Long repositoryId) {
-
+    opensourceRepoRepository.deleteById(repositoryId);
   }
 
   private Repository getRepo(GitTree gitTree) {
