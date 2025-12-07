@@ -1,8 +1,8 @@
 package com.opensourcereader.api.controller.analysis;
 
-import com.opensourcereader.api.dto.OpensourceRepoCreateRequest;
-import com.opensourcereader.api.dto.OpensourceRepoCreateResponse;
-import com.opensourcereader.api.facade.analysis.OpensourceRepoFacade;
+import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
+import com.opensourcereader.api.dto.OpenSourceRepoCreateResponse;
+import com.opensourcereader.api.facade.analysis.OpenSourceRepoFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/opensource-repo")
 @RestController
 @RequiredArgsConstructor
-public class OpensourceRepoController {
+public class OpenSourceRepoController {
 
-  private final OpensourceRepoFacade opensourceRepoFacade;
+  private final OpenSourceRepoFacade opensourceRepoFacade;
 
   @PostMapping
-  public OpensourceRepoCreateResponse createRepo(
-      @RequestBody OpensourceRepoCreateRequest repoCreateRequest
+  public OpenSourceRepoCreateResponse createRepo(
+      @RequestBody OpenSourceRepoCreateRequest repoCreateRequest
   ) {
     return opensourceRepoFacade.create(repoCreateRequest);
   }

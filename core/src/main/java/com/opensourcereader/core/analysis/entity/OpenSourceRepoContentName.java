@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OpensourceRepoContentName {
+public class OpenSourceRepoContentName {
 
   private String name;
 
-  public static OpensourceRepoContentName from(String path) {
-    return new OpensourceRepoContentName(extractName(path));
+  public static OpenSourceRepoContentName from(String path) {
+    return new OpenSourceRepoContentName(extractName(path));
   }
 
-  private OpensourceRepoContentName(String name) {
+  private OpenSourceRepoContentName(String name) {
     this.name = name;
   }
 

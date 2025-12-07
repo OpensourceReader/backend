@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OpensourceRepo {
+public class OpenSourceRepo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,13 +25,13 @@ public class OpensourceRepo {
 
   @OneToMany(mappedBy = "opensourceRepo")
   @Column(name = "contents")
-  private List<OpensourceRepoContent> contents = new ArrayList<>();
+  private List<OpenSourceRepoContent> contents = new ArrayList<>();
 
-  public OpensourceRepo(String cloneUrl) {
+  public OpenSourceRepo(String cloneUrl) {
     this.cloneUrl = cloneUrl;
   }
 
-  public void addContent(OpensourceRepoContent content) {
+  public void addContent(OpenSourceRepoContent content) {
     contents.add(content);
   }
 

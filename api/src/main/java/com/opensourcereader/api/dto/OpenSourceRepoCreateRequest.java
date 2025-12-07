@@ -1,7 +1,7 @@
 package com.opensourcereader.api.dto;
 
-public record OpensourceRepoCreateRequest(
-    String opensourceUri,
+public record OpenSourceRepoCreateRequest(
+    String openSourceUri,
     String localPath,
     String repoReference
 ) {
