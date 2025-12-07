@@ -3,10 +3,7 @@ package com.opensourcereader.core.analysis.service.basic;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.opensourcereader.core.analysis.dto.GitTree;
-import java.io.File;
 import java.io.IOException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,31 +15,31 @@ class LocalGitRepositoryServiceTest {
   @Disabled
   @DisplayName("레포를 로컬 볼륨에 저장합니다.")
   @Test
-  void saveLocalToDirectory() {
+  void saveToLocal() {
     // given
     String opensourceUri = "https://github.com/hibernate/hibernate-orm.git";
     String localPath = "./local-repos/hibernate-orm.git";
 
     // when
-    Repository repo = localGitRepositoryService.saveLocalToDirectory(opensourceUri, localPath);
+    String savedLocalPath = localGitRepositoryService.saveToLocal(opensourceUri, localPath);
 
     // then
-    assertThat(repo).isNotNull();
+    assertThat(savedLocalPath).isNotNull();
   }
 
   @Disabled
   @DisplayName("같은 이름의 폴더가 있으면, 다시 저장하지 않고 폴더만 다시 반환합니다.")
   @Test
-  void saveLocalToDirectorySameName() {
+  void saveToLocalSameName() {
     // given
     String opensourceUri = "https://github.com/hibernate/hibernate-orm.git";
     String localPath = "./local-repos/hibernate-orm.git";
 
     // when
-    Repository repo = localGitRepositoryService.saveLocalToDirectory(opensourceUri, localPath);
+    String savedLocalPath = localGitRepositoryService.saveToLocal(opensourceUri, localPath);
 
     // then
-    assertThat(repo).isNotNull();
+    assertThat(savedLocalPath).isNotNull();
   }
 
   @DisplayName("레포의 트리구조를 반환합니다.")
@@ -51,12 +48,9 @@ class LocalGitRepositoryServiceTest {
     // given
     String localPath = "./local-repos/hibernate-orm.git";
     String reference = "HEAD";
-    Repository repo = new FileRepositoryBuilder()
-        .setGitDir(new File(localPath))
-        .build();
 
     // when
-    GitTree treeOfRepo = localGitRepositoryService.getFlatTreeOfRepo(repo, reference);
+    GitTree treeOfRepo = localGitRepositoryService.getFlatTree(localPath, reference);
 
     // then
     assertThat(treeOfRepo.fileInfos()).isNotNull();

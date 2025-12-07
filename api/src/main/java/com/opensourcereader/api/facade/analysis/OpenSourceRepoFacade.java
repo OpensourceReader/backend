@@ -7,7 +7,6 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.basic.LocalGitRepositoryService;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,11 +17,12 @@ public class OpenSourceRepoFacade {
   private final OpenSourceRepoService opensourceRepoService;
 
   public OpenSourceRepoCreateResponse create(OpenSourceRepoCreateRequest request) {
-    Repository repo = localGitRepositoryService.saveLocalToDirectory(
+    String savedLocalPath = localGitRepositoryService.saveToLocal(
         request.openSourceUri(),
         request.localPath()
     );
-    GitTree treeOfRepo = localGitRepositoryService.getFlatTreeOfRepo(repo, request.repoReference());
+    GitTree treeOfRepo = localGitRepositoryService.getFlatTree(savedLocalPath,
+        request.repoReference());
     OpenSourceRepo opensourceRepo = opensourceRepoService.create(treeOfRepo);
 
     return OpenSourceRepoCreateResponse.from(opensourceRepo);

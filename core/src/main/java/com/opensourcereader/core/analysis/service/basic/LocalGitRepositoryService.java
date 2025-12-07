@@ -3,6 +3,7 @@ package com.opensourcereader.core.analysis.service.basic;
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.ContentType;
+import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
@@ -23,14 +24,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LocalGitRepositoryService {
+public class LocalGitRepositoryService implements GitRepositoryService {
 
-  public Repository saveLocalToDirectory(String opensourceUri, String localPath) {
+  @Override
+  public String saveToLocal(String openSourceUri, String localPath) {
     FileUtil.createDirectory(localPath);
     File localDirectory = new File(localPath);
     if (!(localDirectory.exists() || localDirectory.isFile())) {
       try (Git git = Git.cloneRepository()
-          .setURI(opensourceUri)
+          .setURI(openSourceUri)
           .setDirectory(localDirectory)
           .setBare(true)
           .call()) {
@@ -39,16 +41,12 @@ public class LocalGitRepositoryService {
       }
     }
 
-    try {
-      return new FileRepositoryBuilder()
-          .setGitDir(localDirectory)
-          .build();
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
+    return localPath;
   }
 
-  public GitTree getFlatTreeOfRepo(Repository repo, String reference) {
+  @Override
+  public GitTree getFlatTree(String localPath, String reference) {
+    Repository repo = createRepositoryBuilder(localPath);
     ObjectId commitId = getCommitId(repo, reference);
     RevTree tree = getTree(repo, commitId);
 
@@ -75,6 +73,16 @@ public class LocalGitRepositoryService {
       return new GitTree(repo.getDirectory().toString(), flatTrees);
     } catch (IOException e) {
       throw new IllegalStateException("flatTree 추출 시 에러");
+    }
+  }
+
+  private Repository createRepositoryBuilder(String localPath) {
+    try {
+      return new FileRepositoryBuilder()
+          .setGitDir(new File(localPath))
+          .build();
+    } catch (IOException e) {
+      throw new IllegalStateException("JGit 레포지토리 생성 실패");
     }
   }
 
