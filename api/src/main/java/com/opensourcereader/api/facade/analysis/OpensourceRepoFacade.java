@@ -1,5 +1,7 @@
 package com.opensourcereader.api.facade.analysis;
 
+import com.opensourcereader.api.dto.OpensourceRepoCreateRequest;
+import com.opensourcereader.api.dto.OpensourceRepoCreateResponse;
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.entity.OpensourceRepo;
 import com.opensourcereader.core.analysis.service.OpensourceRepoService;
@@ -15,12 +17,15 @@ public class OpensourceRepoFacade {
   private final LocalGitRepoService localGitRepoService;
   private final OpensourceRepoService opensourceRepoService;
 
-  // response로 수정바람
-  public OpensourceRepo create(String opensourceUri, String localPath, String repoReference) {
-    Repository repo = localGitRepoService.saveLocalToDirectory(opensourceUri, localPath);
-    GitTree treeOfRepo = localGitRepoService.getFlatTreeOfRepo(repo, repoReference);
+  public OpensourceRepoCreateResponse create(OpensourceRepoCreateRequest request) {
+    Repository repo = localGitRepoService.saveLocalToDirectory(
+        request.opensourceUri(),
+        request.localPath()
+    );
+    GitTree treeOfRepo = localGitRepoService.getFlatTreeOfRepo(repo, request.repoReference());
+    OpensourceRepo opensourceRepo = opensourceRepoService.create(treeOfRepo);
 
-    return opensourceRepoService.create(treeOfRepo);
+    return OpensourceRepoCreateResponse.from(opensourceRepo);
   }
 
 }

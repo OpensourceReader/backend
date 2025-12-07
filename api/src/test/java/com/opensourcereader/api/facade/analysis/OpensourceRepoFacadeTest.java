@@ -3,7 +3,8 @@ package com.opensourcereader.api.facade.analysis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.opensourcereader.api.IntegrationTestSupport;
-import com.opensourcereader.core.analysis.entity.OpensourceRepo;
+import com.opensourcereader.api.dto.OpensourceRepoCreateRequest;
+import com.opensourcereader.api.dto.OpensourceRepoCreateResponse;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,13 +23,14 @@ class OpensourceRepoFacadeTest extends IntegrationTestSupport {
     String opensourceUri = "https://github.com/hibernate/hibernate-orm.git";
     String localPath = "./local-repos/hibernate-orm.git";
     String reference = "HEAD";
+    OpensourceRepoCreateRequest request = new OpensourceRepoCreateRequest(
+        opensourceUri, localPath, reference);
 
     // when
-    OpensourceRepo opensourceRepo = opensourceRepoFacade.create(opensourceUri, localPath,
-        reference);
+    OpensourceRepoCreateResponse response = opensourceRepoFacade.create(request);
 
     // then
-    assertThat(opensourceRepo).isNotNull();
+    assertThat(response).isNotNull();
   }
 
 }
