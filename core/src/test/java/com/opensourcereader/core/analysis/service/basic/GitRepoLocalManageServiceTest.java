@@ -1,11 +1,10 @@
-package com.opensourcereader.core.analysis.service.local;
+package com.opensourcereader.core.analysis.service.basic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.opensourcereader.core.analysis.dto.GitTree;
 import java.io.File;
 import java.io.IOException;
-import org.assertj.core.api.Assertions;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.junit.jupiter.api.Disabled;

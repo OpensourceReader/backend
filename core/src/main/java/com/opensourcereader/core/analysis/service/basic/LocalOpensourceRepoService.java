@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.local;
+package com.opensourcereader.core.analysis.service.basic;
 
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
@@ -15,13 +15,9 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-@ConditionalOnProperty(
-    value = "opensource.ingest-mode",
-    havingValue = "local"
-)
+
 @Service
 @RequiredArgsConstructor
 public class LocalOpensourceRepoService implements OpensourceRepoService {

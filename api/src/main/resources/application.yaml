@@ -15,12 +15,6 @@ spring:
         show_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
-github:
-  personal-token: ${GITHUB_PERSONAL_TOKEN:sampleToken}
-
-opensource:
-  ingest-mode: local # "local" | "github-api"
-
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   access-token-expiration: 600 # 10 분

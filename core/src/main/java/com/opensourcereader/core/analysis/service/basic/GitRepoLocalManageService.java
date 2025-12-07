@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.local;
+package com.opensourcereader.core.analysis.service.basic;
 
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
