@@ -27,7 +27,7 @@ public class LocalOpensourceRepoService implements OpensourceRepoService {
   @Transactional
   @Override
   public OpensourceRepo create(GitTree gitTree) {
-    OpensourceRepo opensourceRepo = new OpensourceRepo(gitTree.url());
+    OpensourceRepo opensourceRepo = new OpensourceRepo(gitTree.cloneUrl());
 
     Repository repo = getRepo(gitTree);
     for (GitTreeFileInfo fileInfo : gitTree.fileInfos()) {
@@ -59,7 +59,7 @@ public class LocalOpensourceRepoService implements OpensourceRepoService {
   private Repository getRepo(GitTree gitTree) {
     try {
       return new FileRepositoryBuilder()
-          .setGitDir(new File(gitTree.url()))
+          .setGitDir(new File(gitTree.cloneUrl()))
           .build();
     } catch (IOException e) {
       throw new IllegalStateException(e);

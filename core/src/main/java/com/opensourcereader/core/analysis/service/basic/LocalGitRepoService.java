@@ -69,7 +69,7 @@ public class LocalGitRepoService {
         ) {
           continue;
         }
-        flatTrees.add(new GitTreeFileInfo(path, contentType, null, objId));
+        flatTrees.add(new GitTreeFileInfo(path, contentType, objId));
       }
 
       return new GitTree(repo.getDirectory().toString(), flatTrees);

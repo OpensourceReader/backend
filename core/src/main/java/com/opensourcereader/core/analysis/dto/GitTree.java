@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.dto;
 import java.util.List;
 
 public record GitTree(
-    String url,
+    String cloneUrl,
     List<GitTreeFileInfo> fileInfos
 ) {
 

@@ -6,7 +6,6 @@ import org.eclipse.jgit.lib.ObjectId;
 public record GitTreeFileInfo(
     String path,
     ContentType type,
-    String url,
     ObjectId blobId
 ) {
 
