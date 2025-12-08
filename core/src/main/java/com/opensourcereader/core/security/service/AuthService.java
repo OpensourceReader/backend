@@ -8,11 +8,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.opensourcereader.core.exception.OSRServerException;
 import com.opensourcereader.core.security.dto.SignUpCommand;
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.entity.User;
@@ -25,24 +27,35 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-  private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate;
 
   public User signup(final SignUpCommand command) {
     boolean existed = userRepository.existsByNicknameAndEmail(command.username(), command.email());
     if (existed) {
-      return null;
+      throw new OSRServerException(HttpStatus.BAD_REQUEST);
     }
     String encode = passwordEncoder.encode(command.password());
     User user = User.of(command.username(), command.email(), encode).build();
     return userRepository.save(user);
   }
 
+  public User signup(UserInfo userInfo) {
+    User user =
+        userRepository
+            .findUserByNicknameAndEmail(userInfo.nickname(), userInfo.email())
+            .orElseGet(
+                () ->
+                    User.of(userInfo.name(), userInfo.email(), UUID.randomUUID().toString())
+                        .build());
+    user.updateAvatar(userInfo.avatarUrl());
+    user.linkSocialProvider(userInfo.providerId());
+    return userRepository.save(user);
+  }
+
   public User processOAuth2User(Map<String, Object> attributes) {
     UserInfo userInfo = extractGitHubUserInfo(attributes);
 
-    return userRepository
-        .findByProviderId(userInfo.providerId())
-        .orElseGet(() -> createNewUser(userInfo));
+    return userRepository.findByProviderId(userInfo.providerId()).orElseGet(() -> signup(userInfo));
   }
 
   public UserInfo extractGitHubUserInfo(Map<String, Object> attributes) {
@@ -61,16 +74,6 @@ public class AuthService {
     }
 
     return new UserInfo(providerId, email, name, nickname, avatarUrl);
-  }
-
-  public User createNewUser(UserInfo userInfo) {
-    User user =
-        User.of(userInfo.nickname(), userInfo.email(), UUID.randomUUID().toString())
-            .avatarUrl(userInfo.avatarUrl())
-            .providerId(userInfo.providerId())
-            .build();
-
-    return userRepository.save(user);
   }
 
   public String getGitHubEmail(String accessToken) {
@@ -94,7 +97,7 @@ public class AuthService {
           .filter(email -> Boolean.TRUE.equals(email.get("verified")))
           .findFirst()
           .map(email -> (String) email.get("email"))
-          .orElse(null);
+          .orElseThrow(() -> new RuntimeException("not found User Email IN GITHUB"));
     }
     throw new RuntimeException("not found User Email IN GITHUB");
   }

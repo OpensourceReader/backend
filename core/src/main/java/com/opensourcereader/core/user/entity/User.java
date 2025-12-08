@@ -2,6 +2,7 @@ package com.opensourcereader.core.user.entity;
 
 import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,5 +37,23 @@ public class User extends BaseEntity {
   public static UserBuilder of(String nickname, String email, String password) {
 
     return User.builder().nickname(nickname).email(email).password(password).disabled(false);
+  }
+
+  public void updateAvatar(String newAvatarUrl) {
+    this.avatarUrl = updateField(this.avatarUrl, newAvatarUrl);
+  }
+
+  public void linkSocialProvider(String newProviderId) {
+    this.providerId = updateField(this.providerId, newProviderId);
+  }
+
+  protected <T> T updateField(T target, T replace) {
+    if (target == null && replace != null) {
+      return replace;
+    }
+    if (target != null && replace != null && !target.equals(replace)) {
+      return replace;
+    }
+    return target;
   }
 }
