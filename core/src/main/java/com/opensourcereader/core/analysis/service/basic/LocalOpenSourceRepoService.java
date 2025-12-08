@@ -4,6 +4,9 @@ import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOpenException;
+import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import jakarta.transaction.Transactional;
@@ -33,11 +36,11 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
     for (GitTreeFileInfo fileInfo : gitTree.fileInfos()) {
       try {
         ObjectLoader loader = repo.open(fileInfo.blobId(), Constants.OBJ_BLOB);
-        byte[] bytes = loader.getBytes();
-        String content = new String(bytes, StandardCharsets.UTF_8);
+        String content = new String(loader.getBytes(), StandardCharsets.UTF_8);
         opensourceRepo.addContent(OpenSourceRepoContent.of(fileInfo, content, opensourceRepo));
       } catch (IOException e) {
-        throw new IllegalStateException("blob rawText 로드오류");
+        throw new LocalGitBlobLoadException()
+            .addDetail("cause", e.getCause());
       }
     }
 
@@ -47,7 +50,7 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   @Override
   public OpenSourceRepo getRepoById(Long repositoryId) {
     return opensourceRepoRepository.findById(repositoryId)
-        .orElseThrow(() -> new IllegalArgumentException("Repo not found: " + repositoryId));
+        .orElseThrow(OpenSourceRepoNotFoundException::new);
   }
 
   @Override
@@ -55,13 +58,15 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
     opensourceRepoRepository.deleteById(repositoryId);
   }
 
+  // 파일명 수정하는 로직 따로 만들어서 수정해야합니다.
   private Repository getRepo(GitTree gitTree) {
     try {
       return new FileRepositoryBuilder()
           .setGitDir(new File(gitTree.cloneUrl()))
           .build();
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new LocalGitRepositoryOpenException()
+          .addDetail("cause", e.getCause());
     }
   }
 

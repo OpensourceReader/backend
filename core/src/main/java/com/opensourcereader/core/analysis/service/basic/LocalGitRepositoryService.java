@@ -3,6 +3,11 @@ package com.opensourcereader.core.analysis.service.basic;
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.ContentType;
+import com.opensourcereader.core.analysis.exception.gitrepo.GitCloneFailedException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitReferenceNotFoundException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOpenException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeParseException;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.util.FileUtil;
 import java.io.File;
@@ -33,7 +38,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     Path createdLocalPath = createLocalPath(openSourceUri, localDirectory);
 
     File localPathFile = createdLocalPath.toFile();
-    FileUtil.createDirectory(localPathFile); // 여기서 걸리긴하는데;;
+    FileUtil.createDirectory(localPathFile);
     if (!(localPathFile.exists() || localPathFile.isFile())) {
       try (Git git = Git.cloneRepository()
           .setURI(openSourceUri)
@@ -41,7 +46,8 @@ public class LocalGitRepositoryService implements GitRepositoryService {
           .setBare(true)
           .call()) {
       } catch (GitAPIException e) {
-        throw new IllegalStateException(e);
+        throw new GitCloneFailedException()
+            .addDetail("cause", e.getCause());
       }
     }
 
@@ -76,7 +82,8 @@ public class LocalGitRepositoryService implements GitRepositoryService {
 
       return new GitTree(repo.getDirectory().toString(), flatTrees);
     } catch (IOException e) {
-      throw new IllegalStateException("flatTree 추출 시 에러");
+      throw new LocalGitTreeParseException()
+          .addDetail("cause", e.getCause());
     }
   }
 
@@ -100,7 +107,8 @@ public class LocalGitRepositoryService implements GitRepositoryService {
           .setGitDir(new File(localPath))
           .build();
     } catch (IOException e) {
-      throw new IllegalStateException("JGit 레포지토리 생성 실패");
+      throw new LocalGitRepositoryOpenException()
+          .addDetail("cause", e.getCause());
     }
   }
 
@@ -110,15 +118,17 @@ public class LocalGitRepositoryService implements GitRepositoryService {
       RevCommit commit = revWalk.parseCommit(commitId);
       return commit.getTree();
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new LocalGitTreeAccessException()
+          .addDetail("cause", e.getCause());
     }
   }
 
   private ObjectId getCommitId(Repository repo, String reference) {
     try {
       return repo.resolve(reference);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+    } catch (IOException e) {
+      throw new LocalGitReferenceNotFoundException()
+          .addDetail("cause", e.getCause());
     }
   }
 
