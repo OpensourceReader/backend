@@ -20,7 +20,8 @@ public class OpenSourceRepoController {
 
   @PostMapping
   public OpenSourceRepoCreateResponse createRepo(
-      @RequestBody OpenSourceRepoCreateRequest repoCreateRequest) {
+      @RequestBody OpenSourceRepoCreateRequest repoCreateRequest
+  ) {
     return opensourceRepoFacade.create(repoCreateRequest);
   }
 }

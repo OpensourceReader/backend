@@ -7,6 +7,8 @@ import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,14 @@ import org.springframework.stereotype.Service;
 public class LocalGitRepositoryService implements GitRepositoryService {
 
   @Override
-  public String saveToLocal(String openSourceUri, String localPath) {
+  public String saveToLocal(String openSourceUri, String localDirectory) {
+    String localPath = createLocalPath(openSourceUri, localDirectory);
     FileUtil.createDirectory(localPath);
-    File localDirectory = new File(localPath);
-    if (!(localDirectory.exists() || localDirectory.isFile())) {
+    File localFileDirectory = new File(localPath);
+    if (!(localFileDirectory.exists() || localFileDirectory.isFile())) {
       try (Git git = Git.cloneRepository()
           .setURI(openSourceUri)
-          .setDirectory(localDirectory)
+          .setDirectory(localFileDirectory)
           .setBare(true)
           .call()) {
       } catch (GitAPIException e) {
@@ -74,6 +77,21 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     } catch (IOException e) {
       throw new IllegalStateException("flatTree 추출 시 에러");
     }
+  }
+
+  private String createLocalPath(String openSourceUri, String localDirectory) {
+    Path moduleDir = Paths.get("").toAbsolutePath();
+    Path projectDir = moduleDir.getParent();
+
+    String[] tokens = openSourceUri.split("/");
+    String owner = tokens[tokens.length - 2];
+    String repo = tokens[tokens.length - 1];
+
+    return projectDir
+        .resolve(localDirectory)
+        .resolve(owner)
+        .resolve(repo)
+        .toString();
   }
 
   private Repository createRepositoryBuilder(String localPath) {
