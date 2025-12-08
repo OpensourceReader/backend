@@ -26,7 +26,7 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
   @Transactional
   @Override
-  public OpenSourceRepo create(GitTree gitTree) {
+  public OpenSourceRepo createRepo(GitTree gitTree) {
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(gitTree.cloneUrl());
 
     Repository repo = getRepo(gitTree);
@@ -45,13 +45,13 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   }
 
   @Override
-  public OpenSourceRepo get(Long repositoryId) {
+  public OpenSourceRepo getRepoById(Long repositoryId) {
     return opensourceRepoRepository.findById(repositoryId)
         .orElseThrow(() -> new IllegalArgumentException("Repo not found: " + repositoryId));
   }
 
   @Override
-  public void delete(Long repositoryId) {
+  public void deleteRepoById(Long repositoryId) {
     opensourceRepoRepository.deleteById(repositoryId);
   }
 

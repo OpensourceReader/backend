@@ -7,9 +7,8 @@ public class FileUtil {
   private FileUtil() {
   }
 
-  public static void createDirectory(String localPath) {
-    File dir = new File(localPath);
-    File parent = dir.getParentFile();
+  public static void createDirectory(File localPathFile) {
+    File parent = localPathFile.getParentFile();
 
     if (parent != null && !parent.exists()) {
       boolean created = parent.mkdirs();

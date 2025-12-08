@@ -30,13 +30,14 @@ public class LocalGitRepositoryService implements GitRepositoryService {
 
   @Override
   public String saveToLocal(String openSourceUri, String localDirectory) {
-    String localPath = createLocalPath(openSourceUri, localDirectory);
-    FileUtil.createDirectory(localPath);
-    File localFileDirectory = new File(localPath);
-    if (!(localFileDirectory.exists() || localFileDirectory.isFile())) {
+    Path createdLocalPath = createLocalPath(openSourceUri, localDirectory);
+
+    File localPathFile = createdLocalPath.toFile();
+    FileUtil.createDirectory(localPathFile); // 여기서 걸리긴하는데;;
+    if (!(localPathFile.exists() || localPathFile.isFile())) {
       try (Git git = Git.cloneRepository()
           .setURI(openSourceUri)
-          .setDirectory(localFileDirectory)
+          .setDirectory(localPathFile)
           .setBare(true)
           .call()) {
       } catch (GitAPIException e) {
@@ -44,7 +45,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
       }
     }
 
-    return localPath;
+    return createdLocalPath.toString();
   }
 
   @Override
@@ -79,7 +80,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     }
   }
 
-  private String createLocalPath(String openSourceUri, String localDirectory) {
+  private Path createLocalPath(String openSourceUri, String localDirectory) {
     Path moduleDir = Paths.get("").toAbsolutePath();
     Path projectDir = moduleDir.getParent();
 
@@ -90,8 +91,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     return projectDir
         .resolve(localDirectory)
         .resolve(owner)
-        .resolve(repo)
-        .toString();
+        .resolve(repo);
   }
 
   private Repository createRepositoryBuilder(String localPath) {

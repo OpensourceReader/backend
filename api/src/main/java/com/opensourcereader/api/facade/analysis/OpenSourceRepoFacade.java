@@ -1,7 +1,7 @@
 package com.opensourcereader.api.facade.analysis;
 
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
-import com.opensourcereader.api.dto.OpenSourceRepoCreateResponse;
+import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
@@ -14,19 +14,31 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OpenSourceRepoFacade {
 
-  private final static String LOCAL_DIRECTORY = "/clone-local-repo/";
+  private final static String LOCAL_DIRECTORY = "local-clone-repo";
 
-  private final GitRepositoryService localGitRepositoryService;
+  private final GitRepositoryService gitRepositoryService;
   private final OpenSourceRepoService opensourceRepoService;
 
   @Transactional
-  public OpenSourceRepoCreateResponse create(OpenSourceRepoCreateRequest request) {
+  public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
     String savedLocalPath =
-        localGitRepositoryService.saveToLocal(request.openSourceUri(), LOCAL_DIRECTORY);
+        gitRepositoryService.saveToLocal(request.openSourceUri(), LOCAL_DIRECTORY);
     GitTree treeOfRepo =
-        localGitRepositoryService.getFlatTree(savedLocalPath, request.repoReference());
-    OpenSourceRepo opensourceRepo = opensourceRepoService.create(treeOfRepo);
+        gitRepositoryService.getFlatTree(savedLocalPath, request.repoReference());
+    OpenSourceRepo openSourceRepo = opensourceRepoService.createRepo(treeOfRepo);
 
-    return OpenSourceRepoCreateResponse.from(opensourceRepo);
+    return OpenSourceRepoResponse.from(openSourceRepo);
   }
+
+  @Transactional
+  public OpenSourceRepoResponse getRepoById(Long repoId) {
+    OpenSourceRepo openSourceRepo = opensourceRepoService.getRepoById(repoId);
+    return OpenSourceRepoResponse.from(openSourceRepo);
+  }
+
+  @Transactional
+  public void deleteRepoById(Long repoId) {
+    opensourceRepoService.deleteRepoById(repoId);
+  }
+
 }

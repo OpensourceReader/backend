@@ -5,10 +5,10 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 
 public interface OpenSourceRepoService {
 
-  OpenSourceRepo create(GitTree gitTree);
+  OpenSourceRepo createRepo(GitTree gitTree);
 
-  OpenSourceRepo get(Long repositoryId);
+  OpenSourceRepo getRepoById(Long repositoryId);
 
-  void delete(Long repositoryId);
+  void deleteRepoById(Long repositoryId);
 
 }
