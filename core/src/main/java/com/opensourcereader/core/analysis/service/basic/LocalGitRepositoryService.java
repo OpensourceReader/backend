@@ -78,8 +78,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
         ObjectId objId = walk.getObjectId(0);
 
         ContentType contentType = ContentType.getContentTypeFromTypeNumber(type.toString());
-        if (!(contentType.equals(ContentType.TREE)
-            || contentType.equals(ContentType.SOURCE_CODE))) {
+        if (contentType.equals(ContentType.OTHERS)) {
           continue;
         }
         flatTrees.add(new GitTreeFileInfo(path, contentType, objId));

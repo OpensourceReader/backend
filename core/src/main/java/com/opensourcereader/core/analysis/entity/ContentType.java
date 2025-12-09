@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ContentType {
-  TREE("tree", "100644"),
-  SOURCE_CODE("blob", "040000"),
+  TREE("tree", "040000"),
+  FILE("blob", "100644"),
+  EXECUTABLE_FILE("blob", "100755"),
   OTHERS("NOT_EXISTS", null);
 
   private final String value;
