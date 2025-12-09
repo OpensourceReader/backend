@@ -2,8 +2,6 @@ package com.opensourcereader.core.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,8 +28,8 @@ public class UserServiceSpringTest {
     User user = User.of("test", "test@github.no-email", encode).build();
     userRepository.save(user);
     // when
-    Optional<User> result = userService.findByEmail("test@github.no-email");
+    User result = userService.findByEmail("test@github.no-email");
     // then
-    assertThat(result).isPresent();
+    assertThat(result).isNotNull();
   }
 }

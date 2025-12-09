@@ -47,7 +47,7 @@ public class User extends BaseEntity {
     this.providerId = updateField(this.providerId, newProviderId);
   }
 
-  protected <T> T updateField(T target, T replace) {
+  private <T> T updateField(T target, T replace) {
     if (target == null && replace != null) {
       return replace;
     }

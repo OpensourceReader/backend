@@ -1,9 +1,9 @@
 package com.opensourcereader.core.user.service;
 
-import java.util.Optional;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.opensourcereader.core.exception.OSRServerException;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
 
@@ -16,12 +16,16 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
-  public Optional<User> findByNickname(String nickname) {
-    return userRepository.findFirstByNickname(nickname);
+  public User findByNickname(String nickname) {
+    return userRepository
+        .findFirstByNickname(nickname)
+        .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
   }
 
   @Override
-  public Optional<User> findByEmail(String email) {
-    return userRepository.findFirstByEmail(email);
+  public User findByEmail(String email) {
+    return userRepository
+        .findFirstByEmail(email)
+        .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
   }
 }
