@@ -7,11 +7,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-import com.opensourcereader.core.user.repository.UserRepository;
 import java.util.Collections;
 import java.util.Map;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,44 +28,43 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.user.repository.UserRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 @SpringBootTest
 @AutoConfigureMockRestServiceServer
 @Transactional
 @ActiveProfiles("test")
 public class DefaultOauth2UserServiceTest {
 
-  @Autowired
-  private DefaultOAuth2UserService defaultOAuth2UserService;
+  @Autowired private DefaultOAuth2UserService defaultOAuth2UserService;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private MockRestServiceServer mockServer;
+  @Autowired private MockRestServiceServer mockServer;
 
   @MockitoBean(name = "internalOAuth2UserService")
   private OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate;
 
   @Test
   @DisplayName("통합 테스트: 이메일 없는 유저가 로그인 시 API를 통해 이메일 요청을 한다.")
-  void loadUser_Integration_CallGitHubApi(){
+  void loadUser_Integration_CallGitHubApi() {
     // given
     String fakeToken = "accessToken";
     OAuth2UserRequest oAuth2UserRequest = mockUserRequest(fakeToken);
 
-    Map<String, Object> attributes = Map.of(
-        "id", 12345,
-        "login", "nickname",
-        "username", "Kim User"
-    );
+    Map<String, Object> attributes =
+        Map.of(
+            "id", 12345,
+            "login", "nickname",
+            "username", "Kim User");
 
-    DefaultOAuth2User auth2User = new DefaultOAuth2User(
-        Collections.emptyList(),
-        attributes,
-        "login"
-    );
+    DefaultOAuth2User auth2User =
+        new DefaultOAuth2User(Collections.emptyList(), attributes, "login");
 
-    String gitHubApiResponseJson = """
+    String gitHubApiResponseJson =
+        """
         [
           {
             "email" : "primary@email.com",
@@ -80,7 +77,8 @@ public class DefaultOauth2UserServiceTest {
 
     given(delegate.loadUser(any())).willReturn(auth2User);
 
-    mockServer.expect(requestTo("https://api.github.com/user/emails"))
+    mockServer
+        .expect(requestTo("https://api.github.com/user/emails"))
         .andExpect(method(HttpMethod.GET))
         .andRespond(withSuccess(gitHubApiResponseJson, MediaType.APPLICATION_JSON));
     // when
@@ -109,6 +107,4 @@ public class DefaultOauth2UserServiceTest {
             .build(),
         new OAuth2AccessToken(TokenType.BEARER, fakeToken, null, null));
   }
-
-
 }
