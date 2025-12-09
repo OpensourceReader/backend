@@ -27,7 +27,7 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   @Transactional
   @Override
   public OpenSourceRepo createRepo(String savedLocalPath, String cloneUrl, String repoReference) {
-    //    validateAlreadyExist(cloneUrl);
+    validateAlreadyExist(cloneUrl);
 
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUrl);
     List<GitTreeFileInfo> flatTree =
