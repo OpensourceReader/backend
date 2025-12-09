@@ -3,6 +3,7 @@ package com.opensourcereader.api.security.login;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -34,7 +35,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       setDetails(request, token);
       return this.getAuthenticationManager().authenticate(token);
     } catch (IOException e) {
-      throw new OSRServerException(HttpStatus.BAD_REQUEST);
+      throw new AuthenticationServiceException(HttpStatus.BAD_REQUEST.getReasonPhrase());
     }
   }
 }

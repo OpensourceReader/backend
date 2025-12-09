@@ -22,9 +22,9 @@ public class DefaultUserDetailService implements UserDetailsService {
   private final UserService userService;
 
   @Override
-  public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     final User user =
-        userService.findByNickname(nickname).orElseThrow(() -> new UserNotFoundException(nickname));
+        userService.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
 
     UserConnection userConnection = new UserConnection(user, Instant.now());
 

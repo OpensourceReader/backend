@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 public class UserServiceSpringTest {
 
-  @Autowired private BasicUserService userService;
+  @Autowired private UserServiceImpl userService;
 
   @Autowired private UserRepository userRepository;
 
