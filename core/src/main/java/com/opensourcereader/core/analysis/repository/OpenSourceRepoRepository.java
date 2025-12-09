@@ -7,5 +7,4 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 public interface OpenSourceRepoRepository extends JpaRepository<OpenSourceRepo, Long> {
 
   boolean existsByCloneUrl(String cloneUrl);
-
 }
