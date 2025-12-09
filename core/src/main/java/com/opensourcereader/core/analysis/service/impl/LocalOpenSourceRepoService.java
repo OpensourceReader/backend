@@ -1,5 +1,6 @@
-package com.opensourcereader.core.analysis.service.basic;
+package com.opensourcereader.core.analysis.service.impl;
 
+import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   @Transactional
   @Override
   public OpenSourceRepo createRepo(String savedLocalPath, String cloneUrl, String repoReference) {
+    validateAlreadyExist(cloneUrl);
+
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUrl);
     List<GitTreeFileInfo> flatTree =
         gitRepositoryService.getFlatTree(savedLocalPath, repoReference);
@@ -49,5 +52,11 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   @Override
   public void deleteRepoById(Long repositoryId) {
     opensourceRepoRepository.deleteById(repositoryId);
+  }
+
+  private void validateAlreadyExist(String cloneUrl) {
+    if (opensourceRepoRepository.existsByCloneUrl(cloneUrl)) {
+      throw new OpenSourceRepoAlreadyExistException();
+    }
   }
 }

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.basic;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.io.File;
 import java.io.IOException;
