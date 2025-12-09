@@ -4,6 +4,8 @@ import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,7 @@ public class OpenSourceRepoContent {
   @Embedded
   private OpenSourceRepoContentName name;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
 
