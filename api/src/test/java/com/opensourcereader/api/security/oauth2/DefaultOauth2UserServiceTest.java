@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 @AutoConfigureMockRestServiceServer
 @Transactional
-@ActiveProfiles("test")
+@ActiveProfiles("h2")
 public class DefaultOauth2UserServiceTest {
 
   @Autowired private DefaultOAuth2UserService defaultOAuth2UserService;

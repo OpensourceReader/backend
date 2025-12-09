@@ -61,7 +61,7 @@ public class AuthService {
   public UserInfo extractGitHubUserInfo(Map<String, Object> attributes) {
     String providerId = String.valueOf(attributes.get("id"));
     String email = (String) attributes.get("email");
-    String name = (String) attributes.get("username");
+    String name = (String) attributes.get("name");
     String nickname = (String) attributes.get("login");
     String avatarUrl = (String) attributes.get("avatar_url");
 

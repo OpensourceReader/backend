@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@ActiveProfiles("test")
+@ActiveProfiles("h2")
 public class JsonLoginFilterIntegrationTest {
   @Autowired private MockMvc mockMvc;
 
