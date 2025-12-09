@@ -30,6 +30,8 @@ public class RefreshTokenService {
 
   public static final String REFRESH_TOKEN_NAME = "refresh_token";
 
+  //TODO 유저가 토큰을 삭제시키거하 하는 등의 작업을 할 수 없게 만들어야한다.
+  @Transactional
   public RefreshToken createRefreshToken(String nickname) {
     User user =
         userRepository
@@ -42,8 +44,9 @@ public class RefreshTokenService {
     return refreshTokenRepository.save(refreshToken);
   }
 
+  @Transactional
   public RefreshToken verifyExpiration(RefreshToken token) {
-    if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+    if (token.isExpired()) {
       refreshTokenRepository.delete(token);
       throw new TokenRefreshException("Token Expired");
     }
