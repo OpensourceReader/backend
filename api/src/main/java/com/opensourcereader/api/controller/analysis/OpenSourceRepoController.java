@@ -23,23 +23,17 @@ public class OpenSourceRepoController {
 
   @PostMapping
   public OpenSourceRepoResponse createRepo(
-      @RequestBody OpenSourceRepoCreateRequest repoCreateRequest
-  ) {
+      @RequestBody OpenSourceRepoCreateRequest repoCreateRequest) {
     return opensourceRepoFacade.createRepo(repoCreateRequest);
   }
 
   @GetMapping("/{repoId}")
-  public OpenSourceRepoResponse getRepoById(
-      @PathVariable(value = "repoId") Long repoId
-  ) {
+  public OpenSourceRepoResponse getRepoById(@PathVariable(value = "repoId") Long repoId) {
     return opensourceRepoFacade.getRepoById(repoId);
   }
 
   @DeleteMapping("/{repoId}")
-  public void deleteRepoById(
-      @PathVariable(value = "repoId") Long repoId
-  ) {
+  public void deleteRepoById(@PathVariable(value = "repoId") Long repoId) {
     opensourceRepoFacade.deleteRepoById(repoId);
   }
-
 }

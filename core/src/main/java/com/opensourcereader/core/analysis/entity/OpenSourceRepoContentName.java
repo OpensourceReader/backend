@@ -1,6 +1,7 @@
 package com.opensourcereader.core.analysis.entity;
 
 import jakarta.persistence.Embeddable;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,4 @@ public class OpenSourceRepoContentName {
     String[] pathTokens = path.split("/");
     return pathTokens[pathTokens.length - 1];
   }
-
 }

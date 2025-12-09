@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,29 +44,16 @@ public class OpenSourceRepoContent {
   private OpenSourceRepo opensourceRepo;
 
   public static OpenSourceRepoContent of(
-      GitTreeFileInfo fileInfo,
-      String rawText,
-      OpenSourceRepo opensourceRepo
-  ) {
-    return new OpenSourceRepoContent(
-        fileInfo.path(),
-        fileInfo.type(),
-        rawText,
-        opensourceRepo
-    );
+      GitTreeFileInfo fileInfo, String rawText, OpenSourceRepo opensourceRepo) {
+    return new OpenSourceRepoContent(fileInfo.path(), fileInfo.type(), rawText, opensourceRepo);
   }
 
   private OpenSourceRepoContent(
-      String path,
-      ContentType contentType,
-      String rawText,
-      OpenSourceRepo opensourceRepo
-  ) {
+      String path, ContentType contentType, String rawText, OpenSourceRepo opensourceRepo) {
     this.path = path;
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = contentType;
     this.rawText = rawText;
     this.opensourceRepo = opensourceRepo;
   }
-
 }

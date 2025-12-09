@@ -19,5 +19,4 @@ class OpenSourceRepoContentNameTest {
     // then
     assertThat(opensourceRepoContentName.getName()).isEqualTo("ci-report.yml");
   }
-
 }

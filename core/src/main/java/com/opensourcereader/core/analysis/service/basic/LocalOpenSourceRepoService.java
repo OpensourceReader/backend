@@ -1,26 +1,20 @@
 package com.opensourcereader.core.analysis.service.basic;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
-import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
-import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOpenException;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import jakarta.transaction.Transactional;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +27,8 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   @Override
   public OpenSourceRepo createRepo(String savedLocalPath, String cloneUrl, String repoReference) {
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUrl);
-    List<GitTreeFileInfo> flatTree = gitRepositoryService.getFlatTree(savedLocalPath,
-        repoReference);
+    List<GitTreeFileInfo> flatTree =
+        gitRepositoryService.getFlatTree(savedLocalPath, repoReference);
 
     Repository repo = gitRepositoryService.createRepositoryBuilder(savedLocalPath);
     for (GitTreeFileInfo fileInfo : flatTree) {
@@ -47,7 +41,8 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
   @Override
   public OpenSourceRepo getRepoById(Long repositoryId) {
-    return opensourceRepoRepository.findById(repositoryId)
+    return opensourceRepoRepository
+        .findById(repositoryId)
         .orElseThrow(OpenSourceRepoNotFoundException::new);
   }
 
@@ -55,5 +50,4 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   public void deleteRepoById(Long repositoryId) {
     opensourceRepoRepository.deleteById(repositoryId);
   }
-
 }

@@ -1,14 +1,13 @@
 package com.opensourcereader.core.util;
 
+import java.io.File;
 
 import com.opensourcereader.core.analysis.exception.file.LocalDirectoryCreationException;
 import com.opensourcereader.core.analysis.exception.file.LocalDirectoryDeletionException;
-import java.io.File;
 
 public class FileUtil {
 
-  private FileUtil() {
-  }
+  private FileUtil() {}
 
   public static void createDirectory(File localPathFile) {
     File parent = localPathFile.getParentFile();
@@ -16,8 +15,7 @@ public class FileUtil {
     if (parent != null && !parent.exists()) {
       boolean created = parent.mkdirs();
       if (!created) {
-        throw new LocalDirectoryCreationException()
-            .addDetail("parent", parent);
+        throw new LocalDirectoryCreationException().addDetail("parent", parent);
       }
     }
   }
@@ -37,9 +35,7 @@ public class FileUtil {
       }
     }
     if (!file.delete()) {
-      throw new LocalDirectoryDeletionException()
-          .addDetail("path", file.getAbsolutePath());
+      throw new LocalDirectoryDeletionException().addDetail("path", file.getAbsolutePath());
     }
   }
-
 }

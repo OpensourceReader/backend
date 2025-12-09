@@ -9,5 +9,4 @@ public interface OpenSourceRepoService {
   OpenSourceRepo getRepoById(Long repositoryId);
 
   void deleteRepoById(Long repositoryId);
-
 }

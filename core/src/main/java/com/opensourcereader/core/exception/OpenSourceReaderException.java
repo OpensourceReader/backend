@@ -3,6 +3,7 @@ package com.opensourcereader.core.exception;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.Getter;
 
 @Getter
@@ -30,5 +31,4 @@ public abstract class OpenSourceReaderException extends RuntimeException {
     this.details.putAll(details);
     return this;
   }
-
 }
