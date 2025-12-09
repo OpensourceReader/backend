@@ -1,9 +1,9 @@
 package com.opensourcereader.core.analysis.service.basic;
 
-import com.opensourcereader.core.analysis.dto.GitTree;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.ContentType;
 import com.opensourcereader.core.analysis.exception.gitrepo.GitCloneFailedException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitReferenceNotFoundException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOpenException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessException;
@@ -12,6 +12,7 @@ import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.util.FileUtil;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,8 +20,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -55,7 +58,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
   }
 
   @Override
-  public GitTree getFlatTree(String localPath, String reference) {
+  public List<GitTreeFileInfo> getFlatTree(String localPath, String reference) {
     Repository repo = createRepositoryBuilder(localPath);
     ObjectId commitId = getCommitId(repo, reference);
     RevTree tree = getTree(repo, commitId);
@@ -80,9 +83,32 @@ public class LocalGitRepositoryService implements GitRepositoryService {
         flatTrees.add(new GitTreeFileInfo(path, contentType, objId));
       }
 
-      return new GitTree(repo.getDirectory().toString(), flatTrees);
+      return flatTrees;
     } catch (IOException e) {
       throw new LocalGitTreeParseException()
+          .addDetail("cause", e.getCause());
+    }
+  }
+
+  @Override
+  public String getRawText(ObjectId blobId, Repository repo) {
+    try {
+      ObjectLoader loader = repo.open(blobId, Constants.OBJ_BLOB);
+      return new String(loader.getBytes(), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new LocalGitBlobLoadException()
+          .addDetail("cause", e.getCause());
+    }
+  }
+
+  @Override
+  public Repository createRepositoryBuilder(String localPath) {
+    try {
+      return new FileRepositoryBuilder()
+          .setGitDir(new File(localPath))
+          .build();
+    } catch (IOException e) {
+      throw new LocalGitRepositoryOpenException()
           .addDetail("cause", e.getCause());
     }
   }
@@ -99,17 +125,6 @@ public class LocalGitRepositoryService implements GitRepositoryService {
         .resolve(localDirectory)
         .resolve(owner)
         .resolve(repo);
-  }
-
-  private Repository createRepositoryBuilder(String localPath) {
-    try {
-      return new FileRepositoryBuilder()
-          .setGitDir(new File(localPath))
-          .build();
-    } catch (IOException e) {
-      throw new LocalGitRepositoryOpenException()
-          .addDetail("cause", e.getCause());
-    }
   }
 
   private RevTree getTree(Repository repo, ObjectId commitId) {

@@ -16,7 +16,7 @@ class OpenSourceRepoFacadeTest extends IntegrationTestSupport {
   @Autowired
   OpenSourceRepoFacade opensourceRepoFacade;
 
-  @Disabled
+  @Disabled("시간과 용량상의 문제로 disabled 처리했습니다.")
   @Transactional
   @DisplayName("오픈소스레포 객체를 생성합니다.")
   @Test
