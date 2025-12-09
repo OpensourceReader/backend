@@ -45,7 +45,7 @@ public class AuthService {
             .findUserByNicknameAndEmail(userInfo.nickname(), userInfo.email())
             .orElseGet(
                 () ->
-                    User.of(userInfo.name(), userInfo.email(), UUID.randomUUID().toString())
+                    User.of(userInfo.nickname(), userInfo.email(), UUID.randomUUID().toString())
                         .build());
     user.updateAvatar(userInfo.avatarUrl());
     user.linkSocialProvider(userInfo.providerId());
@@ -61,7 +61,7 @@ public class AuthService {
   public UserInfo extractGitHubUserInfo(Map<String, Object> attributes) {
     String providerId = String.valueOf(attributes.get("id"));
     String email = (String) attributes.get("email");
-    String name = (String) attributes.get("name");
+    String name = (String) attributes.get("username");
     String nickname = (String) attributes.get("login");
     String avatarUrl = (String) attributes.get("avatar_url");
 

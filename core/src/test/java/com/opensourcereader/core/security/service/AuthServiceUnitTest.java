@@ -143,7 +143,7 @@ public class AuthServiceUnitTest {
     // then
     assertThat(result.providerId()).isEqualTo("12345");
     assertThat(result.email()).isEqualTo("github@test.com");
-    assertThat(result.name()).isEqualTo("test");
+    assertThat(result.username()).isEqualTo("test");
     assertThat(result.avatarUrl()).isEqualTo("http://avatar.url");
   }
 

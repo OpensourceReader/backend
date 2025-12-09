@@ -21,7 +21,7 @@ public class AuthController {
   private final AuthFacadeService authFacadeService;
 
   @PostMapping("/signup")
-  public ResponseEntity<UserConnection> signUpOrGet(@RequestBody SignUpRequest request) {
+  public ResponseEntity<UserConnection> signup(@RequestBody SignUpRequest request) {
     SignUpCommand command = request.toCommand();
     UserConnection connection = authFacadeService.signup(command);
 

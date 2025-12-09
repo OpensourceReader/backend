@@ -16,21 +16,18 @@ import com.opensourcereader.core.security.service.AuthService;
 import com.opensourcereader.core.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
   private final AuthService authService;
+  private final OAuth2UserService<OAuth2UserRequest, OAuth2User> internalOAuth2UserService;
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-    OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate =
-        new org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService();
 
-    OAuth2User oAuth2User = delegate.loadUser(userRequest);
+    OAuth2User oAuth2User = internalOAuth2UserService.loadUser(userRequest);
 
     Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
     if (attributes.get("email") == null) {
