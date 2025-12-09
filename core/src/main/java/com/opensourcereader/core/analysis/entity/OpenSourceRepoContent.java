@@ -36,24 +36,24 @@ public class OpenSourceRepoContent {
   private ContentType contentType;
 
   @Lob
-  @Column(name = "content", columnDefinition = "LONGTEXT")
+  @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
-  private OpenSourceRepo opensourceRepo;
+  private OpenSourceRepo openSourceRepo;
 
   public static OpenSourceRepoContent of(
-      GitTreeFileInfo fileInfo, String rawText, OpenSourceRepo opensourceRepo) {
-    return new OpenSourceRepoContent(fileInfo.path(), fileInfo.type(), rawText, opensourceRepo);
+      GitTreeFileInfo fileInfo, String rawText, OpenSourceRepo openSourceRepo) {
+    return new OpenSourceRepoContent(fileInfo.path(), fileInfo.type(), rawText, openSourceRepo);
   }
 
   private OpenSourceRepoContent(
-      String path, ContentType contentType, String rawText, OpenSourceRepo opensourceRepo) {
+      String path, ContentType contentType, String rawText, OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = contentType;
     this.rawText = rawText;
-    this.opensourceRepo = opensourceRepo;
+    this.openSourceRepo = openSourceRepo;
   }
 }

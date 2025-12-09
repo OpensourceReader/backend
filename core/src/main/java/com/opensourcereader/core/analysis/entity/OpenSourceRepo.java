@@ -24,11 +24,11 @@ public class OpenSourceRepo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "clone_url")
   private String cloneUrl;
 
-  @OneToMany(mappedBy = "opensourceRepo", cascade = CascadeType.PERSIST)
-  @Column(name = "contents")
-  private List<OpenSourceRepoContent> contents = new ArrayList<>();
+  @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
+  private final List<OpenSourceRepoContent> contents = new ArrayList<>();
 
   public OpenSourceRepo(String cloneUrl) {
     this.cloneUrl = cloneUrl;
