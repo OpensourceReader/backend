@@ -26,6 +26,6 @@ public class IssueServiceImpl implements IssueService {
   // 복합 인덱스 검색
   @Override
   public List<Issue> findAllByRepositoryId(Long repositoryId, Boolean isOpened) {
-    return issueRepository.findAllByRepositoryIdAndIsClosed(repositoryId, isOpened);
+    return issueRepository.findAllByRepositoryIdAndIsOpened(repositoryId, isOpened);
   }
 }
