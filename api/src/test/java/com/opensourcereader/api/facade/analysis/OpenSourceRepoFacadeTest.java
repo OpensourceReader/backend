@@ -3,11 +3,11 @@ package com.opensourcereader.api.facade.analysis;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.api.IntegrationTestSupport;
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

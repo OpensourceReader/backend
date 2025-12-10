@@ -12,12 +12,13 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.entity.ContentType;
-import com.opensourcereader.core.analysis.exception.gitrepo.GitCloneFailedException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitCloneFailedException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitReferenceNotFoundException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOpenException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeParseException;
+import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeWalkAccessException;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.util.FileUtil;
 import org.eclipse.jgit.api.Git;
@@ -41,23 +42,18 @@ public class LocalGitRepositoryService implements GitRepositoryService {
 
   @Override
   public String saveToLocal(String openSourceUri, String localDirectory) {
-    Path createdLocalPath = createLocalPath(openSourceUri, localDirectory);
-
-    File localPathFile = createdLocalPath.toFile();
+    File localPathFile = createLocalPath(openSourceUri, localDirectory).toFile();
     FileUtil.createDirectory(localPathFile);
-    if (!(localPathFile.exists() || localPathFile.isFile())) {
-      try (Git git =
-          Git.cloneRepository()
-              .setURI(openSourceUri)
-              .setDirectory(localPathFile)
-              .setBare(true)
-              .call()) {
-      } catch (GitAPIException e) {
-        throw new GitCloneFailedException().addDetail("cause", e.getCause());
-      }
+    try (Git git =
+        Git.cloneRepository()
+            .setURI(openSourceUri)
+            .setDirectory(localPathFile)
+            .setBare(true)
+            .call()) {
+      return localPathFile.getPath();
+    } catch (GitAPIException e) {
+      throw new LocalGitCloneFailedException();
     }
-
-    return createdLocalPath.toString();
   }
 
   @Override
@@ -67,11 +63,8 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     RevTree tree = getTree(repo, commitId);
 
     List<GitTreeFileInfo> flatTrees = new ArrayList<>();
+    TreeWalk walk = getTreeWalk(repo, tree);
     try {
-      TreeWalk walk = new TreeWalk(repo);
-      walk.addTree(tree);
-      walk.setRecursive(true);
-
       while (walk.next()) {
         String path = walk.getPathString();
         FileMode type = walk.getFileMode(0);
@@ -83,10 +76,9 @@ public class LocalGitRepositoryService implements GitRepositoryService {
         }
         flatTrees.add(new GitTreeFileInfo(path, contentType, objId));
       }
-
       return flatTrees;
     } catch (IOException e) {
-      throw new LocalGitTreeParseException().addDetail("cause", e.getCause());
+      throw new LocalGitTreeParseException();
     }
   }
 
@@ -96,7 +88,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
       ObjectLoader loader = repo.open(blobId, Constants.OBJ_BLOB);
       return new String(loader.getBytes(), StandardCharsets.UTF_8);
     } catch (IOException e) {
-      throw new LocalGitBlobLoadException().addDetail("cause", e.getCause());
+      throw new LocalGitBlobLoadException();
     }
   }
 
@@ -105,13 +97,23 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     try {
       return new FileRepositoryBuilder().setGitDir(new File(localPath)).build();
     } catch (IOException e) {
-      throw new LocalGitRepositoryOpenException().addDetail("cause", e.getCause());
+      throw new LocalGitRepositoryOpenException();
+    }
+  }
+
+  private TreeWalk getTreeWalk(Repository repo, RevTree tree) {
+    try {
+      TreeWalk walk = new TreeWalk(repo);
+      walk.addTree(tree);
+      walk.setRecursive(true);
+      return walk;
+    } catch (IOException e) {
+      throw new LocalGitTreeWalkAccessException();
     }
   }
 
   private Path createLocalPath(String openSourceUri, String localDirectory) {
-    Path moduleDir = Paths.get("").toAbsolutePath();
-    Path projectDir = moduleDir.getParent();
+    Path projectDir = Paths.get("").toAbsolutePath().getParent();
 
     String[] tokens = openSourceUri.split("/");
     String owner = tokens[tokens.length - 2];
@@ -126,7 +128,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
       RevCommit commit = revWalk.parseCommit(commitId);
       return commit.getTree();
     } catch (IOException e) {
-      throw new LocalGitTreeAccessException().addDetail("cause", e.getCause());
+      throw new LocalGitTreeAccessException();
     }
   }
 
@@ -134,7 +136,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     try {
       return repo.resolve(reference);
     } catch (IOException e) {
-      throw new LocalGitReferenceNotFoundException().addDetail("cause", e.getCause());
+      throw new LocalGitReferenceNotFoundException();
     }
   }
 }

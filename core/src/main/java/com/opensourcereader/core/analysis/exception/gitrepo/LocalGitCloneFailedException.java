@@ -4,9 +4,9 @@ import static com.opensourcereader.core.analysis.exception.OpenSourceRepoErrorCo
 
 import com.opensourcereader.core.analysis.exception.OpenSourceRepoException;
 
-public class GitCloneFailedException extends OpenSourceRepoException {
+public class LocalGitCloneFailedException extends OpenSourceRepoException {
 
-  public GitCloneFailedException() {
+  public LocalGitCloneFailedException() {
     super(REPOSITORY_CLONE_FAILED);
   }
 }
