@@ -65,6 +65,9 @@ subprojects {
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("com.h2database:h2")
         implementation("org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r")
+
+        // auth
+        implementation("com.auth0:java-jwt:4.4.0")
     }
 
     tasks.withType<Test> {
@@ -78,4 +81,8 @@ tasks.named<BootJar>("bootJar") {
 
 tasks.named<Jar>("jar") {
     enabled = false
+}
+
+tasks.named("build") {
+    dependsOn("spotlessApply")
 }
