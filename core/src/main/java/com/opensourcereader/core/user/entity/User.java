@@ -2,6 +2,8 @@ package com.opensourcereader.core.user.entity;
 
 import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
@@ -20,6 +22,7 @@ public class User extends BaseEntity {
 
   private String providerId;
 
+  @Enumerated(EnumType.STRING)
   private Role role;
 
   private String username;

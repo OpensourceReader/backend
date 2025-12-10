@@ -38,3 +38,9 @@ out/
 *.env
 env.preperties
 secrets
+
+### clone-local-repo ###
+/local-clone-repo/
+
+### logs ###
+.logs
