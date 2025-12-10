@@ -53,13 +53,20 @@ public class Issue extends BaseEntity {
   @Column(name = "is_opened", nullable = false)
   private Boolean isOpened;
 
-  public static IssueBuilder of(Long tagId, User author, OpenSourceRepo repository, String title) {
+  public static IssueBuilder of(
+      Long tagId,
+      User author,
+      OpenSourceRepo repository,
+      String title,
+      Boolean isPull,
+      Boolean isOpened) {
     return Issue.builder()
         .tagId(tagId)
         .user(author)
         .repository(repository)
         .title(title)
-        .isOpened(false);
+        .isPull(isPull)
+        .isOpened(isOpened);
   }
 
   // 대량의 변화일 가능성이 높기에 통짜로 변경한다.

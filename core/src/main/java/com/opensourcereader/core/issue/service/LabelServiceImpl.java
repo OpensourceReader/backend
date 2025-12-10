@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.opensourcereader.core.issue.entity.Issue;
 import com.opensourcereader.core.issue.entity.Label;
 import com.opensourcereader.core.issue.repository.LabelRepository;
 
@@ -19,5 +20,10 @@ public class LabelServiceImpl implements LabelService {
   @Override
   public List<Label> findAllByRepositoryId(Long repositoryId) {
     return labelRepository.findAllByRepositoryId(repositoryId);
+  }
+
+  @Override
+  public List<Label> findAllByIssue(Issue issue) {
+    return labelRepository.findAllByIssue(issue);
   }
 }

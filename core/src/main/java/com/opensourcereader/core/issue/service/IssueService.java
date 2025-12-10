@@ -8,5 +8,5 @@ public interface IssueService {
 
   Issue findByTagId(Long repositoryId, Long tagId);
 
-  List<Issue> findAllByRepositoryId(Long repositoryId, Boolean isClosed);
+  List<Issue> findAllByRepositoryId(Long repositoryId, Boolean isOpened);
 }
