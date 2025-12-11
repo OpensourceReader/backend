@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,13 +112,11 @@ public class LocalGitRepositoryService implements GitRepositoryService {
   }
 
   private Path createLocalPath(String openSourceUri, String localDirectory) {
-    Path projectDir = Paths.get("").toAbsolutePath().getParent();
-
     String[] tokens = openSourceUri.split("/");
     String owner = tokens[tokens.length - 2];
     String repo = tokens[tokens.length - 1];
 
-    return projectDir.resolve(localDirectory).resolve(owner).resolve(repo);
+    return Path.of(localDirectory).resolve(owner).resolve(repo);
   }
 
   private RevTree getTree(Repository repo, ObjectId commitId) {
