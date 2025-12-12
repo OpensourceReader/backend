@@ -25,6 +25,9 @@ spring:
         - read:user
         - user:email
 
+opensource-reader:
+  local-clone-path:  ${OSSR_CLONE_PATH:${user.home}/local-clone-repos}
+
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   access-token-expiration: 600 # 10 분

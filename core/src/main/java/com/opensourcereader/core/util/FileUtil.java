@@ -1,8 +1,8 @@
 package com.opensourcereader.core.util;
 
 import java.io.File;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import com.opensourcereader.core.analysis.exception.file.LocalDirectoryCreationException;
 import com.opensourcereader.core.analysis.exception.file.LocalDirectoryDeletionException;
@@ -17,21 +17,27 @@ import lombok.NoArgsConstructor;
 public final class FileUtil {
 
   public static void createDirectory(File localPathFile) {
-    validateFileExist(localPathFile);
+    validateDirExist(localPathFile);
 
-    File parent = localPathFile.getParentFile();
-    if (parent != null && !parent.exists()) {
-      boolean created = parent.mkdirs();
-      if (created) {
-        return;
+    boolean created = localPathFile.mkdirs();
+    if (created) {
+      return;
+    }
+    throw new LocalDirectoryCreationException().addDetail("parent", localPathFile);
+  }
+
+  private static void validateDirExist(File localPathFile) {
+    if (localPathFile.exists()) {
+      if (localPathFile.isFile()) {
+        throw new LocalGitCloneFileAlreadyExist();
       }
-      throw new LocalDirectoryCreationException().addDetail("parent", parent);
+      throw new LocalGitCloneDirectoryAlreadyExist();
     }
   }
 
   public static void removeDirectory(String localPath) {
-    Path projectDir = Paths.get("").toAbsolutePath().getParent().normalize();
-    if (localPath.equals(projectDir.toString())) {
+    Path root = FileSystems.getDefault().getRootDirectories().iterator().next().toAbsolutePath();
+    if (localPath.equals(root.toString())) {
       throw new RootDirectoryNotDeletableException();
     }
     File dir = new File(localPath);
@@ -51,14 +57,5 @@ public final class FileUtil {
       return;
     }
     throw new LocalDirectoryDeletionException().addDetail("path", file.getAbsolutePath());
-  }
-
-  private static void validateFileExist(File localPathFile) {
-    if (localPathFile.exists()) {
-      if (localPathFile.isFile()) {
-        throw new LocalGitCloneFileAlreadyExist();
-      }
-      throw new LocalGitCloneDirectoryAlreadyExist();
-    }
   }
 }
