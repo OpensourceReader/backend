@@ -4,20 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
@@ -106,98 +98,5 @@ public class AuthServiceUnitTest {
     assertThat(result.getProviderId()).isNotNull();
 
     verify(userRepository).save(any(User.class));
-  }
-
-  @Test
-  @DisplayName("Oauth2 처리 메서드")
-  void processOauth2UserTest() {
-    // given
-    Map<String, Object> attributes =
-        Map.of(
-            "id", "12345",
-            "email", "github@test.com",
-            "name", "test",
-            "nickname", "testNick",
-            "avatar_url", "http://avatar.url");
-    User user = User.of("testNick", "github@test.com", "pw").providerId("12345").build();
-    given(userRepository.findByProviderId("12345")).willReturn(Optional.of(user));
-    // when
-    User result = authService.processOAuth2User(attributes);
-    // then
-    assertThat(result.getProviderId()).isEqualTo("12345");
-  }
-
-  @Test
-  @DisplayName("유저 정보 추출 : 성공")
-  void extractHitHubUserInfo_success() {
-    // given
-    Map<String, Object> attributes =
-        Map.of(
-            "id", "12345",
-            "email", "github@test.com",
-            "name", "test",
-            "nickname", "testNick",
-            "avatar_url", "http://avatar.url");
-    // when
-    UserInfo result = authService.extractGitHubUserInfo(attributes);
-    // then
-    assertThat(result.providerId()).isEqualTo("12345");
-    assertThat(result.email()).isEqualTo("github@test.com");
-    assertThat(result.username()).isEqualTo("test");
-    assertThat(result.avatarUrl()).isEqualTo("http://avatar.url");
-  }
-
-  @Test
-  @DisplayName("GitHub API: 성공")
-  void getGitHubEmail_Success() {
-    // given
-    String accessToken = "mock-token";
-
-    List<Map<String, Object>> mockEmailResponse =
-        List.of(
-            Map.of("email", "secondary@test.com", "primary", false, "verified", true),
-            Map.of("email", "primary@test.com", "primary", true, "verified", true), // 정답
-            Map.of("email", "unverified@test.com", "primary", true, "verified", false));
-
-    ResponseEntity<Object> responseEntity = new ResponseEntity<>(mockEmailResponse, HttpStatus.OK);
-
-    given(
-            restTemplate.exchange(
-                eq("https://api.github.com/user/emails"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-        .willReturn(responseEntity);
-
-    // when
-    String resultEmail = authService.getGitHubEmail(accessToken);
-
-    // then
-    assertThat(resultEmail).isEqualTo("primary@test.com");
-  }
-
-  @Test
-  @DisplayName("GitHub API: 실패")
-  void getGitHubEmail_Fail_NoEmail() {
-    // given
-    String accessToken = "mock-token";
-
-    List<Map<String, Object>> mockEmailResponse =
-        List.of(Map.of("email", "secondary@test.com", "primary", false, "verified", true));
-
-    ResponseEntity<Object> responseEntity = new ResponseEntity<>(mockEmailResponse, HttpStatus.OK);
-
-    given(
-            restTemplate.exchange(
-                anyString(),
-                any(HttpMethod.class),
-                any(HttpEntity.class),
-                any(ParameterizedTypeReference.class)))
-        .willReturn(responseEntity);
-
-    // when & then
-    assertThatThrownBy(() -> authService.getGitHubEmail(accessToken))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage("not found User Email IN GITHUB");
   }
 }

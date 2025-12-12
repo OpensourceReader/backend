@@ -16,6 +16,13 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
 
   @Override
+  public User findByProviderId(String providerId) {
+    return userRepository
+        .findByProviderId(providerId)
+        .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
+  }
+
+  @Override
   public User findByNickname(String nickname) {
     return userRepository
         .findFirstByNickname(nickname)
