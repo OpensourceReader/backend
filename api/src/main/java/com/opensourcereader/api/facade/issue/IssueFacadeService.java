@@ -7,10 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.api.controller.issue.request.IssueGetRequest;
 import com.opensourcereader.api.controller.issue.response.IssueResponse;
+import com.opensourcereader.core.issue.dto.IssueCommentDto;
 import com.opensourcereader.core.issue.dto.IssueDto;
 import com.opensourcereader.core.issue.dto.LabelDto;
 import com.opensourcereader.core.issue.entity.Issue;
+import com.opensourcereader.core.issue.entity.IssueComment;
 import com.opensourcereader.core.issue.entity.Label;
+import com.opensourcereader.core.issue.service.IssueCommentService;
 import com.opensourcereader.core.issue.service.IssueService;
 import com.opensourcereader.core.issue.service.LabelService;
 
@@ -22,6 +25,7 @@ public class IssueFacadeService {
 
   private final IssueService issueService;
   private final LabelService labelService;
+  private final IssueCommentService issueCommentService;
 
   public List<IssueResponse> findIssues(IssueGetRequest request) {
     List<Issue> issueEntities = issueService.findAllByRepositoryId(request.repositoryId(), true);
@@ -44,7 +48,12 @@ public class IssueFacadeService {
                       new LabelDto(label.getName(), label.getDescription(), label.getColorCode()))
               .toList();
 
-      IssueResponse response = new IssueResponse(issue, labels);
+      List<IssueComment> issueComments = issueCommentService.findAllByIssueId(issueEntity.getId());
+      List<IssueCommentDto> comments =
+          issueComments.stream()
+              .map(issueComment -> new IssueCommentDto(issueComment.getBody()))
+              .toList();
+      IssueResponse response = new IssueResponse(issue, labels, comments);
       responses.add(response);
     }
 
@@ -66,6 +75,12 @@ public class IssueFacadeService {
                     new LabelDto(label.getName(), label.getDescription(), label.getColorCode()))
             .toList();
 
-    return new IssueResponse(issue, labels);
+    List<IssueComment> issueComments = issueCommentService.findAllByIssueId(issueEntity.getId());
+    List<IssueCommentDto> comments =
+        issueComments.stream()
+            .map(issueComment -> new IssueCommentDto(issueComment.getBody()))
+            .toList();
+
+    return new IssueResponse(issue, labels, comments);
   }
 }
