@@ -9,7 +9,7 @@ public abstract class IssueException extends OpenSourceReaderException {
 
   private final IssueErrorCode issueErrorCode;
 
-  public IssueException(IssueErrorCode openSourceRepoErrorCode) {
-    this.issueErrorCode = openSourceRepoErrorCode;
+  public IssueException(IssueErrorCode issueErrorCode) {
+    this.issueErrorCode = issueErrorCode;
   }
 }

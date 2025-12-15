@@ -11,11 +11,11 @@ import static org.mockito.Mockito.never;
 import java.time.Instant;
 import java.util.Optional;
 
-import com.opensourcereader.core.exception.OSRServerException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.opensourcereader.core.security.entity.RefreshToken;
-import com.opensourcereader.core.security.exception.TokenRefreshException;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.exception.UserException;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ public class RefreshTokenServiceUnitTest {
 
     // When & Then
     assertThatThrownBy(() -> refreshTokenService.createRefreshToken("unknown"))
-        .isInstanceOf(OSRServerException.class);
+        .isInstanceOf(UserException.class);
 
     then(refreshTokenRepository).should(never()).save(any());
   }
@@ -91,8 +91,7 @@ public class RefreshTokenServiceUnitTest {
 
     // When & Then
     assertThatThrownBy(() -> refreshTokenService.verifyExpiration(expiredToken))
-        .isInstanceOf(TokenRefreshException.class)
-        .hasMessage("Token Expired");
+        .isInstanceOf(TokenExpiredException.class);
 
     then(refreshTokenRepository).should().delete(expiredToken);
   }
@@ -140,7 +139,7 @@ public class RefreshTokenServiceUnitTest {
 
     // When & Then
     assertThatThrownBy(() -> refreshTokenService.invalidate("unknown"))
-        .isInstanceOf(OSRServerException.class);
+        .isInstanceOf(UserException.class);
   }
 
   @Test

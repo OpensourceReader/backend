@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.issue.entity.Issue;
-import com.opensourcereader.core.issue.exception.issue.IssueNotFoundException;
+import com.opensourcereader.core.issue.exception.IssueNotFoundException;
 import com.opensourcereader.core.issue.repository.IssueRepository;
 
 import lombok.RequiredArgsConstructor;

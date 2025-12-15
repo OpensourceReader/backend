@@ -13,10 +13,10 @@ import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
-import com.opensourcereader.core.exception.OSRServerException;
 import com.opensourcereader.core.security.dto.SignUpCommand;
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.exception.UserException;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ public class AuthServiceUnitTest {
 
     given(userRepository.existsByNicknameAndEmail(anyString(), anyString())).willReturn(true);
     // when & then
-    assertThatThrownBy(() -> authService.signup(command)).isInstanceOf(OSRServerException.class);
+    assertThatThrownBy(() -> authService.signup(command)).isInstanceOf(UserException.class);
   }
 
   @Test

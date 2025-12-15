@@ -3,15 +3,14 @@ package com.opensourcereader.core.security.service;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.exception.OSRServerException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.opensourcereader.core.security.entity.RefreshToken;
-import com.opensourcereader.core.security.exception.TokenRefreshException;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,9 +33,7 @@ public class RefreshTokenService {
   @Transactional
   public RefreshToken createRefreshToken(String nickname) {
     User user =
-        userRepository
-            .findFirstByNickname(nickname)
-            .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
+        userRepository.findFirstByNickname(nickname).orElseThrow(UserNotFoundException::new);
 
     Instant expiryDate = Instant.now().plusSeconds(refreshTokenExpireSeconds);
 
@@ -48,7 +45,7 @@ public class RefreshTokenService {
   public RefreshToken verifyExpiration(RefreshToken token) {
     if (token.isExpired()) {
       refreshTokenRepository.delete(token);
-      throw new TokenRefreshException("Token Expired");
+      throw new TokenExpiredException("토큰이 만료되었습니다.", Instant.now());
     }
     return token;
   }
@@ -56,9 +53,7 @@ public class RefreshTokenService {
   @Transactional
   public void invalidate(String nickname) {
     User user =
-        userRepository
-            .findFirstByNickname(nickname)
-            .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
+        userRepository.findFirstByNickname(nickname).orElseThrow(UserNotFoundException::new);
 
     refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
   }
