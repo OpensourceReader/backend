@@ -6,7 +6,6 @@ import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
@@ -19,16 +18,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-    name = "issues",
-    indexes = {
-      @Index(name = "idx_issue_repo_status", columnList = "repository_id, is_opened"),
-    })
+@Table(name = "pulls")
 @Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Issue extends BaseEntity {
+public class Pull extends BaseEntity {
 
   @Column(name = "tag_id", nullable = false)
   private Long tagId;
@@ -50,9 +45,9 @@ public class Issue extends BaseEntity {
   @Column(name = "is_opened", nullable = false)
   private Boolean isOpened;
 
-  public static IssueBuilder of(
+  public static PullBuilder of(
       Long tagId, User author, OpenSourceRepo repository, String title, Boolean isOpened) {
-    return Issue.builder()
+    return Pull.builder()
         .tagId(tagId)
         .user(author)
         .repository(repository)
