@@ -1,3 +1,3 @@
 package com.opensourcereader.api.controller.board.request;
 
-public record IssueGetRequest(Long repositoryId) {}
+public record BoardGetRequest(Long repositoryId) {}

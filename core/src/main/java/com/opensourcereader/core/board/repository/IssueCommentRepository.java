@@ -9,4 +9,6 @@ import com.opensourcereader.core.board.entity.IssueComment;
 public interface IssueCommentRepository extends JpaRepository<IssueComment, Long> {
 
   List<IssueComment> findAllByIssueId(Long issueId);
+
+  Long countAllByIssueId(Long issueId);
 }

@@ -1,10 +1,12 @@
 package com.opensourcereader.core.board.service;
 
-import com.opensourcereader.core.board.entity.Review;
 import java.util.List;
+
+import com.opensourcereader.core.board.entity.Review;
 
 public interface ReviewService {
 
-  List<Review> findAllByPullId(Long pullId);
+  Long countAllByPullId(Long pullId);
 
+  List<Review> findAllByPullId(Long pullId);
 }

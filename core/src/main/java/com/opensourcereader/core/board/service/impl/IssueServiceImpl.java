@@ -18,6 +18,11 @@ public class IssueServiceImpl implements IssueService {
   private final IssueRepository issueRepository;
 
   @Override
+  public boolean existedByTagId(Long repositoryId, Long tagId) {
+    return issueRepository.existsByRepositoryIdAndTagId(repositoryId, tagId);
+  }
+
+  @Override
   public Issue findByTagId(Long repositoryId, Long tagId) {
     return issueRepository
         .findByRepositoryIdAndTagId(repositoryId, tagId)

@@ -12,4 +12,6 @@ public interface PullRepository extends JpaRepository<Pull, Long> {
   Optional<Pull> findByRepositoryIdAndTagId(Long repositoryId, Long tagId);
 
   List<Pull> findAllByRepositoryIdAndIsOpened(Long repositoryId, Boolean isOpened);
+
+  boolean existsByRepositoryIdAndTagId(Long repositoryId, Long tagId);
 }

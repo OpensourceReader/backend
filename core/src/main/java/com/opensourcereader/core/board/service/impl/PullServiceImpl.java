@@ -18,6 +18,11 @@ public class PullServiceImpl implements PullService {
   private final PullRepository pullRepository;
 
   @Override
+  public boolean existedByTagId(Long repositoryId, Long tagId) {
+    return pullRepository.existsByRepositoryIdAndTagId(repositoryId, tagId);
+  }
+
+  @Override
   public Pull findByTagId(Long repositoryId, Long tagId) {
     return pullRepository
         .findByRepositoryIdAndTagId(repositoryId, tagId)

@@ -20,6 +20,6 @@ public class UserFacadeService {
   public UserDto getUser(final UserGetRequest req) {
     User user = userService.findByNickname(req.nickname());
 
-    return UserDto.of(user).build();
+    return UserDto.from(user);
   }
 }

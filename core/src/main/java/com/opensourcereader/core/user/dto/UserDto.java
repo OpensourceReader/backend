@@ -16,15 +16,17 @@ public record UserDto(
     String createdAt,
     boolean disabled) {
 
-  public static UserDtoBuilder of(User user) {
+  public static UserDto from(User user) {
     // time format : yyyy-MM-ddTHH:mm:ss.sssZ
     String createdAtToString = user.getCreatedAt().truncatedTo(ChronoUnit.SECONDS).toString();
 
     return UserDto.builder()
         .nickname(user.getNickname())
         .email(user.getEmail())
+        .avatarUrl(user.getAvatarUrl())
         .role(user.getRole())
         .createdAt(createdAtToString)
-        .disabled(user.getDisabled());
+        .disabled(user.getDisabled())
+        .build();
   }
 }

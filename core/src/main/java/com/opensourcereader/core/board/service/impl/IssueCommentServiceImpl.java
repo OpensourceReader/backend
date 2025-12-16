@@ -17,6 +17,11 @@ public class IssueCommentServiceImpl implements IssueCommentService {
   private final IssueCommentRepository issueCommentRepository;
 
   @Override
+  public Long countAllByIssueId(Long issueId) {
+    return issueCommentRepository.countAllByIssueId(issueId);
+  }
+
+  @Override
   public List<IssueComment> findAllByIssueId(Long issueId) {
     return issueCommentRepository.findAllByIssueId(issueId);
   }
