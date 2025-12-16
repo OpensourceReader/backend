@@ -1,7 +1,14 @@
 package com.opensourcereader.core.analysis.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -11,6 +18,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,6 +44,10 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinColumn(name = "opensource_repo_content_id")
+  private List<CodeMethodMetaData> codeMethodMetaData;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
   private OpenSourceRepo openSourceRepo;
@@ -51,6 +63,20 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = contentType;
     this.rawText = rawText;
+    this.codeMethodMetaData = separateCodeMethods(rawText);
     this.openSourceRepo = openSourceRepo;
+  }
+
+  private List<CodeMethodMetaData> separateCodeMethods(String rawText) {
+    if (this.name.isNotJavaFile()) {
+      return new ArrayList<>();
+    }
+    List<CodeMethodMetaData> result = new ArrayList<>();
+    CompilationUnit compilationUnit = StaticJavaParser.parse(rawText);
+    for (MethodDeclaration methodDeclaration : compilationUnit.findAll(MethodDeclaration.class)) {
+      CodeMethodMetaData methodMetaData = CodeMethodMetaData.createFrom(methodDeclaration, this);
+      result.add(methodMetaData);
+    }
+    return result;
   }
 }

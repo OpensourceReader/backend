@@ -25,4 +25,9 @@ public class OpenSourceRepoContentName {
     String[] pathTokens = path.split("/");
     return pathTokens[pathTokens.length - 1];
   }
+
+  public boolean isNotJavaFile() {
+    int lastIndexOfZero = name.lastIndexOf('.') + 1;
+    return !name.substring(lastIndexOfZero).equals("java");
+  }
 }
