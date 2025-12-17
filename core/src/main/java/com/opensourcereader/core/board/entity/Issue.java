@@ -50,14 +50,23 @@ public class Issue extends BaseEntity {
   @Column(name = "is_opened", nullable = false)
   private Boolean isOpened;
 
+  @Column(name = "comment_count", nullable = false)
+  private Long commentCount;
+
   public static IssueBuilder of(
-      Long tagId, User author, OpenSourceRepo repository, String title, Boolean isOpened) {
+      Long tagId,
+      User author,
+      OpenSourceRepo repository,
+      String title,
+      Boolean isOpened,
+      Long commentCount) {
     return Issue.builder()
         .tagId(tagId)
         .user(author)
         .repository(repository)
         .title(title)
-        .isOpened(isOpened);
+        .isOpened(isOpened)
+        .commentCount(commentCount);
   }
 
   // 대량의 변화일 가능성이 높기에 통짜로 변경한다.
@@ -68,6 +77,10 @@ public class Issue extends BaseEntity {
 
   public void updateStatus(Boolean newStatus) {
     this.isOpened = updateField(this.isOpened, newStatus);
+  }
+
+  public void updateCommentCount(Long newCommentCount) {
+    this.commentCount = updateField(this.commentCount, newCommentCount);
   }
 
   private <T> T updateField(T target, T replace) {

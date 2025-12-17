@@ -24,15 +24,15 @@ public class BoardController {
   private final BoardFacadeService boardFacadeService;
 
   @GetMapping
-  public ResponseEntity<List<BoardPreviewResponse>> findAllByRepositoryId(
+  public ResponseEntity<List<BoardPreviewResponse>> findAllPreview(
       @RequestBody BoardGetRequest request) {
-    List<BoardPreviewResponse> responses = boardFacadeService.findAllByRepositoryId(request);
+    List<BoardPreviewResponse> responses = boardFacadeService.findAllPreviewByRepositoryId(request);
 
     return ResponseEntity.ok(responses);
   }
 
   @GetMapping("/{tagId}")
-  public ResponseEntity<BoardBaseResponse> findAllByTagId(
+  public ResponseEntity<BoardBaseResponse> findByTagId(
       @PathVariable Long tagId, @RequestBody BoardGetRequest request) {
 
     BoardBaseResponse response = boardFacadeService.findByTagId(tagId, request);

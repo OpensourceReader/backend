@@ -45,14 +45,28 @@ public class Pull extends BaseEntity {
   @Column(name = "is_opened", nullable = false)
   private Boolean isOpened;
 
+  @Column(name = "review_count", nullable = false)
+  private Long reviewCount;
+
+  @Column(name = "comment_count", nullable = false)
+  private Long commentCount;
+
   public static PullBuilder of(
-      Long tagId, User author, OpenSourceRepo repository, String title, Boolean isOpened) {
+      Long tagId,
+      User author,
+      OpenSourceRepo repository,
+      String title,
+      Boolean isOpened,
+      Long reviewCount,
+      Long commentCount) {
     return Pull.builder()
         .tagId(tagId)
         .user(author)
         .repository(repository)
         .title(title)
-        .isOpened(isOpened);
+        .isOpened(isOpened)
+        .reviewCount(reviewCount)
+        .commentCount(commentCount);
   }
 
   // 대량의 변화일 가능성이 높기에 통짜로 변경한다.
@@ -63,6 +77,14 @@ public class Pull extends BaseEntity {
 
   public void updateStatus(Boolean newStatus) {
     this.isOpened = updateField(this.isOpened, newStatus);
+  }
+
+  public void updateReviewCount(Long newReviewCount) {
+    this.reviewCount = updateField(this.reviewCount, newReviewCount);
+  }
+
+  public void updateCommentCount(Long newCommentCount) {
+    this.commentCount = updateField(this.commentCount, newCommentCount);
   }
 
   private <T> T updateField(T target, T replace) {

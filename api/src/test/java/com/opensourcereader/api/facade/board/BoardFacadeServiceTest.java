@@ -2,7 +2,6 @@ package com.opensourcereader.api.facade.board;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -30,21 +29,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BoardFacadeServiceTest {
 
-  @Mock
-  private IssueService issueService;
-  @Mock
-  private PullService pullService;
-  @Mock
-  private IssueCommentService issueCommentService;
-  @Mock
-  private PullCommentService pullCommentService;
-  @Mock
-  private LabelService labelService;
-  @Mock
-  private ReviewService reviewService;
+  @Mock private IssueService issueService;
+  @Mock private PullService pullService;
+  @Mock private IssueCommentService issueCommentService;
+  @Mock private PullCommentService pullCommentService;
+  @Mock private LabelService labelService;
+  @Mock private ReviewService reviewService;
 
-  @InjectMocks
-  private BoardFacadeService boardFacadeService;
+  @InjectMocks private BoardFacadeService boardFacadeService;
 
   private static final Instant NOW = Instant.now();
 
@@ -73,6 +65,7 @@ class BoardFacadeServiceTest {
             .user(user)
             .tagId(101L)
             .isOpened(true)
+            .commentCount(5L)
             .build();
 
     ReflectionTestUtils.setField(issue, "id", id);
@@ -89,6 +82,8 @@ class BoardFacadeServiceTest {
             .user(user)
             .tagId(202L)
             .isOpened(true)
+            .reviewCount(2L)
+            .commentCount(3L)
             .build();
 
     ReflectionTestUtils.setField(pull, "id", id);
@@ -99,7 +94,7 @@ class BoardFacadeServiceTest {
 
   @Test
   @DisplayName("findAllByRepositoryId: 이슈와 PR을 모두 조회하여 미리보기 리스트로 반환한다.")
-  void findAllByRepositoryId_Success() {
+  void findAllPreviewByRepositoryId_Success() {
     // [Given]
     Long repoId = 100L;
     BoardGetRequest request = new BoardGetRequest(repoId);
@@ -115,14 +110,8 @@ class BoardFacadeServiceTest {
     given(issueService.findAllByRepositoryId(repoId, true)).willReturn(List.of(issue));
     given(pullService.findAllByRepositoryId(repoId, true)).willReturn(List.of(pull));
 
-    given(issueCommentService.countAllByIssueId(issue.getId())).willReturn(5L);
-
-    given(reviewService.findAllByPullId(pull.getId())).willReturn(List.of(review));
-    given(reviewService.countAllByPullId(pull.getId())).willReturn(2L);
-    given(pullCommentService.coundAllByReviewId(review.getId())).willReturn(3L);
-
     // [When]
-    List<BoardPreviewResponse> result = boardFacadeService.findAllByRepositoryId(request);
+    List<BoardPreviewResponse> result = boardFacadeService.findAllPreviewByRepositoryId(request);
 
     // [Then]
     assertThat(result).hasSize(2);

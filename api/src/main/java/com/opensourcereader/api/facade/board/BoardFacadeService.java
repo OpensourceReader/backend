@@ -1,6 +1,7 @@
 package com.opensourcereader.api.facade.board;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.opensourcereader.core.board.dto.ReviewDto;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.entity.Review;
+import com.opensourcereader.core.board.exception.BoardNotFoundException;
 import com.opensourcereader.core.board.service.IssueCommentService;
 import com.opensourcereader.core.board.service.IssueService;
 import com.opensourcereader.core.board.service.LabelService;
@@ -39,7 +41,7 @@ public class BoardFacadeService {
   private final LabelService labelService;
   private final ReviewService reviewService;
 
-  public List<BoardPreviewResponse> findAllByRepositoryId(BoardGetRequest request) {
+  public List<BoardPreviewResponse> findAllPreviewByRepositoryId(BoardGetRequest request) {
     List<BoardPreviewResponse> responses = new ArrayList<>();
     Long repositoryId = request.repositoryId();
 
@@ -47,7 +49,7 @@ public class BoardFacadeService {
     List<Pull> pullEntities = pullService.findAllByRepositoryId(repositoryId, true);
 
     for (Issue issue : issueEntities) {
-      Long issueCommentCount = issueCommentService.countAllByIssueId(issue.getId());
+      Long issueCommentCount = issue.getCommentCount();
 
       UserDto userDto = UserDto.from(issue.getUser());
 
@@ -56,13 +58,7 @@ public class BoardFacadeService {
     }
 
     for (Pull pull : pullEntities) {
-      Long pullId = pull.getId();
-      List<Review> reviews = reviewService.findAllByPullId(pullId);
-      Long pullCommentCount = reviewService.countAllByPullId(pullId);
-
-      for (Review review : reviews) {
-        pullCommentCount += pullCommentService.coundAllByReviewId(review.getId());
-      }
+      Long pullCommentCount = pull.getReviewCount() + pull.getCommentCount();
 
       UserDto userDto = UserDto.from(pull.getUser());
 
@@ -71,10 +67,14 @@ public class BoardFacadeService {
       responses.add(response);
     }
 
-    // TODO 리스트를 시간 내림차순으로 정렬해야함, label 붙여야 함
-    return responses;
+    return responses.stream()
+        .sorted(Comparator.comparing(BoardPreviewResponse::createdAt).reversed())
+        .toList();
   }
 
+  // 지연 전략
+  // issue랑 pull엔티티에 코멘트 수를 미리 저장해두기
+  // 0이라면 조회하지 않기
   public BoardBaseResponse findByTagId(Long tagId, BoardGetRequest request) {
     Long repositoryId = request.repositoryId();
     boolean b1 = issueService.existedByTagId(repositoryId, tagId);
@@ -83,15 +83,18 @@ public class BoardFacadeService {
     if (b1) {
       Issue entity = issueService.findByTagId(repositoryId, tagId);
       UserDto userDto = UserDto.from(entity.getUser());
+      List<IssueCommentDto> comments = new ArrayList<>();
 
-      List<IssueCommentDto> comments =
-          issueCommentService.findAllByIssueId(entity.getId()).stream()
-              .map(
-                  comment -> {
-                    UserDto author = UserDto.from(comment.getAuthor());
-                    return IssueCommentDto.of(author, comment);
-                  })
-              .toList();
+      if (entity.getCommentCount() > 0) {
+        comments =
+            issueCommentService.findAllByIssueId(entity.getId()).stream()
+                .map(
+                    comment -> {
+                      UserDto author = UserDto.from(comment.getAuthor());
+                      return IssueCommentDto.of(author, comment);
+                    })
+                .toList();
+      }
 
       BoardIssueResponse response = new BoardIssueResponse();
       response.setId(entity.getId());
@@ -107,24 +110,30 @@ public class BoardFacadeService {
       List<ReviewDto> reviews = new ArrayList<>();
       List<PullCommentDto> comments = new ArrayList<>();
 
-      List<Review> reviewEntities = reviewService.findAllByPullId(entity.getId());
+      // 리뷰가 있어야만 코멘트가 존재한다.
+      if (entity.getReviewCount() > 0) {
+        List<Review> reviewEntities = reviewService.findAllByPullId(entity.getId());
 
-      for (Review review : reviewEntities) {
-        UserDto reviewAuthor = UserDto.from(review.getUser());
-        ReviewDto reviewDto = ReviewDto.of(review, reviewAuthor);
-        reviews.add(reviewDto);
+        for (Review review : reviewEntities) {
+          UserDto reviewAuthor = UserDto.from(review.getUser());
+          ReviewDto reviewDto = ReviewDto.of(review, reviewAuthor);
+          reviews.add(reviewDto);
 
-        List<PullCommentDto> commentDtoList =
-            pullCommentService.findAllByReviewId(review.getId()).stream()
-                .map(
-                    comment -> {
-                      UserDto commentAuthor = UserDto.from(comment.getUser());
+          // 리뷰만 존재할 수 있다.
+          if (entity.getCommentCount() > 0) {
+            List<PullCommentDto> commentDtoList =
+                pullCommentService.findAllByReviewId(review.getId()).stream()
+                    .map(
+                        comment -> {
+                          UserDto commentAuthor = UserDto.from(comment.getUser());
 
-                      return PullCommentDto.of(comment, commentAuthor);
-                    })
-                .toList();
+                          return PullCommentDto.of(comment, commentAuthor);
+                        })
+                    .toList();
 
-        comments.addAll(commentDtoList);
+            comments.addAll(commentDtoList);
+          }
+        }
       }
 
       BoardPullResponse response = new BoardPullResponse();
@@ -137,7 +146,7 @@ public class BoardFacadeService {
       return response;
     }
 
-    // TODO 오류를 던져야 함
-    return null;
+    // 이슈랑 PR 둘 다 발견 못했으므로 404 오류
+    throw new BoardNotFoundException();
   }
 }
