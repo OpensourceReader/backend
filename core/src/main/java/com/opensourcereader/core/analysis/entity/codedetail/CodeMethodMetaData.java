@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity.codedetail;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.github.javaparser.Range;
@@ -9,7 +10,9 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,6 +30,9 @@ public class CodeMethodMetaData extends BaseEntity {
 
   private Integer startLine;
   private Integer endLine;
+
+  @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY)
+  private List<CodeMethodCallEdge> outgoingCalls;
 
   @ManyToOne private OpenSourceRepoContent openSourceRepoContent;
 
