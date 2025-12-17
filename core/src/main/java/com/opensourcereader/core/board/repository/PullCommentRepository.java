@@ -9,6 +9,4 @@ import com.opensourcereader.core.board.entity.PullComment;
 public interface PullCommentRepository extends JpaRepository<PullComment, Long> {
 
   List<PullComment> findAllByReviewId(Long reviewId);
-
-  Long countAllByReviewId(Long reviewId);
 }

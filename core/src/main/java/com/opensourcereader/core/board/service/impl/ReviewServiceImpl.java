@@ -17,11 +17,6 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
 
   @Override
-  public Long countAllByPullId(Long pullId) {
-    return reviewRepository.countAllByPullId(pullId);
-  }
-
-  @Override
   public List<Review> findAllByPullId(Long pullId) {
     return reviewRepository.findAllByPullId(pullId);
   }

@@ -6,7 +6,5 @@ import com.opensourcereader.core.board.entity.Review;
 
 public interface ReviewService {
 
-  Long countAllByPullId(Long pullId);
-
   List<Review> findAllByPullId(Long pullId);
 }
