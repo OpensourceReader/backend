@@ -34,6 +34,9 @@ public class CodeMethodMetaData extends BaseEntity {
   @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY)
   private List<CodeMethodCallEdge> outgoingCalls;
 
+  @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY)
+  private List<CodeMethodCallEdge> ingoingCalls;
+
   @ManyToOne private OpenSourceRepoContent openSourceRepoContent;
 
   public CodeMethodMetaData(
@@ -64,5 +67,9 @@ public class CodeMethodMetaData extends BaseEntity {
     }
 
     return new CodeMethodMetaData(methodName, modifier, null, null, openSourceRepoContent);
+  }
+
+  public void updateOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
+    this.outgoingCalls = methodCallEdges;
   }
 }

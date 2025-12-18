@@ -1,11 +1,12 @@
 package com.opensourcereader.core.analysis.service.impl;
 
 import static com.opensourcereader.core.analysis.OpenSourceRepoServiceTestFixture.OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE;
-import static com.opensourcereader.core.analysis.service.impl.MethodFlowService.PATH_SEPARATOR;
+import static com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PATH_SEPARATOR;
 
 import java.util.List;
 
 import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.FieldInfo;
+import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndMethod;
 import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndType;
 import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.ReceiverMethodName;
 import org.assertj.core.api.Assertions;
@@ -15,12 +16,38 @@ import org.junit.jupiter.api.Test;
 
 class JavaAstExtractorTest {
 
+  private final JavaAstExtractor javaAstExtractor = new JavaAstExtractor();
+
+  @DisplayName("현재 메서드가 사용하는 함수들을 보여줍니다.")
+  @Test
+  void flowTest() {
+    // given & when
+    String methodName = "createRepo";
+    List<PathAndMethod> pathAndMethods =
+        javaAstExtractor.extractOutgoingPathAndMethod(
+            OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, methodName);
+
+    // then
+    Assertions.assertThat(pathAndMethods)
+        .extracting(PathAndMethod::path, PathAndMethod::methodName)
+        .containsExactlyInAnyOrder(
+            Tuple.tuple(
+                "com.opensourcereader.core.analysis.service.GitRepositoryService", "getFlatTree"),
+            Tuple.tuple(
+                "com.opensourcereader.core.analysis.service.GitRepositoryService",
+                "createRepositoryBuilder"),
+            Tuple.tuple(
+                "com.opensourcereader.core.analysis.service.GitRepositoryService", "getRawText"),
+            Tuple.tuple(
+                "com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository", "save"));
+  }
+
   @DisplayName("필드에 선언된 타입과 선언명을 추출합니다")
   @Test
   void extractField() {
     // given & when
     List<FieldInfo> fieldInfos =
-        JavaAstExtractor.extractField(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE);
+        javaAstExtractor.extractField(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE);
 
     // then
     Assertions.assertThat(fieldInfos)
@@ -35,7 +62,7 @@ class JavaAstExtractorTest {
   void extractPath() {
     // given &  when
     List<PathAndType> pathAndTypes =
-        JavaAstExtractor.extractPath(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, PATH_SEPARATOR);
+        javaAstExtractor.extractPath(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, PATH_SEPARATOR);
 
     // then
     Assertions.assertThat(pathAndTypes)
@@ -76,7 +103,7 @@ class JavaAstExtractorTest {
     // given & when
     String methodName = "createRepo";
     List<ReceiverMethodName> receiverMethodNames =
-        JavaAstExtractor.extractMethodCall(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, methodName);
+        javaAstExtractor.extractMethodCall(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, methodName);
 
     // then
     Assertions.assertThat(receiverMethodNames)

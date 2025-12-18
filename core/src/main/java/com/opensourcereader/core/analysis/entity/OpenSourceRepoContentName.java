@@ -26,6 +26,11 @@ public class OpenSourceRepoContentName {
     return pathTokens[pathTokens.length - 1];
   }
 
+  public static String getExtension(String name) {
+    int lastIndexOfZero = name.lastIndexOf('.') + 1;
+    return name.substring(lastIndexOfZero);
+  }
+
   public boolean isNotJavaFile() {
     int lastIndexOfZero = name.lastIndexOf('.') + 1;
     return !name.substring(lastIndexOfZero).equals("java");

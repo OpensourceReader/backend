@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class CodeMethodCallEdge extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "callee_id")
-  private CodeMethodMetaData callee;
-
-  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "caller_id")
   private CodeMethodMetaData caller;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "callee_id")
+  private CodeMethodMetaData callee;
 
   public CodeMethodCallEdge(CodeMethodMetaData callee, CodeMethodMetaData caller) {
     this.callee = callee;
