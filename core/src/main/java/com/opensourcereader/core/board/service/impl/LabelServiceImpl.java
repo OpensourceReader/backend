@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Deprecated
 public class LabelServiceImpl implements LabelService {
 
   private final LabelRepository labelRepository;

@@ -5,6 +5,7 @@ import java.util.List;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Label;
 
+@Deprecated
 public interface LabelService {
 
   List<Label> findAllByRepositoryId(Long repositoryId);

@@ -2,6 +2,7 @@ package com.opensourcereader.core.board.entity;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.board.dto.PullCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,17 +13,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "pulls")
-@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Pull extends BaseEntity {
 
   @Column(name = "tag_id", nullable = false)
@@ -51,28 +48,33 @@ public class Pull extends BaseEntity {
   @Column(name = "comment_count", nullable = false)
   private Long commentCount;
 
-  public static PullBuilder of(
-      Long tagId,
-      User author,
-      OpenSourceRepo repository,
-      String title,
-      Boolean isOpened,
-      Long reviewCount,
-      Long commentCount) {
-    return Pull.builder()
-        .tagId(tagId)
-        .user(author)
-        .repository(repository)
-        .title(title)
-        .isOpened(isOpened)
-        .reviewCount(reviewCount)
-        .commentCount(commentCount);
+  @Column(nullable = false)
+  private Boolean disabled = false;
+
+  private Pull(PullCommand command) {
+    super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
+    this.tagId = command.getTagId();
+    this.user = command.getAuthor();
+    this.repository = command.getRepo();
+    this.title = command.getTitle();
+    this.body = command.getBody();
+    this.isOpened = command.getIsOpened();
+    this.commentCount = command.getCommentCount();
+    this.reviewCount = command.getReviewCount();
+  }
+
+  public static Pull from(PullCommand command) {
+    return new Pull(command);
   }
 
   // 대량의 변화일 가능성이 높기에 통짜로 변경한다.
-  // TODO 단, 로그를 남겨야 한다.(이전 변화, 현재 변화)
+  // TODO 로그를 남겨야 한다.(이전 변화, 현재 변화)
   public void updateBody(String newContent) {
     this.body = newContent;
+  }
+
+  public void updateDisabled(Boolean newDisabled) {
+    this.disabled = newDisabled;
   }
 
   public void updateStatus(Boolean newStatus) {

@@ -20,7 +20,6 @@ import com.opensourcereader.core.board.entity.Review;
 import com.opensourcereader.core.board.exception.BoardNotFoundException;
 import com.opensourcereader.core.board.service.IssueCommentService;
 import com.opensourcereader.core.board.service.IssueService;
-import com.opensourcereader.core.board.service.LabelService;
 import com.opensourcereader.core.board.service.PullCommentService;
 import com.opensourcereader.core.board.service.PullService;
 import com.opensourcereader.core.board.service.ReviewService;
@@ -38,7 +37,6 @@ public class BoardFacadeService {
   private final IssueCommentService issueCommentService;
   private final PullCommentService pullCommentService;
 
-  private final LabelService labelService;
   private final ReviewService reviewService;
 
   public List<BoardPreviewResponse> findAllPreviewByRepositoryId(BoardGetRequest request) {
@@ -115,7 +113,7 @@ public class BoardFacadeService {
         List<Review> reviewEntities = reviewService.findAllByPullId(entity.getId());
 
         for (Review review : reviewEntities) {
-          UserDto reviewAuthor = UserDto.from(review.getUser());
+          UserDto reviewAuthor = UserDto.from(review.getAuthor());
           ReviewDto reviewDto = ReviewDto.of(review, reviewAuthor);
           reviews.add(reviewDto);
 
@@ -125,7 +123,7 @@ public class BoardFacadeService {
                 pullCommentService.findAllByReviewId(review.getId()).stream()
                     .map(
                         comment -> {
-                          UserDto commentAuthor = UserDto.from(comment.getUser());
+                          UserDto commentAuthor = UserDto.from(comment.getAuthor());
 
                           return PullCommentDto.of(comment, commentAuthor);
                         })

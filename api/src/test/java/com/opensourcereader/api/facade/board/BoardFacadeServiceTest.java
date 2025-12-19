@@ -14,6 +14,9 @@ import com.opensourcereader.api.controller.board.response.BoardBaseResponse;
 import com.opensourcereader.api.controller.board.response.BoardIssueResponse;
 import com.opensourcereader.api.controller.board.response.BoardPreviewResponse;
 import com.opensourcereader.api.controller.board.response.BoardPullResponse;
+import com.opensourcereader.core.board.dto.BoardBaseCommand;
+import com.opensourcereader.core.board.dto.PullCommand;
+import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.entity.Review;
@@ -33,7 +36,6 @@ class BoardFacadeServiceTest {
   @Mock private PullService pullService;
   @Mock private IssueCommentService issueCommentService;
   @Mock private PullCommentService pullCommentService;
-  @Mock private LabelService labelService;
   @Mock private ReviewService reviewService;
 
   @InjectMocks private BoardFacadeService boardFacadeService;
@@ -58,38 +60,45 @@ class BoardFacadeServiceTest {
   }
 
   private Issue createDummyIssue(Long id, User user) {
-    Issue issue =
-        Issue.builder()
-            .title("Test Issue Title")
-            .body("Test Issue Body")
-            .user(user)
-            .tagId(101L)
-            .isOpened(true)
-            .commentCount(5L)
-            .build();
+    BoardBaseCommand command = new BoardBaseCommand();
+    command.setId(id);
+    command.setCreatedAt(NOW);
+    command.setUpdatedAt(NOW);
+    command.setAuthor(user);
+    command.setIsOpened(true);
+    command.setCommentCount(5L);
+    command.setTitle("Test Issue Title");
+    command.setBody("Test Issue Body");
+    command.setTagId(101L);
 
-    ReflectionTestUtils.setField(issue, "id", id);
-    ReflectionTestUtils.setField(issue, "createdAt", NOW);
-    ReflectionTestUtils.setField(issue, "updatedAt", NOW);
-    return issue;
+    return Issue.from(command);
   }
 
   private Pull createDummyPull(Long id, User user) {
-    Pull pull =
-        Pull.builder()
-            .title("Test Pull Title")
-            .body("Test Pull Body")
-            .user(user)
-            .tagId(202L)
-            .isOpened(true)
-            .reviewCount(2L)
-            .commentCount(3L)
-            .build();
+    PullCommand command = new PullCommand();
+    command.setId(id);
+    command.setCreatedAt(NOW);
+    command.setUpdatedAt(NOW);
+    command.setAuthor(user);
+    command.setIsOpened(true);
+    command.setCommentCount(3L);
+    command.setTitle("Test Pull Title");
+    command.setBody("Test Pull Body");
+    command.setTagId(202L);
+    command.setReviewCount(2L);
 
-    ReflectionTestUtils.setField(pull, "id", id);
-    ReflectionTestUtils.setField(pull, "createdAt", NOW);
-    ReflectionTestUtils.setField(pull, "updatedAt", NOW);
-    return pull;
+    return Pull.from(command);
+  }
+
+  private Review createDummyReview(Long id, Pull pull, User user) {
+    ReviewCommand command = new ReviewCommand();
+    command.setId(id);
+    command.setCreatedAt(NOW);
+    command.setUpdatedAt(NOW);
+    command.setAuthor(user);
+    command.setPull(pull);
+
+    return Review.from(command);
   }
 
   @Test
@@ -104,7 +113,7 @@ class BoardFacadeServiceTest {
     Issue issue = createDummyIssue(1L, user);
     Pull pull = createDummyPull(2L, user);
 
-    Review review = Review.builder().pull(pull).user(user).build();
+    Review review = createDummyReview(3L, pull, user);
     ReflectionTestUtils.setField(review, "id", 10L);
 
     given(issueService.findAllByRepositoryId(repoId, true)).willReturn(List.of(issue));
