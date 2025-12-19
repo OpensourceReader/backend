@@ -1,6 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl;
 
-import static com.opensourcereader.core.analysis.OpenSourceRepoServiceTestFixture.OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE;
+import static com.opensourcereader.core.analysis.OpenSourceRepoServiceTestFixture.OPEN_SOURCE_REPO_CONTEXT;
 import static com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PATH_SEPARATOR;
 
 import java.util.List;
@@ -24,8 +24,7 @@ class JavaAstExtractorTest {
     // given & when
     String methodName = "createRepo";
     List<PathAndMethod> pathAndMethods =
-        javaAstExtractor.extractOutgoingPathAndMethod(
-            OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, methodName);
+        javaAstExtractor.extractOutgoingPathAndMethod(OPEN_SOURCE_REPO_CONTEXT, methodName);
 
     // then
     Assertions.assertThat(pathAndMethods)
@@ -46,8 +45,7 @@ class JavaAstExtractorTest {
   @Test
   void extractField() {
     // given & when
-    List<FieldInfo> fieldInfos =
-        javaAstExtractor.extractField(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE);
+    List<FieldInfo> fieldInfos = javaAstExtractor.extractField(OPEN_SOURCE_REPO_CONTEXT);
 
     // then
     Assertions.assertThat(fieldInfos)
@@ -62,7 +60,7 @@ class JavaAstExtractorTest {
   void extractPath() {
     // given &  when
     List<PathAndType> pathAndTypes =
-        javaAstExtractor.extractPath(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, PATH_SEPARATOR);
+        javaAstExtractor.extractPath(OPEN_SOURCE_REPO_CONTEXT, PATH_SEPARATOR);
 
     // then
     Assertions.assertThat(pathAndTypes)
@@ -103,7 +101,7 @@ class JavaAstExtractorTest {
     // given & when
     String methodName = "createRepo";
     List<ReceiverMethodName> receiverMethodNames =
-        javaAstExtractor.extractMethodCall(OPEN_SOURCE_REPO_SERVICE_JAVA_SOURCE, methodName);
+        javaAstExtractor.extractMethodCall(OPEN_SOURCE_REPO_CONTEXT, methodName);
 
     // then
     Assertions.assertThat(receiverMethodNames)

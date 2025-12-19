@@ -82,7 +82,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     StaticJavaParser.getConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
     CompilationUnit compilationUnit = StaticJavaParser.parse(rawText);
     for (MethodDeclaration methodDeclaration : compilationUnit.findAll(MethodDeclaration.class)) {
-      CodeMethodMetaData methodMetaData = CodeMethodMetaData.createFrom(methodDeclaration, this);
+      CodeMethodMetaData methodMetaData = CodeMethodMetaData.of(methodDeclaration, this);
       result.add(methodMetaData);
     }
     return result;

@@ -68,14 +68,4 @@ class MethodFlowServiceTest {
         .containsExactlyInAnyOrder(
             Tuple.tuple("com.opensourcereader.api.facade.analysis", "createRepo"));
   }
-
-  @DisplayName("")
-  @Test
-  void getMethodFlow() {
-    // given
-
-    // when
-
-    // then
-  }
 }
