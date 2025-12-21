@@ -56,8 +56,8 @@ public class DefaultOauth2UserServiceTest {
 
     Map<String, Object> attributes =
         Map.of(
-            "id", 12345,
-            "login", "nickname",
+            "id", 12345L,
+            "login", "loginName",
             "username", "Kim User");
 
     DefaultOAuth2User auth2User =
@@ -87,7 +87,7 @@ public class DefaultOauth2UserServiceTest {
     // then
     assertThat(result.getAttributes().get("email")).isEqualTo("primary@email.com");
 
-    boolean existsed = userRepository.existsByNicknameAndEmail("nickname", "primary@email.com");
+    boolean existsed = userRepository.existsByLoginNameAndEmail("loginName", "primary@email.com");
     assertThat(existsed).isTrue();
 
     mockServer.verify();

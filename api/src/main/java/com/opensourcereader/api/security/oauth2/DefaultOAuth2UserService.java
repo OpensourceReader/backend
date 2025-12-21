@@ -17,7 +17,6 @@ import com.opensourcereader.api.controller.auth.response.GitHubApiEmailResponse;
 import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.dto.UserConnection;
 import com.opensourcereader.core.security.dto.UserInfo;
-import com.opensourcereader.core.security.service.AuthService;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.service.UserService;
 
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
   private final UserService userService;
-  private final AuthService authService;
   private final OAuth2UserService<OAuth2UserRequest, OAuth2User> internalOAuth2UserService;
 
   private final RestClient restClient;
@@ -57,12 +55,12 @@ public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserReq
     try {
       return userService.findByProviderId(userInfo.providerId());
     } catch (Exception e) {
-      return authService.signup(userInfo);
+      return userService.signup(userInfo);
     }
   }
 
   private UserInfo extractGitHubUserInfo(Map<String, Object> attributes) {
-    String providerId = String.valueOf(attributes.get("id"));
+    Long providerId = (Long) attributes.get("id");
     String email = (String) attributes.get("email");
     String name = (String) attributes.get("name");
     String nickname = (String) attributes.get("login");

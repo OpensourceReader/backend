@@ -31,9 +31,9 @@ public class RefreshTokenService {
 
   // TODO 유저가 토큰을 삭제시키거하 하는 등의 작업을 할 수 없게 만들어야한다.
   @Transactional
-  public RefreshToken createRefreshToken(String nickname) {
+  public RefreshToken createRefreshToken(String loginName) {
     User user =
-        userRepository.findFirstByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
 
     Instant expiryDate = Instant.now().plusSeconds(refreshTokenExpireSeconds);
 
@@ -51,9 +51,9 @@ public class RefreshTokenService {
   }
 
   @Transactional
-  public void invalidate(String nickname) {
+  public void invalidate(String loginName) {
     User user =
-        userRepository.findFirstByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
 
     refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
   }

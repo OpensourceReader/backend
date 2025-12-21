@@ -14,6 +14,7 @@ import java.util.Optional;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.opensourcereader.core.security.entity.RefreshToken;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;
+import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.exception.UserException;
 import com.opensourcereader.core.user.repository.UserRepository;
@@ -38,9 +39,10 @@ public class RefreshTokenServiceUnitTest {
   void createRefreshToken_Success() {
     // Given
     String nickname = "testUser";
-    User user = User.of(nickname, "test@email.com", "pw").build();
+    UserSignUpCommand command = UserSignUpCommand.of("test@email.com", "pw", nickname);
+    User user = User.from(command);
 
-    given(userRepository.findFirstByNickname(nickname)).willReturn(Optional.of(user));
+    given(userRepository.findFirstByLoginName(nickname)).willReturn(Optional.of(user));
     given(refreshTokenRepository.save(any(RefreshToken.class)))
         .willAnswer(invocation -> invocation.getArgument(0));
 
@@ -58,7 +60,7 @@ public class RefreshTokenServiceUnitTest {
   @DisplayName("토큰 생성 실패 (유저 없음)")
   void createRefreshToken_Fail_UserNotFound() {
     // Given
-    given(userRepository.findFirstByNickname(anyString())).willReturn(Optional.empty());
+    given(userRepository.findFirstByLoginName(anyString())).willReturn(Optional.empty());
 
     // When & Then
     assertThatThrownBy(() -> refreshTokenService.createRefreshToken("unknown"))
@@ -71,7 +73,8 @@ public class RefreshTokenServiceUnitTest {
   @DisplayName("만료 검증 성공")
   void verifyExpiration_Success() {
     // Given
-    User user = User.of("user", "email", "pw").build();
+    UserSignUpCommand command = UserSignUpCommand.of("email", "pw", "user");
+    User user = User.from(command);
     RefreshToken validToken = RefreshToken.of(user, "token", Instant.now().plusSeconds(3600));
 
     // When
@@ -86,7 +89,8 @@ public class RefreshTokenServiceUnitTest {
   @DisplayName("만료 검증 실패 (시간 초과)")
   void verifyExpiration_Expired() {
     // Given
-    User user = User.of("user", "email", "pw").build();
+    UserSignUpCommand command = UserSignUpCommand.of("email", "pw", "user");
+    User user = User.from(command);
     RefreshToken expiredToken = RefreshToken.of(user, "token", Instant.now().minusSeconds(3600));
 
     // When & Then
@@ -101,10 +105,11 @@ public class RefreshTokenServiceUnitTest {
   void invalidate_Success() {
     // Given
     String nickname = "user";
-    User user = User.of(nickname, "email", "pw").build();
+    UserSignUpCommand command = UserSignUpCommand.of("email", "pw", nickname);
+    User user = User.from(command);
     RefreshToken token = RefreshToken.of(user, "token", Instant.now());
 
-    given(userRepository.findFirstByNickname(nickname)).willReturn(Optional.of(user));
+    given(userRepository.findFirstByLoginName(nickname)).willReturn(Optional.of(user));
     given(refreshTokenRepository.findByUser(user)).willReturn(Optional.of(token));
 
     // When
@@ -119,9 +124,10 @@ public class RefreshTokenServiceUnitTest {
   void invalidate_UserExists_But_NoToken() {
     // Given
     String nickname = "user";
-    User user = User.of(nickname, "email", "pw").build();
+    UserSignUpCommand command = UserSignUpCommand.of("email", "pw", nickname);
+    User user = User.from(command);
 
-    given(userRepository.findFirstByNickname(nickname)).willReturn(Optional.of(user));
+    given(userRepository.findFirstByLoginName(nickname)).willReturn(Optional.of(user));
     given(refreshTokenRepository.findByUser(user)).willReturn(Optional.empty());
 
     // When
@@ -135,7 +141,7 @@ public class RefreshTokenServiceUnitTest {
   @DisplayName("토큰 무효화 실패 (유저 없음)")
   void invalidate_Fail_UserNotFound() {
     // Given
-    given(userRepository.findFirstByNickname(anyString())).willReturn(Optional.empty());
+    given(userRepository.findFirstByLoginName(anyString())).willReturn(Optional.empty());
 
     // When & Then
     assertThatThrownBy(() -> refreshTokenService.invalidate("unknown"))

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.opensourcereader.api.controller.auth.request.SignUpRequest;
 import com.opensourcereader.api.facade.auth.AuthFacadeService;
-import com.opensourcereader.core.security.dto.SignUpCommand;
 import com.opensourcereader.core.security.dto.UserConnection;
 
 import lombok.RequiredArgsConstructor;
@@ -22,8 +21,8 @@ public class AuthController {
 
   @PostMapping("/signup")
   public ResponseEntity<UserConnection> signup(@RequestBody SignUpRequest request) {
-    SignUpCommand command = request.toCommand();
-    UserConnection connection = authFacadeService.signup(command);
+
+    UserConnection connection = authFacadeService.signup(request);
 
     return ResponseEntity.ok(connection);
   }

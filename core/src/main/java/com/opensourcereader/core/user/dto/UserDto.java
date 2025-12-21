@@ -21,7 +21,7 @@ public record UserDto(
     String createdAtToString = user.getCreatedAt().truncatedTo(ChronoUnit.SECONDS).toString();
 
     return UserDto.builder()
-        .nickname(user.getNickname())
+        .nickname(user.getLoginName())
         .email(user.getEmail())
         .avatarUrl(user.getAvatarUrl())
         .role(user.getRole())
