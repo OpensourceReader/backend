@@ -15,8 +15,8 @@ public interface CodeMethodMetaDataRepository extends JpaRepository<CodeMethodMe
       SELECT meta
       FROM CodeMethodMetaData meta
       WHERE meta.openSourceRepoContent.path LIKE %:path
-          AND meta.methodName = :methodName
+          AND meta.methodSignature = :methodSignature
       """)
   Optional<CodeMethodMetaData> findByRepoPathAndMethodName(
-      @Param("path") String path, @Param("methodName") String methodName);
+      @Param("path") String path, @Param("methodSignature") String methodSignature);
 }

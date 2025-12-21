@@ -32,7 +32,7 @@ class CodeMethodMetaDataTest {
     Assertions.assertThat(methodMetaData)
         .extracting(
             CodeMethodMetaData::getMethodName,
-            CodeMethodMetaData::getParameterSignature,
+            CodeMethodMetaData::getMethodSignature,
             CodeMethodMetaData::getMethodModifier,
             CodeMethodMetaData::getStartLine,
             CodeMethodMetaData::getEndLine)

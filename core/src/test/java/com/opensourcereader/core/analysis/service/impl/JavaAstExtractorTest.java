@@ -6,9 +6,9 @@ import static com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.P
 import java.util.List;
 
 import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.FieldInfo;
-import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndMethod;
+import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndMethodSignature;
 import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndType;
-import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.ReceiverMethodName;
+import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.ReceiverAndMethodSignature;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -16,19 +16,20 @@ import org.junit.jupiter.api.Test;
 
 class JavaAstExtractorTest {
 
-  private final JavaAstExtractor javaAstExtractor = new JavaAstExtractor();
+  private final ExpressionTypeResolver expressionTypeResolver = new ExpressionTypeResolver();
+  private final JavaAstExtractor javaAstExtractor = new JavaAstExtractor(expressionTypeResolver);
 
   @DisplayName("현재 메서드가 사용하는 함수들을 보여줍니다.")
   @Test
   void flowTest() {
     // given & when
     String methodName = "createRepo";
-    List<PathAndMethod> pathAndMethods =
+    List<PathAndMethodSignature> pathAndMethodSignatures =
         javaAstExtractor.extractOutgoingPathAndMethod(OPEN_SOURCE_REPO_CONTEXT, methodName);
 
     // then
-    Assertions.assertThat(pathAndMethods)
-        .extracting(PathAndMethod::path, PathAndMethod::methodName)
+    Assertions.assertThat(pathAndMethodSignatures)
+        .extracting(PathAndMethodSignature::path, PathAndMethodSignature::methodSignature)
         .containsExactlyInAnyOrder(
             Tuple.tuple(
                 "com.opensourcereader.core.analysis.service.GitRepositoryService", "getFlatTree"),
@@ -100,12 +101,13 @@ class JavaAstExtractorTest {
   void extractMethodCallTest() {
     // given & when
     String methodName = "createRepo";
-    List<ReceiverMethodName> receiverMethodNames =
+    List<ReceiverAndMethodSignature> receiverAndMethodSignatures =
         javaAstExtractor.extractMethodCall(OPEN_SOURCE_REPO_CONTEXT, methodName);
 
     // then
-    Assertions.assertThat(receiverMethodNames)
-        .extracting(ReceiverMethodName::receiver, ReceiverMethodName::methodName)
+    Assertions.assertThat(receiverAndMethodSignatures)
+        .extracting(
+            ReceiverAndMethodSignature::receiver, ReceiverAndMethodSignature::methodSignature)
         .containsExactlyInAnyOrder(
             Tuple.tuple(null, "validateAlreadyExist"),
             Tuple.tuple("gitRepositoryService", "getFlatTree"),
@@ -115,5 +117,42 @@ class JavaAstExtractorTest {
             Tuple.tuple("opensourceRepo", "addContent"),
             Tuple.tuple("OpenSourceRepoContent", "of"),
             Tuple.tuple("opensourceRepoRepository", "save"));
+  }
+
+  @DisplayName("")
+  @Test
+  void getParameterTypeFromArgumentTest() {
+    // given
+    String source =
+        """
+        package demo;
+
+        import java.util.ArrayList;
+
+        class Demo {
+          void run() {
+            pay("hello", 10, 10L, 3.14, true, 'a');
+            pay(new Rate(10), (Rate) obj, (long) 10);
+            ch.pay(rate, getRate()); // 이 둘은 Unknown으로 남는 게 정상, 내부 메서드 콜이니 getRate가 하나더 생기긴하네
+            pay(new ArrayList<String>());
+          }
+
+          void pay(Object... args) {}
+          Rate getRate() { return null; }
+
+          static class Rate {
+            Rate(int v) {}
+          }
+
+          Object obj;
+          Object rate;
+        }
+        """;
+
+    // when
+    List<ReceiverAndMethodSignature> run = javaAstExtractor.extractMethodCall(source, "run");
+
+    // then
+    Assertions.assertThat(run).isNotEmpty();
   }
 }

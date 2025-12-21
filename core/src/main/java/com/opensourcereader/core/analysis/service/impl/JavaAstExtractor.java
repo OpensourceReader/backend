@@ -16,13 +16,18 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class JavaAstExtractor {
 
   public static final String PATH_SEPARATOR = ".";
+  private final ExpressionTypeResolver expressionTypeResolver;
 
   // 축소필요
-  public List<PathAndMethod> extractOutgoingPathAndMethod(String rawText, String targetMethodName) {
+  public List<PathAndMethodSignature> extractOutgoingPathAndMethod(
+      String rawText, String targetMethodName) {
     Map<String, String> fieldInfos =
         extractField(rawText).stream()
             .collect(Collectors.toMap(FieldInfo::fieldName, FieldInfo::type));
@@ -33,7 +38,8 @@ public class JavaAstExtractor {
             .collect(
                 Collectors.groupingBy(
                     rm -> fieldInfos.get(rm.receiver()),
-                    Collectors.mapping(ReceiverMethodName::methodName, Collectors.toList())));
+                    Collectors.mapping(
+                        ReceiverAndMethodSignature::methodSignature, Collectors.toList())));
 
     Map<String, String> pathAndTypes =
         extractPath(rawText, PATH_SEPARATOR).stream()
@@ -45,7 +51,9 @@ public class JavaAstExtractor {
                 entry.getValue().stream()
                     .map(
                         methodName ->
-                            new PathAndMethod(pathAndTypes.get(entry.getKey()), methodName)))
+                            new PathAndMethodSignature(
+                                pathAndTypes.get(entry.getKey()).replace('.', '/') + ".java",
+                                methodName)))
         .toList();
   }
 
@@ -65,7 +73,7 @@ public class JavaAstExtractor {
   }
 
   // 만약 static이면 .바로 이전걸 뽑아서 넣어야함 -> 이것도 비즈니스 로직
-
+  // 추가 분석 필요
   public List<PathAndType> extractPath(String rawText, String pathSeparator) {
     CompilationUnit cu = StaticJavaParser.parse(rawText);
 
@@ -89,26 +97,37 @@ public class JavaAstExtractor {
   }
 
   // import static 예외처리 필요
-  public List<ReceiverMethodName> extractMethodCall(String rawText, String methodName) {
-    CompilationUnit cu = StaticJavaParser.parse(rawText);
+  public List<ReceiverAndMethodSignature> extractMethodCall(String rawText, String methodName) {
+    CompilationUnit compilationUnit = StaticJavaParser.parse(rawText);
 
-    MethodDeclaration md =
-        cu.findAll(MethodDeclaration.class).stream()
-            .filter(m -> m.getNameAsString().equals(methodName))
-            .findFirst()
-            .orElseThrow();
+    List<ReceiverAndMethodSignature> result = new ArrayList<>();
+    for (MethodDeclaration methodDeclaration : compilationUnit.findAll(MethodDeclaration.class)) {
+      if (!methodDeclaration.getNameAsString().equals(methodName)) {
+        continue;
+      }
+      for (MethodCallExpr methodCall : methodDeclaration.findAll(MethodCallExpr.class)) {
+        String receiver = methodCall.getScope().map(Expression::toString).orElse(null);
+        List<String> paramTypes = getParameterTypeFromArgument(methodCall);
+        String methodSignature = methodCall.getNameAsString() + String.join(".", paramTypes);
+        result.add(new ReceiverAndMethodSignature(receiver, methodSignature));
+      }
+    }
 
-    return md.findAll(MethodCallExpr.class).stream()
-        .map(
-            call ->
-                new ReceiverMethodName(
-                    call.getScope().map(Expression::toString).orElse(null), call.getNameAsString()))
-        .toList();
+    return result;
   }
 
-  public record PathAndMethod(String path, String methodName) {}
+  public List<String> getParameterTypeFromArgument(MethodCallExpr call) {
+    List<String> argTypes = new ArrayList<>();
+    for (Expression argument : call.getArguments()) {
+      argTypes.add(expressionTypeResolver.getTypeToString(argument));
+      //      args.add(argument.toString());
+    }
+    return argTypes;
+  }
 
-  public record ReceiverMethodName(String receiver, String methodName) {}
+  public record PathAndMethodSignature(String path, String methodSignature) {}
+
+  public record ReceiverAndMethodSignature(String receiver, String methodSignature) {}
 
   public record PathAndType(String path, String type, boolean isAsterisk) {}
 

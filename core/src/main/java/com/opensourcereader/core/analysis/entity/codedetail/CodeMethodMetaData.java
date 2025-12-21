@@ -30,8 +30,6 @@ public class CodeMethodMetaData extends BaseEntity {
 
   private String methodName;
 
-  private String parameterSignature;
-
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "param_types", columnDefinition = "json", nullable = false)
   private List<String> paramTypes;
@@ -39,6 +37,7 @@ public class CodeMethodMetaData extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private MethodModifier methodModifier;
 
+  private String methodSignature;
   private Integer startLine;
   private Integer endLine;
 
@@ -52,16 +51,16 @@ public class CodeMethodMetaData extends BaseEntity {
 
   private CodeMethodMetaData(
       String methodName,
-      String parameterSignature,
       List<String> paramTypes,
       MethodModifier methodModifier,
+      String methodSignature,
       Integer startLine,
       Integer endLine,
       OpenSourceRepoContent openSourceRepoContent) {
     this.methodName = methodName;
-    this.parameterSignature = parameterSignature;
     this.paramTypes = paramTypes;
     this.methodModifier = methodModifier;
+    this.methodSignature = methodSignature;
     this.startLine = startLine;
     this.endLine = endLine;
     this.openSourceRepoContent = openSourceRepoContent;
@@ -71,16 +70,15 @@ public class CodeMethodMetaData extends BaseEntity {
       MethodDeclaration methodDeclaration, OpenSourceRepoContent openSourceRepoContent) {
     String methodName = methodDeclaration.getNameAsString();
     MethodModifier modifier = MethodModifier.from(methodDeclaration);
-
     List<String> paramTypes = getParameterTypes(methodDeclaration);
-    String parameterTypeSignature = String.join("", paramTypes);
+    String methodSignature = methodName + String.join("", paramTypes);
     Integer startLine = getStartLine(methodDeclaration);
     Integer endLine = getEndLine(methodDeclaration);
     return new CodeMethodMetaData(
         methodName,
-        parameterTypeSignature,
         paramTypes,
         modifier,
+        methodSignature,
         startLine,
         endLine,
         openSourceRepoContent);

@@ -13,7 +13,7 @@ import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.MethodModifier;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndMethod;
+import com.opensourcereader.core.analysis.service.impl.JavaAstExtractor.PathAndMethodSignature;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,18 +42,18 @@ public class MethodFlowService {
         if (codeMethodMetaData.getMethodModifier().equals(MethodModifier.PRIVATE)) {
           continue;
         }
-        List<PathAndMethod> pathAndMethods =
+        List<PathAndMethodSignature> pathAndMethodSignatures =
             javaAstExtractor.extractOutgoingPathAndMethod(
                 openSourceRepoContent.getRawText(), codeMethodMetaData.getMethodName());
 
         List<CodeMethodCallEdge> outgoingCodeMethodMetas = new ArrayList<>();
-        for (PathAndMethod pathAndMethod : pathAndMethods) {
-          String path = pathAndMethod.path().replace('.', '/') + ".java";
+        for (PathAndMethodSignature pathAndMethodSignature : pathAndMethodSignatures) {
           //          System.out.println("직전path:"+path);
-          //          System.out.println("직전메서드:"+pathAndMethod.methodName());
+          //          System.out.println("직전메서드:"+pathAndMethod.methodSignature());
           CodeMethodMetaData outgoingCodeMethodMetaData =
               codeMethodMetaDataRepository
-                  .findByRepoPathAndMethodName(path, pathAndMethod.methodName())
+                  .findByRepoPathAndMethodName(
+                      pathAndMethodSignature.path(), pathAndMethodSignature.methodSignature())
                   .orElseThrow(IllegalArgumentException::new);
 
           outgoingCodeMethodMetas.add(
