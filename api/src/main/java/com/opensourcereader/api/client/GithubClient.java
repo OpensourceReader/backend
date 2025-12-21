@@ -1,6 +1,5 @@
 package com.opensourcereader.api.client;
 
-import com.opensourcereader.api.client.response.GithubRepoResponse;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +11,7 @@ import org.springframework.web.client.RestClient;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
+import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.controller.auth.response.GitHubApiEmailResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -26,11 +26,13 @@ public class GithubClient {
   private final RestClient restClient;
 
   public GithubRepoResponse fetchRepo(GithubRepoRequest request) {
-    ResponseEntity<GithubRepoResponse> response = restClient.get()
-        .uri("/repos/{owner}/{repoName}", request.owner(), request.repoName())
-        .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
-        .retrieve()
-        .toEntity(GithubRepoResponse.class);
+    ResponseEntity<GithubRepoResponse> response =
+        restClient
+            .get()
+            .uri("/repos/{owner}/{repoName}", request.owner(), request.repoName())
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .retrieve()
+            .toEntity(GithubRepoResponse.class);
     return response.getBody();
   }
 

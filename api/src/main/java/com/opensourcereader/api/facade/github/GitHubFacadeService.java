@@ -1,8 +1,5 @@
 package com.opensourcereader.api.facade.github;
 
-import com.opensourcereader.api.client.response.GithubRepoResponse;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -13,7 +10,10 @@ import com.opensourcereader.api.client.GithubClient;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
+import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.PullCommand;
@@ -44,8 +44,7 @@ public class GitHubFacadeService {
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
     try {
-      return openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(),
-          request.repoName());
+      return openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
     } catch (OpenSourceRepoNotFoundException e) {
       GithubRepoResponse response = githubClient.fetchRepo(request);
       User owner = findByUser(response.owner());
@@ -54,8 +53,8 @@ public class GitHubFacadeService {
   }
 
   public List<Issue> createIssues(GithubRepoRequest request) {
-    OpenSourceRepo repo = openSourceRepoService.getRepoByOwnerNameAndTitle(
-        request.owner(), request.repoName());
+    OpenSourceRepo repo =
+        openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
 
     List<GithubIssueResponse> fetchedRepoIssues = githubClient.fetchRepoIssues(request);
 
@@ -75,8 +74,8 @@ public class GitHubFacadeService {
   }
 
   public List<Pull> createPulls(GithubRepoRequest request) {
-    OpenSourceRepo repo = openSourceRepoService.getRepoByOwnerNameAndTitle(
-        request.owner(), request.repoName());
+    OpenSourceRepo repo =
+        openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
 
     List<GithubPullResponse> fetchedRepoPulls = githubClient.fetchRepoPulls(request);
 
