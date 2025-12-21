@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
+import com.opensourcereader.api.client.GithubClient;
 import com.opensourcereader.api.controller.auth.response.GitHubApiEmailResponse;
 import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.dto.UserConnection;
@@ -27,8 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
   private final UserService userService;
   private final OAuth2UserService<OAuth2UserRequest, OAuth2User> internalOAuth2UserService;
-
-  private final RestClient restClient;
+  private final GithubClient githubClient;
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -78,13 +76,7 @@ public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserReq
   }
 
   private String getGitHubEmail(String accessToken) {
-    List<GitHubApiEmailResponse> emails =
-        restClient
-            .get()
-            .uri("/user/emails")
-            .headers(httpHeaders -> httpHeaders.setBearerAuth(accessToken))
-            .retrieve()
-            .body(new ParameterizedTypeReference<List<GitHubApiEmailResponse>>() {});
+    List<GitHubApiEmailResponse> emails = githubClient.fetchUserEmails(accessToken);
 
     if (emails != null) {
       return emails.stream()

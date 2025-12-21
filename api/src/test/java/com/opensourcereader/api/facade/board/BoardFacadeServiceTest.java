@@ -21,6 +21,7 @@ import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.entity.Review;
 import com.opensourcereader.core.board.service.*;
+import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,14 +44,10 @@ class BoardFacadeServiceTest {
   private static final Instant NOW = Instant.now();
 
   private User createDummyUser() {
-    User user =
-        User.builder()
-            .username("testUser")
-            .nickname("TestNick")
-            .email("test@example.com")
-            .password("password")
-            .disabled(false)
-            .build();
+    UserSignUpCommand command =
+        new UserSignUpCommand("test@example.com", "password", "TestNick", null, "testUser");
+
+    User user = User.from(command);
 
     ReflectionTestUtils.setField(user, "id", 1L);
     ReflectionTestUtils.setField(user, "createdAt", NOW);

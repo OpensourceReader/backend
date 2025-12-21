@@ -12,6 +12,7 @@ import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRep
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.user.entity.User;
 import jakarta.transaction.Transactional;
 import org.eclipse.jgit.lib.Repository;
 
@@ -23,6 +24,12 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
   private final GitRepositoryService gitRepositoryService;
   private final OpenSourceRepoRepository opensourceRepoRepository;
+
+  @Override
+  public OpenSourceRepo createRepoInDB(User owner, String title) {
+    OpenSourceRepo openSourceRepo = new OpenSourceRepo(owner, title);
+    return opensourceRepoRepository.save(openSourceRepo);
+  }
 
   @Transactional
   @Override
@@ -46,6 +53,13 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   public OpenSourceRepo getRepoById(Long repositoryId) {
     return opensourceRepoRepository
         .findById(repositoryId)
+        .orElseThrow(OpenSourceRepoNotFoundException::new);
+  }
+
+  @Override
+  public OpenSourceRepo getRepoByOwnerNameAndTitle(String ownerName, String title) {
+    return opensourceRepoRepository
+        .findByOwnerLoginNameAndTitle(ownerName, title)
         .orElseThrow(OpenSourceRepoNotFoundException::new);
   }
 
