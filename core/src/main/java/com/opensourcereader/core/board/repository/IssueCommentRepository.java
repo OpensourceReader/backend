@@ -15,27 +15,27 @@ public interface IssueCommentRepository extends JpaRepository<IssueComment, Long
   @Query(
       value =
           """
-      INSERT INTO IssueComments(
-        id,
-        created_at,
-        updated_at,
-        author_id,
-        issue_id,
-        body,
-        disabled
-      ) VALUES(
-      :#{#issueComment.id},
-      :#{#issueComment.createdAt},
-      :#{#issueComment.updatedAt},
-      :#{#issueComment.author.id},
-      :#{#issueComment.issue.id},
-      :#{#issueComment.body},
-      :#{#issueComment.disabled}
-      )
-      ON DUPLICATE KEY UPDATE
-                body = VALUES(:#{#issueComment.body}),
-                updated_at = VALUES(:#{#issueComment.updatedAt})
-      """,
+              INSERT INTO IssueComments(
+                id,
+                created_at,
+                updated_at,
+                author_id,
+                issue_id,
+                body,
+                disabled
+              ) VALUES(
+              :#{#issueComment.id},
+              :#{#issueComment.createdAt},
+              :#{#issueComment.updatedAt},
+              :#{#issueComment.author.id},
+              :#{#issueComment.issue.id},
+              :#{#issueComment.body},
+              :#{#issueComment.disabled}
+              )
+              ON DUPLICATE KEY UPDATE
+                        body = :#{#issueComment.body},
+                        updated_at = :#{#issueComment.updatedAt}
+              """,
       nativeQuery = true)
   void upsert(@Param("issueComment") IssueComment issueComment);
 

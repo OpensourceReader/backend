@@ -15,33 +15,33 @@ public interface PullCommentRepository extends JpaRepository<PullComment, Long> 
   @Query(
       value =
           """
-      INSERT INTO PullComments(
-        id,
-        created_at,
-        updated_at,
-        author_id,
-        review_id,
-        body,
-       diff_hunk,
-         path,
-        disabled
-      ) VALUES(
-      :#{#pullComment.id},
-      :#{#pullComment.createdAt},
-      :#{#pullComment.updatedAt},
-      :#{#pullComment.author.id},
-      :#{#pullComment.review.id},
-      :#{#pullComment.body},
-      :#{#pullComment.diffHunk},
-      :#{#pullComment.path},
-      :#{#pullComment.disabled}
-      )
-      ON DUPLICATE KEY UPDATE
-                body = VALUES(:#{#pullComment.body}),
-                diff_hunk = VALUES(:#{#pullComment.diffHunk}),
-                path = VALUES(:#{#pullComment.path}),
-                updated_at = VALUES(:#{#pullComment.updatedAt})
-      """,
+              INSERT INTO PullComments(
+                id,
+                created_at,
+                updated_at,
+                author_id,
+                review_id,
+                body,
+                diff_hunk,
+                path,
+                disabled
+              ) VALUES(
+              :#{#pullComment.id},
+              :#{#pullComment.createdAt},
+              :#{#pullComment.updatedAt},
+              :#{#pullComment.author.id},
+              :#{#pullComment.review.id},
+              :#{#pullComment.body},
+              :#{#pullComment.diffHunk},
+              :#{#pullComment.path},
+              :#{#pullComment.disabled}
+              )
+              ON DUPLICATE KEY UPDATE
+                        body = :#{#pullComment.body},
+                        diff_hunk = :#{#pullComment.diffHunk},
+                        path = :#{#pullComment.path},
+                        updated_at = :#{#pullComment.updatedAt}
+              """,
       nativeQuery = true)
   void upsert(@Param("pullComment") PullComment pullComment);
 

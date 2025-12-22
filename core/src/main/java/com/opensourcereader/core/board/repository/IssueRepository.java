@@ -16,38 +16,38 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
   @Query(
       value =
           """
-    INSERT INTO issues(
-      id,
-      tag_id,
-      title,
-      body,
-      is_opened,
-      comment_count,
-      repository_id,
-      author_id,
-      created_at,
-      updated_at,
-      disabled
-    ) VALUES(
-      :#{#issue.id},
-      :#{#issue.tagId},
-      :#{#issue.title},
-      :#{#issue.body},
-      :#{#issue.isOpened},
-      :#{#issue.commentCount},
-      :#{#issue.repository.id},
-      :#{#issue.author.id},
-      :#{#issue.createdAt},
-      :#{#issue.updatedAt},
-      :#{#issue.disabled}
-    )
-    ON DUPLICATE KEY UPDATE
-      title = VALUES(:#{#issue.title}),
-      body = VALUES(:#{#issue.body}),
-      is_opened = VALUES(:#{#issue.isOpened}),
-      comment_count = VALUES(:#{#issue.commentCount}),
-      updated_at = VALUES(:#{#issue.updatedAt})
-""",
+                  INSERT INTO issues(
+                    id,
+                    tag_id,
+                    title,
+                    body,
+                    is_opened,
+                    comment_count,
+                    repository_id,
+                    author_id,
+                    created_at,
+                    updated_at,
+                    disabled
+                  ) VALUES(
+                    :#{#issue.id},
+                    :#{#issue.tagId},
+                    :#{#issue.title},
+                    :#{#issue.body},
+                    :#{#issue.isOpened},
+                    :#{#issue.commentCount},
+                    :#{#issue.repository.id},
+                    :#{#issue.author.id},
+                    :#{#issue.createdAt},
+                    :#{#issue.updatedAt},
+                    :#{#issue.disabled}
+                  )
+                  ON DUPLICATE KEY UPDATE
+                        title = :#{#issue.title},
+                        body = :#{#issue.body},
+                        is_opened = :#{#issue.isOpened},
+                        comment_count = :#{#issue.commentCount},
+                        updated_at = :#{#issue.updatedAt}
+              """,
       nativeQuery = true)
   void upsert(@Param("issue") Issue issue);
 

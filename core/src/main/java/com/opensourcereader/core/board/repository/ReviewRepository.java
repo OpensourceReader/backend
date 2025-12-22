@@ -15,27 +15,27 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   @Query(
       value =
           """
-      INSERT INTO reviews(
-        id,
-        created_at,
-        updated_at,
-        author_id,
-        pull_id,
-        body,
-        disabled
-      ) VALUES(
-      :#{#review.id},
-      :#{#review.createdAt},
-      :#{#review.updatedAt},
-      :#{#review.author.id},
-      :#{#review.pull.id},
-      :#{#review.body},
-      :#{#review.disabled}
-      )
-      ON DUPLICATE KEY UPDATE
-                body = VALUES(:#{#review.body}),
-                updated_at = VALUES(:#{#review.updatedAt})
-      """,
+              INSERT INTO reviews(
+                id,
+                created_at,
+                updated_at,
+                author_id,
+                pull_id,
+                body,
+                disabled
+              ) VALUES(
+              :#{#review.id},
+              :#{#review.createdAt},
+              :#{#review.updatedAt},
+              :#{#review.author.id},
+              :#{#review.pull.id},
+              :#{#review.body},
+              :#{#review.disabled}
+              )
+              ON DUPLICATE KEY UPDATE
+                        body = :#{#review.body},
+                        updated_at = :#{#review.updatedAt}
+              """,
       nativeQuery = true)
   void upsert(@Param("review") Review review);
 

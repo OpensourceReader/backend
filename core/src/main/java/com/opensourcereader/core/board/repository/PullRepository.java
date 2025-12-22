@@ -16,40 +16,40 @@ public interface PullRepository extends JpaRepository<Pull, Long> {
   @Query(
       value =
           """
-    INSERT INTO pulls(
-      id,
-      tag_id,
-      title,
-      body,
-      is_opened,
-      comment_count,
-      review_count,
-      repository_id,
-      author_id,
-      created_at,
-      updated_at,
-      disabled
-    ) VALUES(
-      :#{#pull.id},
-      :#{#pull.tagId},
-      :#{#pull.title},
-      :#{#pull.body},
-      :#{#pull.isOpened},
-      :#{#pull.commentCount},
-      :#{#pull.reviewCount},
-      :#{#pull.repository.id},
-      :#{#pull.author.id},
-      :#{#pull.createdAt},
-      :#{#pull.updatedAt},
-      :#{#pull.disabled}
-    )
-    ON DUPLICATE KEY UPDATE
-      title = VALUES(:#{#pull.title}),
-      body = VALUES(:#{#pull.body}),
-      is_opened = VALUES(:#{#pull.isOpened}),
-      comment_count = VALUES(:#{#pull.commentCount}),
-      updated_at = VALUES(:#{#pull.updatedAt})
-""",
+                  INSERT INTO pulls(
+                    id,
+                    tag_id,
+                    title,
+                    body,
+                    is_opened,
+                    comment_count,
+                    review_count,
+                    repository_id,
+                    author_id,
+                    created_at,
+                    updated_at,
+                    disabled
+                  ) VALUES(
+                    :#{#pull.id},
+                    :#{#pull.tagId},
+                    :#{#pull.title},
+                    :#{#pull.body},
+                    :#{#pull.isOpened},
+                    :#{#pull.commentCount},
+                    :#{#pull.reviewCount},
+                    :#{#pull.repository.id},
+                    :#{#pull.author.id},
+                    :#{#pull.createdAt},
+                    :#{#pull.updatedAt},
+                    :#{#pull.disabled}
+                  )
+                  ON DUPLICATE KEY UPDATE
+                    title = :#{#pull.title},
+                    body = :#{#pull.body},
+                    is_opened = :#{#pull.isOpened},
+                    comment_count = :#{#pull.commentCount},
+                    updated_at = :#{#pull.updatedAt}
+              """,
       nativeQuery = true)
   void upsert(@Param("pull") Pull pull);
 
