@@ -12,6 +12,7 @@ import com.opensourcereader.core.board.service.IssueCommentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class IssueCommentServiceImpl implements IssueCommentService {
   private final IssueCommentRepository issueCommentRepository;
 
   @Override
+  @Transactional
   public IssueComment create(IssueCommentCommand command) {
     IssueComment issueComment =
         issueCommentRepository
@@ -40,11 +42,13 @@ public class IssueCommentServiceImpl implements IssueCommentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<IssueComment> findAllByIssueId(Long issueId) {
     return issueCommentRepository.findAllByIssueId(issueId);
   }
 
   @Override
+  @Transactional
   public void deleteSoftById(Long id) {
     IssueComment issueComment =
         issueCommentRepository.findById(id).orElseThrow(CommentNotFoundException::new);

@@ -12,6 +12,7 @@ import com.opensourcereader.core.board.service.PullService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class PullServiceImpl implements PullService {
   private final PullRepository pullRepository;
 
   @Override
+  @Transactional
   public Pull create(PullCommand command) {
     Pull pull =
         pullRepository
@@ -39,11 +41,13 @@ public class PullServiceImpl implements PullService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public boolean existedByTagId(Long repositoryId, Long tagId) {
     return pullRepository.existsByRepositoryIdAndTagId(repositoryId, tagId);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Pull findByTagId(Long repositoryId, Long tagId) {
     return pullRepository
         .findByRepositoryIdAndTagId(repositoryId, tagId)
@@ -51,11 +55,13 @@ public class PullServiceImpl implements PullService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Pull> findAllByRepositoryId(Long repositoryId, Boolean isOpened) {
     return pullRepository.findAllByRepositoryIdAndIsOpened(repositoryId, isOpened);
   }
 
   @Override
+  @Transactional
   public void deleteSoftById(Long id) {
     Pull pull = pullRepository.findById(id).orElseThrow(PullNotFoundException::new);
     pull.updateDisabled(true);

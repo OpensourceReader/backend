@@ -14,6 +14,7 @@ import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
+  @Transactional
   public User signup(UserSignUpCommand command) {
     User user =
         userRepository
@@ -38,6 +40,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public User signup(UserInfo userInfo) {
     User user =
         userRepository
@@ -55,6 +58,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public User guest(GithubUserCommand command) {
     User user =
         userRepository
@@ -69,16 +73,19 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public User findByProviderId(Long providerId) {
     return userRepository.findByProviderId(providerId).orElseThrow(UserNotFoundException::new);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public User findByNickname(String loginName) {
     return userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public User findByEmail(String email) {
     return userRepository.findFirstByEmail(email).orElseThrow(UserNotFoundException::new);
   }

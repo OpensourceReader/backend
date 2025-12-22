@@ -12,6 +12,7 @@ import com.opensourcereader.core.board.service.PullCommentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class PullCommentServiceImpl implements PullCommentService {
   private final PullCommentRepository pullCommentRepository;
 
   @Override
+  @Transactional
   public PullComment create(PullCommentCommand command) {
     PullComment pullComment =
         pullCommentRepository
@@ -39,11 +41,13 @@ public class PullCommentServiceImpl implements PullCommentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<PullComment> findAllByReviewId(Long reviewId) {
     return pullCommentRepository.findAllByReviewId(reviewId);
   }
 
   @Override
+  @Transactional
   public void deleteSoftById(Long id) {
     PullComment pullComment =
         pullCommentRepository.findById(id).orElseThrow(CommentNotFoundException::new);

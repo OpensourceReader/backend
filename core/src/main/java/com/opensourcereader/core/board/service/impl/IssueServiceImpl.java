@@ -12,6 +12,7 @@ import com.opensourcereader.core.board.service.IssueService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class IssueServiceImpl implements IssueService {
   private final IssueRepository issueRepository;
 
   @Override
+  @Transactional
   public Issue create(BoardBaseCommand command) {
     // TODO 비활성화된 것 제외하고 가져와야 함
     Issue issue =
@@ -39,11 +41,13 @@ public class IssueServiceImpl implements IssueService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public boolean existedByTagId(Long repositoryId, Long tagId) {
     return issueRepository.existsByRepositoryIdAndTagId(repositoryId, tagId);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Issue findByTagId(Long repositoryId, Long tagId) {
     return issueRepository
         .findByRepositoryIdAndTagId(repositoryId, tagId)
@@ -52,11 +56,13 @@ public class IssueServiceImpl implements IssueService {
 
   // 복합 인덱스 검색
   @Override
+  @Transactional(readOnly = true)
   public List<Issue> findAllByRepositoryId(Long repositoryId, Boolean isOpened) {
     return issueRepository.findAllByRepositoryIdAndIsOpened(repositoryId, isOpened);
   }
 
   @Override
+  @Transactional
   public void deleteSoftById(Long id) {
     Issue issue = issueRepository.findById(id).orElseThrow(IssueNotFoundException::new);
     issue.updateDisabled(true);

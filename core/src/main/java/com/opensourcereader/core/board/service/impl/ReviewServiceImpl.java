@@ -12,6 +12,7 @@ import com.opensourcereader.core.board.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -21,6 +22,7 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReviewRepository reviewRepository;
 
   @Override
+  @Transactional
   public Review create(ReviewCommand command) {
     Review review =
         reviewRepository
@@ -39,11 +41,13 @@ public class ReviewServiceImpl implements ReviewService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Review> findAllByPullId(Long pullId) {
     return reviewRepository.findAllByPullId(pullId);
   }
 
   @Override
+  @Transactional
   public void deleteSoftById(Long id) {
     Review review = reviewRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     review.updateDisabled(true);
