@@ -9,6 +9,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -28,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CodeMethodMetaData extends BaseEntity {
 
+  @Column(name = "method_name")
   private String methodName;
 
   @JdbcTypeCode(SqlTypes.JSON)
@@ -41,11 +43,11 @@ public class CodeMethodMetaData extends BaseEntity {
   private Integer startLine;
   private Integer endLine;
 
-  @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY)
-  private List<CodeMethodCallEdge> outgoingCalls;
+  @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  private List<CodeMethodCallEdge> outgoingCalls = new ArrayList<>();
 
-  @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY)
-  private List<CodeMethodCallEdge> ingoingCalls;
+  @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne private OpenSourceRepoContent openSourceRepoContent;
 
@@ -71,16 +73,14 @@ public class CodeMethodMetaData extends BaseEntity {
     String methodName = methodDeclaration.getNameAsString();
     MethodModifier modifier = MethodModifier.from(methodDeclaration);
     List<String> paramTypes = getParameterTypes(methodDeclaration);
-    String methodSignature = methodName + String.join("", paramTypes);
-    Integer startLine = getStartLine(methodDeclaration);
-    Integer endLine = getEndLine(methodDeclaration);
+
     return new CodeMethodMetaData(
         methodName,
         paramTypes,
         modifier,
-        methodSignature,
-        startLine,
-        endLine,
+        methodName + String.join(".", paramTypes), // 바이트 코드 추출떄랑 통일 필요
+        getStartLine(methodDeclaration),
+        getEndLine(methodDeclaration),
         openSourceRepoContent);
   }
 

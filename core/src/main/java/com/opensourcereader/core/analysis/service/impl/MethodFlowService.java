@@ -48,11 +48,11 @@ public class MethodFlowService {
 
         List<CodeMethodCallEdge> outgoingCodeMethodMetas = new ArrayList<>();
         for (PathAndMethodSignature pathAndMethodSignature : pathAndMethodSignatures) {
-          //          System.out.println("직전path:"+path);
+          //          System.out.println("직전path:"+calleePath);
           //          System.out.println("직전메서드:"+pathAndMethod.methodSignature());
           CodeMethodMetaData outgoingCodeMethodMetaData =
               codeMethodMetaDataRepository
-                  .findByRepoPathAndMethodName(
+                  .findByRepoContentPathAndMethodSignature(
                       pathAndMethodSignature.path(), pathAndMethodSignature.methodSignature())
                   .orElseThrow(IllegalArgumentException::new);
 
@@ -70,7 +70,7 @@ public class MethodFlowService {
   @Transactional
   public CodeMethodMetaData getMethodFlow(String path, String methodName) {
     return codeMethodMetaDataRepository
-        .findByRepoPathAndMethodName(path, methodName)
+        .findByRepoContentPathAndMethodSignature(path, methodName)
         .orElseThrow(IllegalArgumentException::new);
   }
 }

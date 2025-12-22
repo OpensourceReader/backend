@@ -23,8 +23,8 @@ public class CodeMethodCallEdge extends BaseEntity {
   @JoinColumn(name = "callee_id")
   private CodeMethodMetaData callee;
 
-  public CodeMethodCallEdge(CodeMethodMetaData callee, CodeMethodMetaData caller) {
-    this.callee = callee;
+  public CodeMethodCallEdge(CodeMethodMetaData caller, CodeMethodMetaData callee) {
     this.caller = caller;
+    this.callee = callee;
   }
 }

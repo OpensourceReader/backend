@@ -1,0 +1,71 @@
+package com.opensourcereader.core.analysis.service.impl.callgraph;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
+import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer.CallGraphResult;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphClassVisitor.CalleePathAndMethodDescriptor;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class LocalGitRepoContentMethodCallGraphService {
+
+  private final GitWorktreeManager gitWorktreeManager;
+  private final BuildExecutor buildExecutor;
+  private final BuildArtifactCollector buildArtifactCollector;
+  private final CallGraphAnalyzer callGraphAnalyzer;
+  private final CodeMethodMetaDataRepository codeMethodMetaDataRepository;
+
+  @Transactional
+  public boolean createMethodCallGraph(String localClonePath, String reference) {
+    Path worktree = gitWorktreeManager.createWorktree(localClonePath, reference);
+    buildExecutor.build(worktree);
+
+    for (Path byteCodeFile : buildArtifactCollector.collectClassFiles(worktree)) {
+      CallGraphResult callGraphResult = callGraphAnalyzer.analyzeByteCodeFile(byteCodeFile);
+      for (Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge :
+          callGraphResult.edges().entrySet()) {
+        Optional<CodeMethodMetaData> codeMethodMetaData =
+            codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+                callGraphResult.classInternalName() + ".java", edge.getKey());
+        if (codeMethodMetaData.isEmpty()) {
+          continue;
+        }
+        CodeMethodMetaData caller = codeMethodMetaData.get();
+        caller.updateOutgoingCalls(getCodeMethodCallEdges(edge, caller));
+        codeMethodMetaDataRepository.save(caller);
+      }
+    }
+
+    return true;
+  }
+
+  private List<CodeMethodCallEdge> getCodeMethodCallEdges(
+      Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge, CodeMethodMetaData caller) {
+    List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
+    for (CalleePathAndMethodDescriptor calleeInfo : edge.getValue()) {
+      Optional<CodeMethodMetaData> CodeMethodMetaData =
+          codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+              calleeInfo.calleePath() + ".java", calleeInfo.methodDescriptor());
+      if (CodeMethodMetaData.isEmpty()) {
+        continue;
+      }
+      methodCallEdges.add(new CodeMethodCallEdge(caller, CodeMethodMetaData.get()));
+    }
+    return methodCallEdges;
+  }
+}

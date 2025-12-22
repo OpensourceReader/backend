@@ -46,7 +46,9 @@ class MethodFlowServiceTest {
     String path = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";
     String methodName = "createRepo";
     CodeMethodMetaData codeMethodMetaData =
-        codeMethodMetaDataRepository.findByRepoPathAndMethodName(path, methodName).get();
+        codeMethodMetaDataRepository
+            .findByRepoContentPathAndMethodSignature(path, methodName)
+            .get();
     Assertions.assertThat(codeMethodMetaData.getOutgoingCalls())
         .extracting(
             codeEdge -> codeEdge.getCallee().getOpenSourceRepoContent().getPath(),

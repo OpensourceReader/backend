@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenSourceRepoContent extends BaseEntity {
 
-  @Column(name = "path", nullable = false)
+  @Column(name = "calleePath", nullable = false)
   private String path;
 
   @Column(name = "name", nullable = false)
@@ -79,6 +79,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       return new ArrayList<>();
     }
     List<CodeMethodMetaData> result = new ArrayList<>();
+    // 추출 필요
     StaticJavaParser.getConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
     CompilationUnit compilationUnit = StaticJavaParser.parse(rawText);
     for (MethodDeclaration methodDeclaration : compilationUnit.findAll(MethodDeclaration.class)) {
