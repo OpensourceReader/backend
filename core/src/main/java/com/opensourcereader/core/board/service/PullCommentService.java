@@ -7,7 +7,7 @@ import com.opensourcereader.core.board.entity.PullComment;
 
 public interface PullCommentService {
 
-  PullComment create(PullCommentCommand command);
+  PullComment upsert(PullCommentCommand command);
 
   List<PullComment> findAllByReviewId(Long reviewId);
 

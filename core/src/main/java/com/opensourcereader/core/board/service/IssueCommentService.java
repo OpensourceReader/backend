@@ -7,7 +7,7 @@ import com.opensourcereader.core.board.entity.IssueComment;
 
 public interface IssueCommentService {
 
-  IssueComment create(IssueCommentCommand command);
+  IssueComment upsert(IssueCommentCommand command);
 
   List<IssueComment> findAllByIssueId(Long issueId);
 

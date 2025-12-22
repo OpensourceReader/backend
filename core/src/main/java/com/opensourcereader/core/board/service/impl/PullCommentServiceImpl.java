@@ -3,6 +3,7 @@ package com.opensourcereader.core.board.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.board.dto.PullCommentCommand;
 import com.opensourcereader.core.board.entity.PullComment;
@@ -12,7 +13,6 @@ import com.opensourcereader.core.board.service.PullCommentService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -23,21 +23,10 @@ public class PullCommentServiceImpl implements PullCommentService {
 
   @Override
   @Transactional
-  public PullComment create(PullCommentCommand command) {
-    PullComment pullComment =
-        pullCommentRepository
-            .findById(command.getId())
-            .orElseGet(
-                () -> {
-                  PullComment entity = PullComment.from(command);
-                  return pullCommentRepository.save(entity);
-                });
-    // TODO 만약 updatedAt가 command의 updatedAt랑 다르면 update 작업을 진행하는 로직 만들어야 함
-    if (pullComment.getUpdatedAt() != command.getUpdatedAt()) {
-      log.info("업데이트 로직 필요");
-    }
-
-    return pullComment;
+  public PullComment upsert(PullCommentCommand command) {
+    PullComment entity = PullComment.from(command);
+    pullCommentRepository.upsert(entity);
+    return entity;
   }
 
   @Override

@@ -7,7 +7,7 @@ import com.opensourcereader.core.board.entity.Pull;
 
 public interface PullService {
 
-  Pull create(PullCommand command);
+  Pull upsert(PullCommand command);
 
   boolean existedByTagId(Long repositoryId, Long tagId);
 

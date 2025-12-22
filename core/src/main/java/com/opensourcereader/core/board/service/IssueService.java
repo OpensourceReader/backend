@@ -7,7 +7,7 @@ import com.opensourcereader.core.board.entity.Issue;
 
 public interface IssueService {
 
-  Issue create(BoardBaseCommand command);
+  Issue upsert(BoardBaseCommand command);
 
   boolean existedByTagId(Long repositoryId, Long tagId);
 

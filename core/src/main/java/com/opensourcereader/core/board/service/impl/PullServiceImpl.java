@@ -3,6 +3,7 @@ package com.opensourcereader.core.board.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.board.dto.PullCommand;
 import com.opensourcereader.core.board.entity.Pull;
@@ -12,7 +13,6 @@ import com.opensourcereader.core.board.service.PullService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -23,21 +23,10 @@ public class PullServiceImpl implements PullService {
 
   @Override
   @Transactional
-  public Pull create(PullCommand command) {
-    Pull pull =
-        pullRepository
-            .findById(command.getId())
-            .orElseGet(
-                () -> {
-                  Pull entity = Pull.from(command);
-                  return pullRepository.save(entity);
-                });
-    // TODO 만약 updatedAt가 command의 updatedAt랑 다르면 update 작업을 진행하는 로직 만들어야 함
-    if (pull.getUpdatedAt() != command.getUpdatedAt()) {
-      log.info("업데이트 로직 필요");
-    }
-
-    return pull;
+  public Pull upsert(PullCommand command) {
+    Pull entity = Pull.from(command);
+    pullRepository.upsert(entity);
+    return entity;
   }
 
   @Override

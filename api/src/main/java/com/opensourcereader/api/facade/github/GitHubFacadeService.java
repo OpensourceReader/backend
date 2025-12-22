@@ -65,8 +65,7 @@ public class GitHubFacadeService {
       Boolean isOpened = isOpened(fetched.state());
 
       BoardBaseCommand command = modelMapper.toCommand(fetched, author, repo, isOpened);
-
-      Issue issue = issueService.create(command);
+      Issue issue = issueService.upsert(command);
       responses.add(issue);
     }
 
@@ -87,7 +86,7 @@ public class GitHubFacadeService {
 
       PullCommand command = modelMapper.toCommand(fetched, author, repo, isOpened);
 
-      Pull pull = pullService.create(command);
+      Pull pull = pullService.upsert(command);
       responses.add(pull);
     }
 

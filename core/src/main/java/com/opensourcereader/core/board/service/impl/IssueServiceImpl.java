@@ -3,6 +3,7 @@ package com.opensourcereader.core.board.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.entity.Issue;
@@ -12,7 +13,6 @@ import com.opensourcereader.core.board.service.IssueService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -23,21 +23,10 @@ public class IssueServiceImpl implements IssueService {
 
   @Override
   @Transactional
-  public Issue create(BoardBaseCommand command) {
-    // TODO 비활성화된 것 제외하고 가져와야 함
-    Issue issue =
-        issueRepository
-            .findById(command.getId())
-            .orElseGet(
-                () -> {
-                  Issue entity = Issue.from(command);
-                  return issueRepository.save(entity);
-                });
-    // TODO 만약 updatedAt가 command의 updatedAt랑 다르면 update 작업을 진행하는 로직 만들어야 함
-    if (issue.getUpdatedAt() != command.getUpdatedAt()) {
-      log.info("업데이트 로직 필요");
-    }
-    return issue;
+  public Issue upsert(BoardBaseCommand command) {
+    Issue entity = Issue.from(command);
+    issueRepository.upsert(entity);
+    return entity;
   }
 
   @Override

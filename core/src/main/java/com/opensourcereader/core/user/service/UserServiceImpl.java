@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
@@ -14,7 +15,6 @@ import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

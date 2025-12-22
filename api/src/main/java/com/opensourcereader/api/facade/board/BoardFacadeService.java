@@ -49,7 +49,7 @@ public class BoardFacadeService {
     for (Issue issue : issueEntities) {
       Long issueCommentCount = issue.getCommentCount();
 
-      UserDto userDto = UserDto.from(issue.getUser());
+      UserDto userDto = UserDto.from(issue.getAuthor());
 
       BoardPreviewResponse response = BoardPreviewResponse.of(issue, userDto, issueCommentCount);
       responses.add(response);
@@ -58,7 +58,7 @@ public class BoardFacadeService {
     for (Pull pull : pullEntities) {
       Long pullCommentCount = pull.getReviewCount() + pull.getCommentCount();
 
-      UserDto userDto = UserDto.from(pull.getUser());
+      UserDto userDto = UserDto.from(pull.getAuthor());
 
       BoardPreviewResponse response = BoardPreviewResponse.of(pull, userDto, pullCommentCount);
 
@@ -80,7 +80,7 @@ public class BoardFacadeService {
 
     if (b1) {
       Issue entity = issueService.findByTagId(repositoryId, tagId);
-      UserDto userDto = UserDto.from(entity.getUser());
+      UserDto userDto = UserDto.from(entity.getAuthor());
       List<IssueCommentDto> comments = new ArrayList<>();
 
       if (entity.getCommentCount() > 0) {
@@ -103,7 +103,7 @@ public class BoardFacadeService {
       return response;
     } else if (b2) {
       Pull entity = pullService.findByTagId(repositoryId, tagId);
-      UserDto userDto = UserDto.from(entity.getUser());
+      UserDto userDto = UserDto.from(entity.getAuthor());
 
       List<ReviewDto> reviews = new ArrayList<>();
       List<PullCommentDto> comments = new ArrayList<>();

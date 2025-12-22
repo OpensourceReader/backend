@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -27,14 +26,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Issue extends BaseEntity {
 
-  @Column(name = "tag_id", nullable = false)
+  @Column(name = "tag_id")
   private Long tagId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
-  private User user;
+  private User author;
 
-  // 세컨드 인덱스 : repository_id
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "repository_id", nullable = false)
   private OpenSourceRepo repository;
@@ -42,7 +40,8 @@ public class Issue extends BaseEntity {
   @Column(nullable = false)
   private String title;
 
-  @Lob @Column private String body;
+  @Column(columnDefinition = "LONGTEXT")
+  private String body;
 
   @Column(name = "is_opened", nullable = false)
   private Boolean isOpened;
@@ -56,7 +55,7 @@ public class Issue extends BaseEntity {
   protected Issue(BoardBaseCommand command) {
     super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
     this.tagId = command.getTagId();
-    this.user = command.getAuthor();
+    this.author = command.getAuthor();
     this.repository = command.getRepo();
     this.title = command.getTitle();
     this.body = command.getBody();

@@ -7,7 +7,7 @@ import com.opensourcereader.core.board.entity.Review;
 
 public interface ReviewService {
 
-  Review create(ReviewCommand command);
+  Review upsert(ReviewCommand command);
 
   List<Review> findAllByPullId(Long pullId);
 
