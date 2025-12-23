@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,15 +21,26 @@ public class CallGraphAnalyzer {
     try (InputStream inputStream = Files.newInputStream(byteCodeFile)) {
       ClassReader classReader = new ClassReader(inputStream);
       String internalName = classReader.getClassName();
+      String[] interfaces = classReader.getInterfaces();
       CallGraphClassVisitor callGraphClassVisitor = new CallGraphClassVisitor();
       classReader.accept(callGraphClassVisitor, ClassReader.SKIP_DEBUG);
 
-      return new CallGraphResult(internalName, callGraphClassVisitor.getGraph());
+      return CallGraphResult.of(internalName, interfaces, callGraphClassVisitor.getGraph());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   public record CallGraphResult(
-      String classInternalName, Map<String, Set<CalleePathAndMethodDescriptor>> edges) {}
+      String classInternalName,
+      List<String> interfaces,
+      Map<String, Set<CalleePathAndMethodDescriptor>> edges) {
+
+    public static CallGraphResult of(
+        String classInternalName,
+        String[] interfaces,
+        Map<String, Set<CalleePathAndMethodDescriptor>> edges) {
+      return new CallGraphResult(classInternalName, Arrays.stream(interfaces).toList(), edges);
+    }
+  }
 }

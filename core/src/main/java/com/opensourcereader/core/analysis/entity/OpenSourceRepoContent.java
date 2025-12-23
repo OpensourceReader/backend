@@ -21,6 +21,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,10 +30,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Table(
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "uk_code_open_source_repo_content",
+          columnNames = {"path"})
+    })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenSourceRepoContent extends BaseEntity {
 
-  @Column(name = "calleePath", nullable = false)
+  @Column(name = "path", nullable = false)
   private String path;
 
   @Column(name = "name", nullable = false)

@@ -46,7 +46,9 @@ public class LocalGitRepoContentMethodCallGraphService {
           continue;
         }
         CodeMethodMetaData caller = codeMethodMetaData.get();
-        caller.updateOutgoingCalls(getCodeMethodCallEdges(edge, caller));
+        caller.updateAllOutgoingCalls(getOutgoingCalls(edge, caller));
+        caller.updateAllIngoingCalls(getIngoingCalls(callGraphResult, caller));
+
         codeMethodMetaDataRepository.save(caller);
       }
     }
@@ -54,7 +56,22 @@ public class LocalGitRepoContentMethodCallGraphService {
     return true;
   }
 
-  private List<CodeMethodCallEdge> getCodeMethodCallEdges(
+  private List<CodeMethodCallEdge> getIngoingCalls(
+      CallGraphResult callGraphResult, CodeMethodMetaData caller) {
+    List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
+    for (String linkedInterface : callGraphResult.interfaces()) {
+      Optional<CodeMethodMetaData> ingoingCodeMethodMetaData =
+          codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+              linkedInterface + ".java", caller.getMethodSignature());
+      if (ingoingCodeMethodMetaData.isEmpty()) {
+        continue;
+      }
+      methodCallEdges.add(new CodeMethodCallEdge(ingoingCodeMethodMetaData.get(), caller));
+    }
+    return methodCallEdges;
+  }
+
+  private List<CodeMethodCallEdge> getOutgoingCalls(
       Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge, CodeMethodMetaData caller) {
     List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
     for (CalleePathAndMethodDescriptor calleeInfo : edge.getValue()) {

@@ -3,6 +3,8 @@ package com.opensourcereader.core.analysis.entity.codedetail;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -17,6 +19,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -25,6 +29,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Table(
+    name = "code_method",
+    uniqueConstraints = {
+      @UniqueConstraint(
+          name = "uk_code_method_repo_content_method_name",
+          columnNames = {"open_source_repo_content_id", "method_signature"})
+    })
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CodeMethodMetaData extends BaseEntity {
@@ -39,7 +50,9 @@ public class CodeMethodMetaData extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private MethodModifier methodModifier;
 
+  @Column(name = "method_signature")
   private String methodSignature;
+
   private Integer startLine;
   private Integer endLine;
 
@@ -108,7 +121,20 @@ public class CodeMethodMetaData extends BaseEntity {
     return range.get().end.line;
   }
 
-  public void updateOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
+  public void updateAllOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
     this.outgoingCalls = methodCallEdges;
+  }
+
+  public void updateAllIngoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
+    this.ingoingCalls = methodCallEdges;
+  }
+
+  public void updateIngoingCall(CodeMethodCallEdge methodCallEdge) {
+    Set<Long> existingCallerIds =
+        ingoingCalls.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+    if (existingCallerIds.contains(methodCallEdge.getId())) {
+      return;
+    }
+    this.ingoingCalls.add(methodCallEdge);
   }
 }

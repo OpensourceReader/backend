@@ -47,7 +47,6 @@ public class CallGraphClassVisitor extends ClassVisitor {
           String calleeDescription,
           boolean isInterface) {
 
-        //        owner 이게 callee거가 아닌데?, 본인의 리시버를 불러야되는데 그게 아니잖아
         CalleePathAndMethodDescriptor calleePathAndMethodDescriptor =
             new CalleePathAndMethodDescriptor(
                 owner, calleeName + getArgumentTypes(calleeDescription));

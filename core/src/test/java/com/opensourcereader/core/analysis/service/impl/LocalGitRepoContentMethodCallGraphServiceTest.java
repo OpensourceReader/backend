@@ -9,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
-import com.opensourcereader.core.analysis.repository.CodeMethodCallEdgeRepository;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.impl.callgraph.LocalGitRepoContentMethodCallGraphService;
 import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,6 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
   private LocalGitRepoContentMethodCallGraphService localGitRepoContentMethodCallGraphService;
 
   @Autowired private CodeMethodMetaDataRepository codeMethodMetaDataRepository;
-  @Autowired private CodeMethodCallEdgeRepository codeMethodCallEdgeRepository;
 
   @TempDir private Path tempDir;
 
@@ -46,7 +45,7 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
   }
 
   @Transactional
-  @DisplayName("연습")
+  @DisplayName("메서드에서 사용하는(outgoing), 메서드를 사용하는(ingoing) 메서드들을 연결합니다.")
   @Test
   void createMethodCallGraph() {
     // given
@@ -79,6 +78,15 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
                   "addContent",
                   "of",
                   "validateAlreadyExist");
+          softly
+              .assertThat(codeMethodMetaData.get().getIngoingCalls())
+              .extracting(
+                  edge -> edge.getCaller().getOpenSourceRepoContent().getPath(),
+                  edge -> edge.getCaller().getMethodName())
+              .containsExactlyInAnyOrder(
+                  Tuple.tuple(
+                      "core/src/main/java/com/opensourcereader/core/analysis/service/OpenSourceRepoService.java",
+                      "createRepo"));
         });
   }
 }
