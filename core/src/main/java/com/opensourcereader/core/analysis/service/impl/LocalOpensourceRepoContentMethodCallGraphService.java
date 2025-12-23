@@ -4,16 +4,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.CallGraphResult;
-import com.opensourcereader.core.analysis.dto.CalleePathAndMethodDescriptor;
+import com.opensourcereader.core.analysis.dto.callgraph.CallGraphResult;
+import com.opensourcereader.core.analysis.dto.callgraph.RawMethodCall;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.OpensourceRepoContentMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
@@ -42,20 +44,31 @@ public class LocalOpensourceRepoContentMethodCallGraphService
         gitWorktreeManager.createWorktree(savedLocalPath, reference, workingTreeDirName);
     buildExecutor.build(worktree);
 
+    // 바이트 코드 하나씩
     for (Path byteCodeFile : buildArtifactCollector.collectClassFiles(worktree)) {
-      CallGraphResult callGraphResult =
-          callGraphAnalyzer.analyzeByteCodeFile(byteCodeFile); // 한번에 다 가져다 주기
-      for (Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge :
-          callGraphResult.edges().entrySet()) {
-        Optional<CodeMethodMetaData> codeMethodMetaData =
+      CallGraphResult callGraphResult = callGraphAnalyzer.analyzeByteCodeFile(byteCodeFile);
+      Map<CodeMethodSignature, List<RawMethodCall>> rawCallsByCallerSignature =
+          callGraphResult.rawMethodCalls().stream()
+              .collect(
+                  Collectors.groupingBy(
+                      rawMethodCall ->
+                          CodeMethodSignature.of(
+                              rawMethodCall.callerMethodName(),
+                              rawMethodCall.callerRawArgumentTypes())));
+
+      for (Entry<CodeMethodSignature, List<RawMethodCall>> rawCallByCallerSignature :
+          rawCallsByCallerSignature.entrySet()) {
+        Optional<CodeMethodMetaData> callerCodeMethodMetaData =
             codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-                callGraphResult.classPath(), edge.getKey());
-        if (codeMethodMetaData.isEmpty()) {
+                callGraphResult.classPath(), rawCallByCallerSignature.getKey().methodSignature());
+        if (callerCodeMethodMetaData.isEmpty()) {
           continue;
         }
-        CodeMethodMetaData caller = codeMethodMetaData.get();
-        caller.updateAllOutgoingCalls(getOutgoingCalls(edge, caller));
-        caller.updateAllIngoingCalls(getIngoingCalls(callGraphResult, caller));
+        CodeMethodMetaData caller = callerCodeMethodMetaData.get();
+        caller.updateAllOutgoingCalls(
+            getOutgoingCalls(caller, rawCallByCallerSignature.getValue()));
+        caller.updateAllIngoingCalls(
+            getIngoingCalls(callGraphResult.linkedInterfacePaths(), caller));
 
         codeMethodMetaDataRepository.save(caller);
       }
@@ -64,32 +77,35 @@ public class LocalOpensourceRepoContentMethodCallGraphService
     return true;
   }
 
-  private List<CodeMethodCallEdge> getIngoingCalls(
-      CallGraphResult callGraphResult, CodeMethodMetaData caller) {
-    List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
-    for (String linkedInterfacePath : callGraphResult.interfacePaths()) {
-      Optional<CodeMethodMetaData> ingoingCodeMethodMetaData =
-          codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-              linkedInterfacePath, caller.getMethodSignature());
-      if (ingoingCodeMethodMetaData.isEmpty()) {
-        continue;
-      }
-      methodCallEdges.add(new CodeMethodCallEdge(ingoingCodeMethodMetaData.get(), caller));
-    }
-    return methodCallEdges;
-  }
-
   private List<CodeMethodCallEdge> getOutgoingCalls(
-      Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge, CodeMethodMetaData caller) {
+      CodeMethodMetaData caller, List<RawMethodCall> calleeRawMethodCalls) {
     List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
-    for (CalleePathAndMethodDescriptor calleeInfo : edge.getValue()) {
+    for (RawMethodCall rawMethodCall : calleeRawMethodCalls) {
+      CodeMethodSignature calleeMethodSignature =
+          CodeMethodSignature.of(
+              rawMethodCall.calleeMethodName(), rawMethodCall.calleeRawArgumentTypes());
       Optional<CodeMethodMetaData> CodeMethodMetaData =
           codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-              calleeInfo.calleePath(), calleeInfo.methodDescriptor());
+              rawMethodCall.calleeClassPath(), calleeMethodSignature.methodSignature());
       if (CodeMethodMetaData.isEmpty()) {
         continue;
       }
       methodCallEdges.add(new CodeMethodCallEdge(caller, CodeMethodMetaData.get()));
+    }
+    return methodCallEdges;
+  }
+
+  private List<CodeMethodCallEdge> getIngoingCalls(
+      List<String> linkedInterfacePaths, CodeMethodMetaData caller) {
+    List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
+    for (String linkedInterfacePath : linkedInterfacePaths) {
+      Optional<CodeMethodMetaData> ingoingCodeMethodMetaData =
+          codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+              linkedInterfacePath, caller.getMethodSignature().methodSignature());
+      if (ingoingCodeMethodMetaData.isEmpty()) {
+        continue;
+      }
+      methodCallEdges.add(new CodeMethodCallEdge(ingoingCodeMethodMetaData.get(), caller));
     }
     return methodCallEdges;
   }

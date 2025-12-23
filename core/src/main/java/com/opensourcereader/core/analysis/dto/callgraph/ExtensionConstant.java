@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.dto;
+package com.opensourcereader.core.analysis.dto.callgraph;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
-package com.opensourcereader.core.analysis.dto;
+package com.opensourcereader.core.analysis.dto.callgraph;
 
-import static com.opensourcereader.core.analysis.dto.ExtensionConstant.JAVA_EXTENSION;
+import static com.opensourcereader.core.analysis.dto.callgraph.ExtensionConstant.JAVA_EXTENSION;
 
 public record CalleePathAndMethodDescriptor(String calleePath, String methodDescriptor) {
 

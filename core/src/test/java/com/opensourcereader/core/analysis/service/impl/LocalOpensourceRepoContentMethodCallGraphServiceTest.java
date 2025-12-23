@@ -1,6 +1,7 @@
 package com.opensourcereader.core.analysis.service.impl;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
@@ -56,7 +58,9 @@ class LocalOpensourceRepoContentMethodCallGraphServiceTest {
 
     // then
     String url = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";
-    String methodSignature = "createRepoString.String.String";
+    String methodSignature =
+        CodeMethodSignature.of("createRepo", List.of("String", "String", "String"))
+            .methodSignature();
     Optional<CodeMethodMetaData> codeMethodMetaData =
         codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(url, methodSignature);
 

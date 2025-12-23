@@ -13,6 +13,7 @@ import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -51,7 +52,8 @@ public class CodeMethodMetaData extends BaseEntity {
   private MethodModifier methodModifier;
 
   @Column(name = "method_signature")
-  private String methodSignature;
+  @Embedded
+  private CodeMethodSignature methodSignature;
 
   private Integer startLine;
   private Integer endLine;
@@ -68,7 +70,7 @@ public class CodeMethodMetaData extends BaseEntity {
       String methodName,
       List<String> paramTypes,
       MethodModifier methodModifier,
-      String methodSignature,
+      CodeMethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
       OpenSourceRepoContent openSourceRepoContent) {
@@ -91,7 +93,7 @@ public class CodeMethodMetaData extends BaseEntity {
         methodName,
         paramTypes,
         modifier,
-        methodName + String.join(".", paramTypes), // 바이트 코드 추출떄랑 통일 필요
+        CodeMethodSignature.of(methodName, paramTypes), // 바이트 코드 추출떄랑 통일 필요
         getStartLine(methodDeclaration),
         getEndLine(methodDeclaration),
         openSourceRepoContent);

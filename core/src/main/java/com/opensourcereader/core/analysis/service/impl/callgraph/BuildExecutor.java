@@ -35,11 +35,7 @@ public class BuildExecutor {
 
   private void run(Path dir, String... cmd) {
     try {
-      new ProcessBuilder(cmd)
-          .directory(dir.toFile())
-          .inheritIO()
-          .start()
-          .waitFor(); // 프로세서 기다리는코드, 이게 맞나?
+      new ProcessBuilder(cmd).directory(dir.toFile()).inheritIO().start().waitFor();
     } catch (Exception e) {
       throw new RuntimeException("build failed", e);
     }

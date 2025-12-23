@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import org.springframework.stereotype.Component;
 
 import aj.org.objectweb.asm.ClassReader;
-import com.opensourcereader.core.analysis.dto.CallGraphResult;
+import com.opensourcereader.core.analysis.dto.callgraph.CallGraphResult;
 
 @Component
 public class CallGraphAnalyzer {
@@ -22,7 +22,7 @@ public class CallGraphAnalyzer {
       return CallGraphResult.of(
           classReader.getClassName(),
           classReader.getInterfaces(),
-          callGraphClassVisitor.getGraph());
+          callGraphClassVisitor.getRawMethodCalls());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
