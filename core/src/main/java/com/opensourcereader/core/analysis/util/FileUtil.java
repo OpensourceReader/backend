@@ -1,4 +1,4 @@
-package com.opensourcereader.core.util;
+package com.opensourcereader.core.analysis.util;
 
 import java.io.File;
 import java.nio.file.FileSystems;

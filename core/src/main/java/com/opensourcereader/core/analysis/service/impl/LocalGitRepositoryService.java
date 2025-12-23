@@ -19,7 +19,7 @@ import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessEx
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeParseException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeWalkAccessException;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
-import com.opensourcereader.core.util.FileUtil;
+import com.opensourcereader.core.analysis.util.FileUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;

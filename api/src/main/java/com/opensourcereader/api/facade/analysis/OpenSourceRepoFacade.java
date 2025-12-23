@@ -10,7 +10,7 @@ import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
-import com.opensourcereader.core.util.FileUtil;
+import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
