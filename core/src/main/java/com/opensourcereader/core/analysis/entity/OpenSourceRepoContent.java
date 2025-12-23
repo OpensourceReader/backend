@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
@@ -95,5 +96,18 @@ public class OpenSourceRepoContent extends BaseEntity {
       result.add(methodMetaData);
     }
     return result;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof OpenSourceRepoContent that)) {
+      return false;
+    }
+    return Objects.equals(path, that.path) && Objects.equals(openSourceRepo, that.openSourceRepo);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(path, openSourceRepo);
   }
 }

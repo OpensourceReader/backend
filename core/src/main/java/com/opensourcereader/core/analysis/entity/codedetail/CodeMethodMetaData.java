@@ -2,9 +2,8 @@ package com.opensourcereader.core.analysis.entity.codedetail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -93,7 +92,7 @@ public class CodeMethodMetaData extends BaseEntity {
         methodName,
         paramTypes,
         modifier,
-        CodeMethodSignature.of(methodName, paramTypes), // 바이트 코드 추출떄랑 통일 필요
+        CodeMethodSignature.of(methodName, paramTypes),
         getStartLine(methodDeclaration),
         getEndLine(methodDeclaration),
         openSourceRepoContent);
@@ -124,19 +123,38 @@ public class CodeMethodMetaData extends BaseEntity {
   }
 
   public void updateAllOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
-    this.outgoingCalls = methodCallEdges;
+    this.outgoingCalls.removeIf(edge -> !methodCallEdges.contains(edge));
+
+    for (CodeMethodCallEdge edge : methodCallEdges) {
+      if (this.outgoingCalls.contains(edge)) {
+        continue;
+      }
+      this.outgoingCalls.add(edge);
+    }
   }
 
   public void updateAllIngoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
-    this.ingoingCalls = methodCallEdges;
+    this.ingoingCalls.removeIf(edge -> !methodCallEdges.contains(edge));
+
+    for (CodeMethodCallEdge edge : methodCallEdges) {
+      if (this.ingoingCalls.contains(edge)) {
+        continue;
+      }
+      this.ingoingCalls.add(edge);
+    }
   }
 
-  public void updateIngoingCall(CodeMethodCallEdge methodCallEdge) {
-    Set<Long> existingCallerIds =
-        ingoingCalls.stream().map(BaseEntity::getId).collect(Collectors.toSet());
-    if (existingCallerIds.contains(methodCallEdge.getId())) {
-      return;
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof CodeMethodMetaData that)) {
+      return false;
     }
-    this.ingoingCalls.add(methodCallEdge);
+    return Objects.equals(methodSignature, that.methodSignature)
+        && Objects.equals(openSourceRepoContent, that.openSourceRepoContent);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(methodSignature, openSourceRepoContent);
   }
 }

@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.CascadeType;
@@ -30,5 +31,18 @@ public class OpenSourceRepo extends BaseEntity {
 
   public void addContent(OpenSourceRepoContent content) {
     contents.add(content);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof OpenSourceRepo that)) {
+      return false;
+    }
+    return Objects.equals(cloneUrl, that.cloneUrl);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(cloneUrl);
   }
 }

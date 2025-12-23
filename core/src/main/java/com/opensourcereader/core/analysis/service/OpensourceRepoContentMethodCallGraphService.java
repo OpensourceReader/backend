@@ -4,5 +4,5 @@ import java.nio.file.Path;
 
 public interface OpensourceRepoContentMethodCallGraphService {
 
-  boolean createMethodCallGraph(Path savedLocalPath, String reference, String workingTreeDirName);
+  void createMethodCallGraph(Path savedLocalPath, String reference, String workingTreeDirName);
 }
