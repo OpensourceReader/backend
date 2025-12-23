@@ -3,9 +3,9 @@ package com.opensourcereader.core.analysis.service.impl.callgraph;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class GitWorktreeManager {
 
   public Path createWorktree(Path bareRepoPath, String ref, String workingTreeDirName) {

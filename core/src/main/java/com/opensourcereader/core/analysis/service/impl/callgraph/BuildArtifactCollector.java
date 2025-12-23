@@ -6,9 +6,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class BuildArtifactCollector {
 
   public List<Path> collectClassFiles(Path worktree) {

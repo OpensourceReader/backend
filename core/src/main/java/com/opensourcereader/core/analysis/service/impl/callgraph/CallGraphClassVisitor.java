@@ -16,21 +16,9 @@ import lombok.Getter;
 public class CallGraphClassVisitor extends ClassVisitor {
 
   private final Map<String, Set<CalleePathAndMethodDescriptor>> graph = new HashMap<>();
-  private String currentClass;
 
   public CallGraphClassVisitor() {
     super(Opcodes.ASM9);
-  }
-
-  @Override
-  public void visit(
-      int version,
-      int access,
-      String name,
-      String signature,
-      String superName,
-      String[] interfaces) {
-    this.currentClass = name;
   }
 
   @Override

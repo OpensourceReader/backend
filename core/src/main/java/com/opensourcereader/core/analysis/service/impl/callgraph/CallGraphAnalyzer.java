@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import aj.org.objectweb.asm.ClassReader;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphClassVisitor.CalleePathAndMethodDescriptor;
 
-@Service
+@Component
 public class CallGraphAnalyzer {
 
   public CallGraphResult analyzeByteCodeFile(Path byteCodeFile) {

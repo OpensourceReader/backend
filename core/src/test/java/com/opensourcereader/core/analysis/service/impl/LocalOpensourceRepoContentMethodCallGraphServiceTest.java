@@ -7,12 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
-import com.opensourcereader.core.analysis.service.impl.callgraph.LocalGitRepoContentMethodCallGraphService;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 @SpringBootTest
-class LocalGitRepoContentMethodCallGraphServiceTest {
+class LocalOpensourceRepoContentMethodCallGraphServiceTest {
 
   @Autowired private GitRepositoryService gitRepositoryService;
   @Autowired private OpenSourceRepoService openSourceRepoService;
 
   @Autowired
-  private LocalGitRepoContentMethodCallGraphService localGitRepoContentMethodCallGraphService;
+  private LocalOpensourceRepoContentMethodCallGraphService
+      localGitRepoContentMethodCallGraphService;
 
   @Autowired private CodeMethodMetaDataRepository codeMethodMetaDataRepository;
 
@@ -49,8 +48,7 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
     String cloneUrl = "https://github.com/OpensourceReader/backend.git";
     String reference = "HEAD";
     Path savedLocalPath = gitRepositoryService.saveToLocal(cloneUrl, bareCloneRepoPath.toString());
-    OpenSourceRepo openSourceRepo =
-        openSourceRepoService.createRepo(savedLocalPath, cloneUrl, reference);
+    openSourceRepoService.createRepo(savedLocalPath, cloneUrl, reference);
 
     // when
     localGitRepoContentMethodCallGraphService.createMethodCallGraph(

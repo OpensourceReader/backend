@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.callgraph;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,16 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
+import com.opensourcereader.core.analysis.service.OpensourceRepoContentMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
+import com.opensourcereader.core.analysis.service.impl.callgraph.BuildExecutor;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer.CallGraphResult;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphClassVisitor.CalleePathAndMethodDescriptor;
+import com.opensourcereader.core.analysis.service.impl.callgraph.GitWorktreeManager;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
-public class LocalGitRepoContentMethodCallGraphService {
+public class LocalOpensourceRepoContentMethodCallGraphService
+    implements OpensourceRepoContentMethodCallGraphService {
 
   private final GitWorktreeManager gitWorktreeManager;
   private final BuildExecutor buildExecutor;
@@ -30,6 +34,7 @@ public class LocalGitRepoContentMethodCallGraphService {
   private final CallGraphAnalyzer callGraphAnalyzer;
   private final CodeMethodMetaDataRepository codeMethodMetaDataRepository;
 
+  @Override
   @Transactional
   public boolean createMethodCallGraph(
       Path savedLocalPath, String reference, String workingTreeDirName) {
