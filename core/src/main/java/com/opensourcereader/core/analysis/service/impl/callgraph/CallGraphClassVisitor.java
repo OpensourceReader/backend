@@ -9,6 +9,7 @@ import java.util.StringJoiner;
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
+import com.opensourcereader.core.analysis.dto.CalleePathAndMethodDescriptor;
 
 import lombok.Getter;
 
@@ -35,12 +36,11 @@ public class CallGraphClassVisitor extends ClassVisitor {
           String calleeDescription,
           boolean isInterface) {
 
-        CalleePathAndMethodDescriptor calleePathAndMethodDescriptor =
-            new CalleePathAndMethodDescriptor(
-                owner, calleeName + getArgumentTypes(calleeDescription));
         graph
             .computeIfAbsent(callerMethodSignature, k -> new HashSet<>())
-            .add(calleePathAndMethodDescriptor);
+            .add(
+                CalleePathAndMethodDescriptor.of(
+                    owner, calleeName + getArgumentTypes(calleeDescription)));
       }
     };
   }
@@ -55,6 +55,4 @@ public class CallGraphClassVisitor extends ClassVisitor {
     }
     return joiner.toString();
   }
-
-  public record CalleePathAndMethodDescriptor(String calleePath, String methodDescriptor) {}
 }

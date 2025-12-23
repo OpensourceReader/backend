@@ -10,6 +10,8 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.analysis.dto.CallGraphResult;
+import com.opensourcereader.core.analysis.dto.CalleePathAndMethodDescriptor;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
@@ -17,8 +19,6 @@ import com.opensourcereader.core.analysis.service.OpensourceRepoContentMethodCal
 import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
 import com.opensourcereader.core.analysis.service.impl.callgraph.BuildExecutor;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
-import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer.CallGraphResult;
-import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphClassVisitor.CalleePathAndMethodDescriptor;
 import com.opensourcereader.core.analysis.service.impl.callgraph.GitWorktreeManager;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class LocalOpensourceRepoContentMethodCallGraphService
           callGraphResult.edges().entrySet()) {
         Optional<CodeMethodMetaData> codeMethodMetaData =
             codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-                callGraphResult.classInternalName() + ".java", edge.getKey()); // .java 수정 필요
+                callGraphResult.classPath(), edge.getKey());
         if (codeMethodMetaData.isEmpty()) {
           continue;
         }
@@ -67,10 +67,10 @@ public class LocalOpensourceRepoContentMethodCallGraphService
   private List<CodeMethodCallEdge> getIngoingCalls(
       CallGraphResult callGraphResult, CodeMethodMetaData caller) {
     List<CodeMethodCallEdge> methodCallEdges = new ArrayList<>();
-    for (String linkedInterface : callGraphResult.interfaces()) {
+    for (String linkedInterfacePath : callGraphResult.interfacePaths()) {
       Optional<CodeMethodMetaData> ingoingCodeMethodMetaData =
           codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-              linkedInterface + ".java", caller.getMethodSignature());
+              linkedInterfacePath, caller.getMethodSignature());
       if (ingoingCodeMethodMetaData.isEmpty()) {
         continue;
       }
@@ -85,7 +85,7 @@ public class LocalOpensourceRepoContentMethodCallGraphService
     for (CalleePathAndMethodDescriptor calleeInfo : edge.getValue()) {
       Optional<CodeMethodMetaData> CodeMethodMetaData =
           codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-              calleeInfo.calleePath() + ".java", calleeInfo.methodDescriptor());
+              calleeInfo.calleePath(), calleeInfo.methodDescriptor());
       if (CodeMethodMetaData.isEmpty()) {
         continue;
       }
