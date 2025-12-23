@@ -41,7 +41,13 @@ public class GithubClient {
     ResponseEntity<List<GithubIssueResponse>> response =
         restClient
             .get()
-            .uri("/repos/{owner}/{repoName}/issues", request.owner(), request.repoName())
+            .uri(
+                uriBuilder ->
+                    uriBuilder
+                        .path("/repos/{owner}/{repoName}/issues")
+                        .queryParam("state", "all")
+                        .queryParam("per_page", 100)
+                        .build(request.owner(), request.repoName()))
             .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
             .retrieve()
             .toEntity(new ParameterizedTypeReference<List<GithubIssueResponse>>() {});
