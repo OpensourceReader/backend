@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 
 class CodeMethodMetaDataTest {
 
-  @DisplayName("rawData가 .java 클래스이면 메소드메타데이터들을 추출합니다.")
+  @DisplayName("rawData가 .java 클래스이면 메소드 메타데이터들을 추출합니다.")
   @Test
   void createMethodMetaData() {
     // given
@@ -38,7 +38,7 @@ class CodeMethodMetaDataTest {
             CodeMethodMetaData::getEndLine)
         .containsExactly(
             "createRepo",
-            "StringStringString",
+            "createRepoString.String.String",
             MethodModifier.PUBLIC,
             27, // @Transactional 같은 어노테이션들도 다 포함함
             43);
