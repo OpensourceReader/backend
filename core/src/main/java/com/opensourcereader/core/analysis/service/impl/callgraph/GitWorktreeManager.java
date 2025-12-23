@@ -8,12 +8,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class GitWorktreeManager {
 
-  public Path createWorktree(String bareRepoPath, String ref) {
+  public Path createWorktree(Path bareRepoPath, String ref, String workingTreeDirName) {
     try {
-      Path worktreeDir = Files.createTempDirectory("ossr-worktree-");
+      Path worktreeDir = Files.createDirectory(bareRepoPath.resolve(workingTreeDirName));
 
       new ProcessBuilder(
-              "git", "--git-dir", bareRepoPath, "worktree", "add", worktreeDir.toString(), ref)
+              "git",
+              "--git-dir",
+              bareRepoPath.toString(),
+              "worktree",
+              "add",
+              worktreeDir.toString(),
+              ref)
           .inheritIO()
           .start()
           .waitFor();

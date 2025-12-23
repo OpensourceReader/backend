@@ -1,5 +1,7 @@
 package com.opensourcereader.api.facade.analysis;
 
+import java.nio.file.Path;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,15 @@ public class OpenSourceRepoFacade {
   @Value("${opensource-reader.local-clone-path}")
   private String localClonePath;
 
+  @Value("${opensource-reader.work-tree-name}")
+  private String workingTreeDirName;
+
   private final GitRepositoryService gitRepositoryService;
   private final OpenSourceRepoService opensourceRepoService;
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
-    String savedLocalPath =
-        gitRepositoryService.saveToLocal(request.openSourceUri(), localClonePath);
+    Path savedLocalPath = gitRepositoryService.saveToLocal(request.openSourceUri(), localClonePath);
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(
             savedLocalPath, request.openSourceUri(), request.repoReference());

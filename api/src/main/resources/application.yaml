@@ -27,6 +27,7 @@ spring:
 
 opensource-reader:
   local-clone-path:  ${OSSR_CLONE_PATH:${user.home}/local-clone-repos}
+  work-tree-name:  ${OSSR_WORK_TREE_NAME:work-tree-name}
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}

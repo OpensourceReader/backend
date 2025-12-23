@@ -34,14 +34,11 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
   @TempDir private Path tempDir;
 
   private Path bareCloneRepoPath;
-  private Path bareRepoWorkingTreePath;
-  private Path bareRepoByteCodePath;
+  private static final String WORKING_TREE_DIR_NAME = "workingTreeDirName";
 
   @BeforeEach
   void setup() {
     bareCloneRepoPath = tempDir.resolve("repos");
-    bareRepoWorkingTreePath = tempDir.resolve("repos/trees");
-    bareRepoByteCodePath = tempDir.resolve("repos/bytecodes");
   }
 
   @Transactional
@@ -51,13 +48,13 @@ class LocalGitRepoContentMethodCallGraphServiceTest {
     // given
     String cloneUrl = "https://github.com/OpensourceReader/backend.git";
     String reference = "HEAD";
-    String savedLocalPath =
-        gitRepositoryService.saveToLocal(cloneUrl, bareCloneRepoPath.toString());
+    Path savedLocalPath = gitRepositoryService.saveToLocal(cloneUrl, bareCloneRepoPath.toString());
     OpenSourceRepo openSourceRepo =
         openSourceRepoService.createRepo(savedLocalPath, cloneUrl, reference);
 
     // when
-    localGitRepoContentMethodCallGraphService.createMethodCallGraph(savedLocalPath, reference);
+    localGitRepoContentMethodCallGraphService.createMethodCallGraph(
+        savedLocalPath, reference, WORKING_TREE_DIR_NAME);
 
     // then
     String url = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";

@@ -40,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class LocalGitRepositoryService implements GitRepositoryService {
 
   @Override
-  public String saveToLocal(String openSourceUri, String localDirectory) {
+  public Path saveToLocal(String openSourceUri, String localDirectory) {
     File localPathFile = createLocalPath(openSourceUri, localDirectory).toFile();
     FileUtil.createDirectory(localPathFile);
     try (Git git =
@@ -49,14 +49,14 @@ public class LocalGitRepositoryService implements GitRepositoryService {
             .setDirectory(localPathFile)
             .setBare(true)
             .call()) {
-      return localPathFile.getPath();
+      return localPathFile.toPath();
     } catch (GitAPIException e) {
       throw new LocalGitCloneFailedException();
     }
   }
 
   @Override
-  public List<GitTreeFileInfo> getFlatTree(String localPath, String reference) {
+  public List<GitTreeFileInfo> getFlatTree(Path localPath, String reference) {
     Repository repo = createRepositoryBuilder(localPath);
     ObjectId commitId = getCommitId(repo, reference);
     RevTree tree = getTree(repo, commitId);
@@ -92,9 +92,9 @@ public class LocalGitRepositoryService implements GitRepositoryService {
   }
 
   @Override
-  public Repository createRepositoryBuilder(String localPath) {
+  public Repository createRepositoryBuilder(Path localPath) {
     try {
-      return new FileRepositoryBuilder().setGitDir(new File(localPath)).build();
+      return new FileRepositoryBuilder().setGitDir(localPath.toFile()).build();
     } catch (IOException e) {
       throw new LocalGitRepositoryOpenException();
     }

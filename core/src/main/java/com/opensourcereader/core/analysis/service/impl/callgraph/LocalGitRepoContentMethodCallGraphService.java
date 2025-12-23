@@ -31,17 +31,20 @@ public class LocalGitRepoContentMethodCallGraphService {
   private final CodeMethodMetaDataRepository codeMethodMetaDataRepository;
 
   @Transactional
-  public boolean createMethodCallGraph(String localClonePath, String reference) {
-    Path worktree = gitWorktreeManager.createWorktree(localClonePath, reference);
+  public boolean createMethodCallGraph(
+      Path savedLocalPath, String reference, String workingTreeDirName) {
+    Path worktree =
+        gitWorktreeManager.createWorktree(savedLocalPath, reference, workingTreeDirName);
     buildExecutor.build(worktree);
 
     for (Path byteCodeFile : buildArtifactCollector.collectClassFiles(worktree)) {
-      CallGraphResult callGraphResult = callGraphAnalyzer.analyzeByteCodeFile(byteCodeFile);
+      CallGraphResult callGraphResult =
+          callGraphAnalyzer.analyzeByteCodeFile(byteCodeFile); // 한번에 다 가져다 주기
       for (Map.Entry<String, Set<CalleePathAndMethodDescriptor>> edge :
           callGraphResult.edges().entrySet()) {
         Optional<CodeMethodMetaData> codeMethodMetaData =
             codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-                callGraphResult.classInternalName() + ".java", edge.getKey());
+                callGraphResult.classInternalName() + ".java", edge.getKey()); // .java 수정 필요
         if (codeMethodMetaData.isEmpty()) {
           continue;
         }

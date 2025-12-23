@@ -35,12 +35,12 @@ public final class FileUtil {
     }
   }
 
-  public static void removeDirectory(String localPath) {
+  public static void removeDirectory(Path localPath) {
     Path root = FileSystems.getDefault().getRootDirectories().iterator().next().toAbsolutePath();
-    if (localPath.equals(root.toString())) {
+    if (localPath.equals(root)) {
       throw new RootDirectoryNotDeletableException();
     }
-    File dir = new File(localPath);
+    File dir = new File(localPath.toString());
     deleteRecursively(dir);
   }
 

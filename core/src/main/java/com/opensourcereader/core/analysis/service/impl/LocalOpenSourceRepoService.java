@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
   @Transactional
   @Override
-  public OpenSourceRepo createRepo(String savedLocalPath, String cloneUrl, String repoReference) {
+  public OpenSourceRepo createRepo(Path savedLocalPath, String cloneUrl, String repoReference) {
     validateAlreadyExist(cloneUrl);
 
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUrl);
