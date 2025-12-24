@@ -7,7 +7,7 @@ import java.util.List;
 
 import aj.org.objectweb.asm.Type;
 
-public record RawMethodCall(
+public record MethodCall(
     String callerClassPath,
     String callerMethodName,
     String callerMethodReturnType,
@@ -19,7 +19,7 @@ public record RawMethodCall(
     int operationCode,
     boolean isCalleeMethodInterface) {
 
-  public static RawMethodCall of(
+  public static MethodCall of(
       String callerClassName,
       String callerMethodName,
       String callerDescriptor,
@@ -28,7 +28,7 @@ public record RawMethodCall(
       String calleeDescription,
       int operationCode,
       boolean isCalleeMethodInterface) {
-    return new RawMethodCall(
+    return new MethodCall(
         callerClassName + JAVA_EXTENSION,
         callerMethodName,
         getReturnType(callerDescriptor),

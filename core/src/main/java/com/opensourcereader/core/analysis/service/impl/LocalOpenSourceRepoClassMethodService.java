@@ -1,6 +1,5 @@
 package com.opensourcereader.core.analysis.service.impl;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,59 +8,45 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.callgraph.CallGraphResult;
-import com.opensourcereader.core.analysis.dto.callgraph.RawMethodCall;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCall;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoContentMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
-import com.opensourcereader.core.analysis.service.impl.callgraph.BuildExecutor;
-import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
-import com.opensourcereader.core.analysis.service.impl.callgraph.GitWorktreeManager;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LocalOpenSourceRepoContentMethodCallGraphService
-    implements OpenSourceRepoContentMethodCallGraphService {
+public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClassMethodService {
 
-  private final GitWorktreeManager gitWorktreeManager;
-  private final BuildExecutor buildExecutor;
-  private final BuildArtifactCollector buildArtifactCollector;
-  private final CallGraphAnalyzer callGraphAnalyzer;
   private final CodeMethodMetaDataRepository codeMethodMetaDataRepository;
 
   @Override
   @Transactional
-  public void createMethodCallGraph(
-      Path savedLocalPath, String reference, String workingTreeDirName) {
-    Path worktree =
-        gitWorktreeManager.createWorktree(savedLocalPath, reference, workingTreeDirName);
-    buildExecutor.build(worktree);
-
-    List<Path> byteCodeFiles = buildArtifactCollector.collectClassFiles(worktree);
-    for (CallGraphResult callGraphResult : callGraphAnalyzer.analyzeByteCodeFiles(byteCodeFiles)) {
-      Map<CodeMethodSignature, List<RawMethodCall>> rawCallsByCallerSignature =
-          groupByCallerSignature(callGraphResult);
-      List<CodeMethodMetaData> callers = resolveCallers(callGraphResult, rawCallsByCallerSignature);
+  public void createMethodCallGraph(List<ClassMethodCallResult> classMethodCallResults) {
+    for (ClassMethodCallResult classMethodCallResult : classMethodCallResults) {
+      Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature =
+          groupByCallerSignature(classMethodCallResult);
+      List<CodeMethodMetaData> callers =
+          resolveCallers(classMethodCallResult, rawCallsByCallerSignature);
       for (CodeMethodMetaData caller : callers) {
         caller.updateAllOutgoingCalls(
             createOutgoingCalls(
                 caller, rawCallsByCallerSignature.get(caller.getMethodSignature())));
         caller.updateAllIngoingCalls(
-            createIngoingCalls(callGraphResult.linkedInterfacePaths(), caller));
+            createIngoingCalls(classMethodCallResult.linkedInterfacePaths(), caller));
       }
 
       codeMethodMetaDataRepository.saveAll(callers);
     }
   }
 
-  private Map<CodeMethodSignature, List<RawMethodCall>> groupByCallerSignature(
-      CallGraphResult result) {
-    return result.rawMethodCalls().stream()
+  private Map<CodeMethodSignature, List<MethodCall>> groupByCallerSignature(
+      ClassMethodCallResult result) {
+    return result.methodCalls().stream()
         .collect(
             Collectors.groupingBy(
                 call ->
@@ -70,20 +55,20 @@ public class LocalOpenSourceRepoContentMethodCallGraphService
   }
 
   private List<CodeMethodMetaData> resolveCallers(
-      CallGraphResult callGraphResult,
-      Map<CodeMethodSignature, List<RawMethodCall>> rawCallsByCallerSignature) {
+      ClassMethodCallResult classMethodCallResult,
+      Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature) {
     return rawCallsByCallerSignature.keySet().stream()
         .map(
             codeMethodSignature ->
                 codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-                    callGraphResult.classPath(), codeMethodSignature.methodSignature()))
+                    classMethodCallResult.classPath(), codeMethodSignature.methodSignature()))
         .flatMap(Optional::stream)
         .toList();
   }
 
   private List<CodeMethodCallEdge> createOutgoingCalls(
-      CodeMethodMetaData caller, List<RawMethodCall> calleeRawMethodCalls) {
-    return calleeRawMethodCalls.stream()
+      CodeMethodMetaData caller, List<MethodCall> calleeMethodCalls) {
+    return calleeMethodCalls.stream()
         .map(
             call -> {
               CodeMethodSignature codeMethodSignature =

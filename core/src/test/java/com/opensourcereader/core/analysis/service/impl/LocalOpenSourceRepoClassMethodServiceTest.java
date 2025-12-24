@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoMethodCallAnalyzer;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
@@ -22,14 +25,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 @SpringBootTest
-class LocalOpenSourceRepoContentMethodCallGraphServiceTest {
+class LocalOpenSourceRepoClassMethodServiceTest {
 
   @Autowired private GitRepositoryLoader gitRepositoryLoader;
   @Autowired private OpenSourceRepoService openSourceRepoService;
-
-  @Autowired
-  private LocalOpenSourceRepoContentMethodCallGraphService
-      localGitRepoContentMethodCallGraphService;
+  @Autowired private OpenSourceRepoMethodCallAnalyzer openSourceRepoMethodCallAnalyzer;
+  @Autowired private OpenSourceRepoClassMethodService openSourceRepoClassMethodService;
 
   @Autowired private CodeMethodMetaDataRepository codeMethodMetaDataRepository;
 
@@ -53,10 +54,12 @@ class LocalOpenSourceRepoContentMethodCallGraphServiceTest {
     GitRepositoryLoadResult gitRepositoryLoadResult =
         gitRepositoryLoader.downloadGitRepo(cloneUrl, reference, bareCloneRepoPath.toString());
     openSourceRepoService.createRepo(cloneUrl, gitRepositoryLoadResult.files());
+    List<ClassMethodCallResult> methodCalls =
+        openSourceRepoMethodCallAnalyzer.createMethodCallResults(
+            gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
 
     // when
-    localGitRepoContentMethodCallGraphService.createMethodCallGraph(
-        gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
+    openSourceRepoClassMethodService.createMethodCallGraph(methodCalls);
 
     // then
     String url = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";

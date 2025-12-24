@@ -96,7 +96,6 @@ public class EclipseJGitService {
     }
   }
 
-  // 도메인이나 서비스로 추출 필요
   private Path createLocalPath(String openSourceUri, String localDirectory) {
     String[] tokens = openSourceUri.split("/");
     String owner = tokens[tokens.length - 2];
