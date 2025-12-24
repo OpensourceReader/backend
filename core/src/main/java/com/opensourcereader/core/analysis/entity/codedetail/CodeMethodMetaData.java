@@ -3,12 +3,9 @@ package com.opensourcereader.core.analysis.entity.codedetail;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
-import com.github.javaparser.Range;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
 import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,7 +60,21 @@ public class CodeMethodMetaData extends BaseEntity {
   @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
   private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
-  @ManyToOne private OpenSourceRepoContent openSourceRepoContent;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private OpenSourceRepoContent openSourceRepoContent;
+
+  public static CodeMethodMetaData of(
+      OpenSourceContentMethodExtractResult methodExtractResult,
+      OpenSourceRepoContent openSourceRepoContent) {
+    return new CodeMethodMetaData(
+        methodExtractResult.methodName(),
+        methodExtractResult.paramTypes(),
+        methodExtractResult.modifier(),
+        CodeMethodSignature.of(methodExtractResult.methodName(), methodExtractResult.paramTypes()),
+        methodExtractResult.startLine(),
+        methodExtractResult.endLine(),
+        openSourceRepoContent);
+  }
 
   private CodeMethodMetaData(
       String methodName,
@@ -80,46 +91,6 @@ public class CodeMethodMetaData extends BaseEntity {
     this.startLine = startLine;
     this.endLine = endLine;
     this.openSourceRepoContent = openSourceRepoContent;
-  }
-
-  public static CodeMethodMetaData of(
-      MethodDeclaration methodDeclaration, OpenSourceRepoContent openSourceRepoContent) {
-    String methodName = methodDeclaration.getNameAsString();
-    MethodModifier modifier = MethodModifier.from(methodDeclaration);
-    List<String> paramTypes = getParameterTypes(methodDeclaration);
-
-    return new CodeMethodMetaData(
-        methodName,
-        paramTypes,
-        modifier,
-        CodeMethodSignature.of(methodName, paramTypes),
-        getStartLine(methodDeclaration),
-        getEndLine(methodDeclaration),
-        openSourceRepoContent);
-  }
-
-  private static List<String> getParameterTypes(MethodDeclaration methodDeclaration) {
-    List<String> paramTypes = new ArrayList<>();
-    for (Parameter methodParameter : methodDeclaration.getParameters()) {
-      paramTypes.add(methodParameter.getType().toString());
-    }
-    return paramTypes;
-  }
-
-  private static Integer getStartLine(MethodDeclaration methodDeclaration) {
-    Optional<Range> range = methodDeclaration.getRange();
-    if (range.isEmpty()) {
-      return null;
-    }
-    return range.get().begin.line;
-  }
-
-  private static Integer getEndLine(MethodDeclaration methodDeclaration) {
-    Optional<Range> range = methodDeclaration.getRange();
-    if (range.isEmpty()) {
-      return null;
-    }
-    return range.get().end.line;
   }
 
   public void updateAllOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {

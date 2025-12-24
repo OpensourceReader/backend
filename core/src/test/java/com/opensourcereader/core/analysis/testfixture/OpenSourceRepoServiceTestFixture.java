@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis;
+package com.opensourcereader.core.analysis.testfixture;
 
 public class OpenSourceRepoServiceTestFixture {
 

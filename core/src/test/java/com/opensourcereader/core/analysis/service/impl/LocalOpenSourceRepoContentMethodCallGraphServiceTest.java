@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
-import com.opensourcereader.core.analysis.service.GitRepositoryService;
+import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
@@ -21,13 +22,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 @SpringBootTest
-class LocalOpensourceRepoContentMethodCallGraphServiceTest {
+class LocalOpenSourceRepoContentMethodCallGraphServiceTest {
 
-  @Autowired private GitRepositoryService gitRepositoryService;
+  @Autowired private GitRepositoryLoader gitRepositoryLoader;
   @Autowired private OpenSourceRepoService openSourceRepoService;
 
   @Autowired
-  private LocalOpensourceRepoContentMethodCallGraphService
+  private LocalOpenSourceRepoContentMethodCallGraphService
       localGitRepoContentMethodCallGraphService;
 
   @Autowired private CodeMethodMetaDataRepository codeMethodMetaDataRepository;
@@ -49,12 +50,13 @@ class LocalOpensourceRepoContentMethodCallGraphServiceTest {
     // given
     String cloneUrl = "https://github.com/OpensourceReader/backend.git";
     String reference = "HEAD";
-    Path savedLocalPath = gitRepositoryService.saveToLocal(cloneUrl, bareCloneRepoPath.toString());
-    openSourceRepoService.createRepo(savedLocalPath, cloneUrl, reference);
+    GitRepositoryLoadResult gitRepositoryLoadResult =
+        gitRepositoryLoader.downloadGitRepo(cloneUrl, reference, bareCloneRepoPath.toString());
+    openSourceRepoService.createRepo(cloneUrl, gitRepositoryLoadResult.files());
 
     // when
     localGitRepoContentMethodCallGraphService.createMethodCallGraph(
-        savedLocalPath, reference, WORKING_TREE_DIR_NAME);
+        gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
 
     // then
     String url = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";
@@ -66,26 +68,33 @@ class LocalOpensourceRepoContentMethodCallGraphServiceTest {
 
     SoftAssertions.assertSoftly(
         softly -> {
-          softly.assertThat(codeMethodMetaData).isPresent();
           softly
-              .assertThat(codeMethodMetaData.get().getOutgoingCalls())
-              .extracting(edge -> edge.getCallee().getMethodName())
-              .containsExactlyInAnyOrder(
-                  "getFlatTree",
-                  "createRepositoryBuilder",
-                  "getRawText",
-                  "addContent",
-                  "of",
-                  "validateAlreadyExist");
+              .assertThat(codeMethodMetaData)
+              .hasValueSatisfying(
+                  meta ->
+                      softly
+                          .assertThat(meta.getOutgoingCalls())
+                          .extracting(edge -> edge.getCallee().getMethodName())
+                          .containsExactlyInAnyOrder(
+                              "getFlatTree",
+                              "createRepositoryBuilder",
+                              "getRawText",
+                              "addContent",
+                              "of",
+                              "validateAlreadyExist"));
           softly
-              .assertThat(codeMethodMetaData.get().getIngoingCalls())
-              .extracting(
-                  edge -> edge.getCaller().getOpenSourceRepoContent().getPath(),
-                  edge -> edge.getCaller().getMethodName())
-              .containsExactlyInAnyOrder(
-                  Tuple.tuple(
-                      "core/src/main/java/com/opensourcereader/core/analysis/service/OpenSourceRepoService.java",
-                      "createRepo"));
+              .assertThat(codeMethodMetaData)
+              .hasValueSatisfying(
+                  meta ->
+                      softly
+                          .assertThat(meta.getIngoingCalls())
+                          .extracting(
+                              edge -> edge.getCaller().getOpenSourceRepoContent().getPath(),
+                              edge -> edge.getCaller().getMethodName())
+                          .containsExactlyInAnyOrder(
+                              Tuple.tuple(
+                                  "core/src/main/java/com/opensourcereader/core/analysis/service/OpenSourceRepoService.java",
+                                  "createRepo")));
         });
   }
 }

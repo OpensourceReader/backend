@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.service.impl.gitrepo;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,10 +7,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
-import com.opensourcereader.core.analysis.entity.ContentType;
+import com.opensourcereader.core.analysis.dto.gitrepo.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitCloneFailedException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitReferenceNotFoundException;
@@ -18,12 +17,10 @@ import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOp
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeParseException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeWalkAccessException;
-import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
@@ -35,11 +32,10 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class LocalGitRepositoryService implements GitRepositoryService {
+public class EclipseJGitService {
 
-  @Override
   public Path saveToLocal(String openSourceUri, String localDirectory) {
     File localPathFile = createLocalPath(openSourceUri, localDirectory).toFile();
     FileUtil.createDirectory(localPathFile);
@@ -55,7 +51,6 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     }
   }
 
-  @Override
   public List<GitTreeFileInfo> getFlatTree(Path localPath, String reference) {
     Repository repo = createRepositoryBuilder(localPath);
     ObjectId commitId = getCommitId(repo, reference);
@@ -65,15 +60,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     TreeWalk walk = getTreeWalk(repo, tree);
     try {
       while (walk.next()) {
-        String path = walk.getPathString();
-        FileMode type = walk.getFileMode(0);
-        ObjectId objId = walk.getObjectId(0);
-
-        ContentType contentType = ContentType.getContentTypeFromTypeNumber(type.toString());
-        if (contentType.equals(ContentType.OTHERS)) {
-          continue;
-        }
-        flatTrees.add(new GitTreeFileInfo(path, contentType, objId));
+        flatTrees.add(GitTreeFileInfo.from(walk));
       }
       return flatTrees;
     } catch (IOException e) {
@@ -81,7 +68,6 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     }
   }
 
-  @Override
   public String getRawText(ObjectId blobId, Repository repo) {
     try {
       ObjectLoader loader = repo.open(blobId, Constants.OBJ_BLOB);
@@ -91,7 +77,6 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     }
   }
 
-  @Override
   public Repository createRepositoryBuilder(Path localPath) {
     try {
       return new FileRepositoryBuilder().setGitDir(localPath.toFile()).build();
@@ -111,6 +96,7 @@ public class LocalGitRepositoryService implements GitRepositoryService {
     }
   }
 
+  // 도메인이나 서비스로 추출 필요
   private Path createLocalPath(String openSourceUri, String localDirectory) {
     String[] tokens = openSourceUri.split("/");
     String owner = tokens[tokens.length - 2];

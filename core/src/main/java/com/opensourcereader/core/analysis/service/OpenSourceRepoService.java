@@ -1,12 +1,13 @@
 package com.opensourcereader.core.analysis.service;
 
-import java.nio.file.Path;
+import java.util.List;
 
+import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 
 public interface OpenSourceRepoService {
 
-  OpenSourceRepo createRepo(Path savedLocalPath, String cloneUrl, String repoReference);
+  OpenSourceRepo createRepo(String cloneUri, List<OpenSourceFileInfo> sourFileInfos);
 
   OpenSourceRepo getRepoById(Long repositoryId);
 

@@ -25,4 +25,8 @@ public enum ContentType {
     }
     return OTHERS;
   }
+
+  public boolean isSupported() {
+    return this != OTHERS;
+  }
 }

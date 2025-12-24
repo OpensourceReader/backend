@@ -1,15 +1,11 @@
 package com.opensourcereader.core.analysis.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
+import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -68,34 +64,33 @@ public class OpenSourceRepoContent extends BaseEntity {
   private OpenSourceRepo openSourceRepo;
 
   public static OpenSourceRepoContent of(
-      GitTreeFileInfo fileInfo, String rawText, OpenSourceRepo openSourceRepo) {
-    return new OpenSourceRepoContent(fileInfo.path(), fileInfo.type(), rawText, openSourceRepo);
+      OpenSourceFileInfo fileInfo,
+      List<OpenSourceContentMethodExtractResult> methodExtractResults,
+      OpenSourceRepo openSourceRepo) {
+    return new OpenSourceRepoContent(
+        fileInfo.path(), fileInfo.type(), fileInfo.rawText(), methodExtractResults, openSourceRepo);
   }
 
   private OpenSourceRepoContent(
-      String path, ContentType contentType, String rawText, OpenSourceRepo openSourceRepo) {
+      String path,
+      String contentTypeNumber,
+      String rawText,
+      List<OpenSourceContentMethodExtractResult> methodExtractResults,
+      OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.extension = OpenSourceRepoContentName.getExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
-    this.contentType = contentType;
+    this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
     this.rawText = rawText;
-    this.codeMethodMetaData = separateCodeMethods(rawText);
+    this.codeMethodMetaData = getCodeMethodMetaData(methodExtractResults);
     this.openSourceRepo = openSourceRepo;
   }
 
-  private List<CodeMethodMetaData> separateCodeMethods(String rawText) {
-    if (this.name.isNotJavaFile()) {
-      return new ArrayList<>();
-    }
-    List<CodeMethodMetaData> result = new ArrayList<>();
-    // 추출 필요
-    StaticJavaParser.getConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
-    CompilationUnit compilationUnit = StaticJavaParser.parse(rawText);
-    for (MethodDeclaration methodDeclaration : compilationUnit.findAll(MethodDeclaration.class)) {
-      CodeMethodMetaData methodMetaData = CodeMethodMetaData.of(methodDeclaration, this);
-      result.add(methodMetaData);
-    }
-    return result;
+  private List<CodeMethodMetaData> getCodeMethodMetaData(
+      List<OpenSourceContentMethodExtractResult> methodExtractResults) {
+    return methodExtractResults.stream()
+        .map(extractResult -> CodeMethodMetaData.of(extractResult, this))
+        .toList();
   }
 
   @Override

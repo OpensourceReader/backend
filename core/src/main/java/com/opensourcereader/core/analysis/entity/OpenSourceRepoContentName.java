@@ -31,8 +31,8 @@ public class OpenSourceRepoContentName {
     return name.substring(lastIndexOfZero);
   }
 
-  public boolean isNotJavaFile() {
-    int lastIndexOfZero = name.lastIndexOf('.') + 1;
-    return !name.substring(lastIndexOfZero).equals("java");
+  public static boolean isNotJavaFile(String path) {
+    int lastIndexOfZero = path.lastIndexOf('.') + 1;
+    return !path.substring(lastIndexOfZero).equals("java");
   }
 }

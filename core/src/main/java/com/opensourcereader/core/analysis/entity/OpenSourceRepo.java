@@ -23,14 +23,14 @@ public class OpenSourceRepo extends BaseEntity {
   private String cloneUrl;
 
   @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
-  private final List<OpenSourceRepoContent> contents = new ArrayList<>();
+  private List<OpenSourceRepoContent> contents = new ArrayList<>();
 
   public OpenSourceRepo(String cloneUrl) {
     this.cloneUrl = cloneUrl;
   }
 
-  public void addContent(OpenSourceRepoContent content) {
-    contents.add(content);
+  public void addAllContent(List<OpenSourceRepoContent> contents) {
+    this.contents = contents;
   }
 
   @Override

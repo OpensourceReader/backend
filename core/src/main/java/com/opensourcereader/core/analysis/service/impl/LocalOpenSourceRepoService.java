@@ -1,20 +1,19 @@
 package com.opensourcereader.core.analysis.service.impl;
 
-import java.nio.file.Path;
+import static com.opensourcereader.core.analysis.entity.ContentType.getContentTypeFromTypeNumber;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.opensourcereader.core.analysis.dto.GitTreeFileInfo;
+import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.GitRepositoryService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import jakarta.transaction.Transactional;
-import org.eclipse.jgit.lib.Repository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,24 +21,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
-  private final GitRepositoryService gitRepositoryService;
   private final OpenSourceRepoRepository opensourceRepoRepository;
+  private final OpenSourceMethodExtractor openSourceMethodExtractor;
 
   @Transactional
   @Override
-  public OpenSourceRepo createRepo(Path savedLocalPath, String cloneUrl, String repoReference) {
-    validateAlreadyExist(cloneUrl);
-
-    OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUrl);
-    List<GitTreeFileInfo> flatTree =
-        gitRepositoryService.getFlatTree(savedLocalPath, repoReference);
-
-    Repository repo = gitRepositoryService.createRepositoryBuilder(savedLocalPath);
-    for (GitTreeFileInfo fileInfo : flatTree) {
-      String rawText = gitRepositoryService.getRawText(fileInfo.blobId(), repo);
-      opensourceRepo.addContent(OpenSourceRepoContent.of(fileInfo, rawText, opensourceRepo));
-    }
-
+  public OpenSourceRepo createRepo(String cloneUri, List<OpenSourceFileInfo> sourFileInfos) {
+    validateAlreadyExist(cloneUri);
+    OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUri);
+    List<OpenSourceRepoContent> openSourceRepoContents =
+        sourFileInfos.stream()
+            .filter(sourFileInfo -> getContentTypeFromTypeNumber(sourFileInfo.type()).isSupported())
+            .map(
+                sourFileInfo ->
+                    OpenSourceRepoContent.of(
+                        sourFileInfo,
+                        openSourceMethodExtractor.separateCodeMethods(sourFileInfo),
+                        opensourceRepo))
+            .toList();
+    opensourceRepo.addAllContent(openSourceRepoContents);
     return opensourceRepoRepository.save(opensourceRepo);
   }
 

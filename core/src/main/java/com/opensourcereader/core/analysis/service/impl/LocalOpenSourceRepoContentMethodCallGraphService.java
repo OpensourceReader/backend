@@ -15,7 +15,7 @@ import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
-import com.opensourcereader.core.analysis.service.OpensourceRepoContentMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoContentMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
 import com.opensourcereader.core.analysis.service.impl.callgraph.BuildExecutor;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
@@ -25,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LocalOpensourceRepoContentMethodCallGraphService
-    implements OpensourceRepoContentMethodCallGraphService {
+public class LocalOpenSourceRepoContentMethodCallGraphService
+    implements OpenSourceRepoContentMethodCallGraphService {
 
   private final GitWorktreeManager gitWorktreeManager;
   private final BuildExecutor buildExecutor;
