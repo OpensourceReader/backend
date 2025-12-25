@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
 import com.opensourcereader.core.analysis.dto.callgraph.MethodCall;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
@@ -30,9 +30,8 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
     for (ClassMethodCallResult classMethodCallResult : classMethodCallResults) {
       Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature =
           groupByCallerSignature(classMethodCallResult);
-      List<CodeMethodMetaData> callers =
-          resolveCallers(classMethodCallResult, rawCallsByCallerSignature);
-      for (CodeMethodMetaData caller : callers) {
+      List<CodeMethod> callers = resolveCallers(classMethodCallResult, rawCallsByCallerSignature);
+      for (CodeMethod caller : callers) {
         caller.updateAllOutgoingCalls(
             createOutgoingCalls(
                 caller, rawCallsByCallerSignature.get(caller.getMethodSignature())));
@@ -54,7 +53,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
                         call.callerMethodName(), call.callerRawArgumentTypes())));
   }
 
-  private List<CodeMethodMetaData> resolveCallers(
+  private List<CodeMethod> resolveCallers(
       ClassMethodCallResult classMethodCallResult,
       Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature) {
     return rawCallsByCallerSignature.keySet().stream()
@@ -67,7 +66,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
   }
 
   private List<CodeMethodCallEdge> createOutgoingCalls(
-      CodeMethodMetaData caller, List<MethodCall> calleeMethodCalls) {
+      CodeMethod caller, List<MethodCall> calleeMethodCalls) {
     return calleeMethodCalls.stream()
         .map(
             call -> {
@@ -82,7 +81,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
   }
 
   private List<CodeMethodCallEdge> createIngoingCalls(
-      List<String> linkedInterfacePaths, CodeMethodMetaData caller) {
+      List<String> linkedInterfacePaths, CodeMethod caller) {
     return linkedInterfacePaths.stream()
         .map(
             path ->

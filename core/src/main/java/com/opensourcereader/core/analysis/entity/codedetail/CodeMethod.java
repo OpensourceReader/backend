@@ -14,10 +14,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -26,16 +25,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Table(
-    name = "code_method",
-    uniqueConstraints = {
-      @UniqueConstraint(
-          name = "uk_code_method_repo_content_method_name",
-          columnNames = {"open_source_repo_content_id", "method_signature"})
-    })
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CodeMethodMetaData extends BaseEntity {
+public class CodeMethod extends BaseEntity {
 
   @Column(name = "method_name")
   private String methodName;
@@ -61,12 +53,13 @@ public class CodeMethodMetaData extends BaseEntity {
   private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "open_source_repo_content_id", nullable = false)
   private OpenSourceRepoContent openSourceRepoContent;
 
-  public static CodeMethodMetaData of(
+  public static CodeMethod of(
       OpenSourceContentMethodExtractResult methodExtractResult,
       OpenSourceRepoContent openSourceRepoContent) {
-    return new CodeMethodMetaData(
+    return new CodeMethod(
         methodExtractResult.methodName(),
         methodExtractResult.paramTypes(),
         methodExtractResult.modifier(),
@@ -76,7 +69,7 @@ public class CodeMethodMetaData extends BaseEntity {
         openSourceRepoContent);
   }
 
-  private CodeMethodMetaData(
+  private CodeMethod(
       String methodName,
       List<String> paramTypes,
       MethodModifier methodModifier,
@@ -117,7 +110,7 @@ public class CodeMethodMetaData extends BaseEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CodeMethodMetaData that)) {
+    if (!(o instanceof CodeMethod that)) {
       return false;
     }
     return Objects.equals(methodSignature, that.methodSignature)

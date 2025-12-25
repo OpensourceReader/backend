@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
@@ -66,7 +66,7 @@ class LocalOpenSourceRepoClassMethodServiceTest {
     String methodSignature =
         CodeMethodSignature.of("createRepo", List.of("String", "String", "String"))
             .methodSignature();
-    Optional<CodeMethodMetaData> codeMethodMetaData =
+    Optional<CodeMethod> codeMethodMetaData =
         codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(url, methodSignature);
 
     SoftAssertions.assertSoftly(

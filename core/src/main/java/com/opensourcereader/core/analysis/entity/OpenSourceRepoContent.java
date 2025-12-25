@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodMetaData;
+import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -18,8 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,12 +25,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(
-    uniqueConstraints = {
-      @UniqueConstraint(
-          name = "uk_code_open_source_repo_content",
-          columnNames = {"path"})
-    })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OpenSourceRepoContent extends BaseEntity {
 
@@ -55,9 +47,11 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "opensource_repo_content_id")
-  private List<CodeMethodMetaData> codeMethodMetaData;
+  @OneToMany(
+      mappedBy = "openSourceRepoContent",
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.PERSIST)
+  private List<CodeMethod> codeMethods;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
@@ -82,14 +76,14 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
     this.rawText = rawText;
-    this.codeMethodMetaData = getCodeMethodMetaData(methodExtractResults);
+    this.codeMethods = getCodeMethods(methodExtractResults);
     this.openSourceRepo = openSourceRepo;
   }
 
-  private List<CodeMethodMetaData> getCodeMethodMetaData(
+  private List<CodeMethod> getCodeMethods(
       List<OpenSourceContentMethodExtractResult> methodExtractResults) {
     return methodExtractResults.stream()
-        .map(extractResult -> CodeMethodMetaData.of(extractResult, this))
+        .map(extractResult -> CodeMethod.of(extractResult, this))
         .toList();
   }
 

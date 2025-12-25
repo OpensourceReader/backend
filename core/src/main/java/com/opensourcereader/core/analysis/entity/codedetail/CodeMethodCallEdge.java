@@ -17,13 +17,13 @@ public class CodeMethodCallEdge extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "caller_id")
-  private CodeMethodMetaData caller;
+  private CodeMethod caller;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "callee_id")
-  private CodeMethodMetaData callee;
+  private CodeMethod callee;
 
-  public CodeMethodCallEdge(CodeMethodMetaData caller, CodeMethodMetaData callee) {
+  public CodeMethodCallEdge(CodeMethod caller, CodeMethod callee) {
     this.caller = caller;
     this.callee = callee;
   }
