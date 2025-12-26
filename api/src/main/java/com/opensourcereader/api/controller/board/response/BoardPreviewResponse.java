@@ -1,7 +1,6 @@
 package com.opensourcereader.api.controller.board.response;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
@@ -17,55 +16,32 @@ public record BoardPreviewResponse(
     String body,
     UserDto userDto,
     Long commentCount,
-    String createdAt,
-    String updatedAt) {
+    Instant createdAt,
+    Instant updatedAt) {
 
-  public static BoardPreviewResponse of(Issue issue, UserDto userDto, Long commentCount) {
-    return getBoardPreviewResponse(
-        userDto,
-        commentCount,
-        issue.getCreatedAt(),
-        issue.getUpdatedAt(),
-        issue.getId(),
-        issue.getTitle(),
-        issue.getTagId(),
-        issue.getBody());
-  }
-
-  public static BoardPreviewResponse of(Pull pull, UserDto userDto, Long commentCount) {
-    return getBoardPreviewResponse(
-        userDto,
-        commentCount,
-        pull.getCreatedAt(),
-        pull.getUpdatedAt(),
-        pull.getId(),
-        pull.getTitle(),
-        pull.getTagId(),
-        pull.getBody());
-  }
-
-  private static BoardPreviewResponse getBoardPreviewResponse(
-      UserDto userDto,
-      Long commentCount,
-      Instant createdAt,
-      Instant updatedAt,
-      Long id,
-      String title,
-      Long tagId,
-      String body) {
-    // time format : yyyy-MM-ddTHH:mm:ss.sssZ
-    String createdAtToString = createdAt.truncatedTo(ChronoUnit.SECONDS).toString();
-    String updatedAtToString = updatedAt.truncatedTo(ChronoUnit.SECONDS).toString();
-
+  public static BoardPreviewResponse of(Issue entity, UserDto userDto) {
     return BoardPreviewResponse.builder()
-        .id(id)
-        .title(title)
-        .tagId(tagId)
-        .body(body)
+        .id(entity.getId())
+        .title(entity.getTitle())
+        .tagId(entity.getTagId())
+        .body(entity.getBody())
         .userDto(userDto)
-        .commentCount(commentCount)
-        .createdAt(createdAtToString)
-        .updatedAt(updatedAtToString)
+        .commentCount(entity.getCommentCount())
+        .createdAt(entity.getCreatedAt())
+        .updatedAt(entity.getUpdatedAt())
+        .build();
+  }
+
+  public static BoardPreviewResponse of(Pull entity, UserDto userDto) {
+    return BoardPreviewResponse.builder()
+        .id(entity.getId())
+        .title(entity.getTitle())
+        .tagId(entity.getTagId())
+        .body(entity.getBody())
+        .userDto(userDto)
+        .commentCount(entity.getCommentCount() + entity.getReviewCount())
+        .createdAt(entity.getCreatedAt())
+        .updatedAt(entity.getUpdatedAt())
         .build();
   }
 }

@@ -9,18 +9,14 @@ import org.springframework.stereotype.Service;
 import com.opensourcereader.api.client.GithubClient;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
-import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
-import com.opensourcereader.core.board.dto.PullCommand;
 import com.opensourcereader.core.board.entity.Issue;
-import com.opensourcereader.core.board.entity.Pull;
-import com.opensourcereader.core.board.service.IssueService;
-import com.opensourcereader.core.board.service.PullService;
+import com.opensourcereader.core.board.service.IssueSyncService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.exception.UserNotFoundException;
@@ -39,8 +35,7 @@ public class GitHubFacadeService {
 
   private final OpenSourceRepoService openSourceRepoService;
   private final UserService userService;
-  private final IssueService issueService;
-  private final PullService pullService;
+  private final IssueSyncService issueSyncService;
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
     try {
@@ -61,33 +56,16 @@ public class GitHubFacadeService {
     List<Issue> responses = new ArrayList<>();
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
       User author = findByUser(fetched.user());
-
       Boolean isOpened = isOpened(fetched.state());
+      BoardBaseCommand command;
 
-      BoardBaseCommand command = modelMapper.toCommand(fetched, author, repo, isOpened);
-      Issue issue = issueService.upsert(command);
-      responses.add(issue);
-    }
-
-    return responses;
-  }
-
-  public List<Pull> createPulls(GithubRepoRequest request) {
-    OpenSourceRepo repo =
-        openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
-
-    List<GithubPullResponse> fetchedRepoPulls = githubClient.fetchRepoPulls(request);
-
-    List<Pull> responses = new ArrayList<>();
-    for (GithubPullResponse fetched : fetchedRepoPulls) {
-      User author = findByUser(fetched.user());
-
-      Boolean isOpened = isOpened(fetched.state());
-
-      PullCommand command = modelMapper.toCommand(fetched, author, repo, isOpened);
-
-      Pull pull = pullService.upsert(command);
-      responses.add(pull);
+      if (fetched.isPullRequest()) {
+        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+      } else {
+        // TODO 일단 저장, 나중에 pull 전부 요청 때릴 때, 그때 Pull 객체 정보를 완전히 만들기
+        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
+      }
+      issueSyncService.syncIssue(command);
     }
 
     return responses;

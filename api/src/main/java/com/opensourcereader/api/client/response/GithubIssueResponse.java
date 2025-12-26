@@ -13,4 +13,10 @@ public record GithubIssueResponse(
     String state,
     @JsonProperty("comments") Long commentCount,
     @JsonProperty("created_at") Instant createdAt,
-    @JsonProperty("updated_at") Instant updatedAt) {}
+    @JsonProperty("updated_at") Instant updatedAt,
+    @JsonProperty("pull_request") GithubPullRequestInfo pullRequest) {
+
+  public boolean isPullRequest() {
+    return pullRequest != null;
+  }
+}

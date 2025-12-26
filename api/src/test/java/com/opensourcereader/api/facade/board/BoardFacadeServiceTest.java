@@ -3,26 +3,17 @@ package com.opensourcereader.api.facade.board;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.test.util.ReflectionTestUtils;
-
+import com.navercorp.fixturemonkey.FixtureMonkey;
+import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitraryIntrospector;
+import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
 import com.opensourcereader.api.controller.board.request.BoardGetRequest;
-import com.opensourcereader.api.controller.board.response.BoardBaseResponse;
-import com.opensourcereader.api.controller.board.response.BoardIssueResponse;
 import com.opensourcereader.api.controller.board.response.BoardPreviewResponse;
-import com.opensourcereader.api.controller.board.response.BoardPullResponse;
-import com.opensourcereader.core.board.dto.BoardBaseCommand;
-import com.opensourcereader.core.board.dto.PullCommand;
-import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
-import com.opensourcereader.core.board.entity.Review;
-import com.opensourcereader.core.board.service.*;
-import com.opensourcereader.core.user.dto.UserSignUpCommand;
-import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.board.service.IssueRetrieveService;
+import com.opensourcereader.core.board.service.PullRetrieveService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,150 +23,38 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class BoardFacadeServiceTest {
+  private static final FixtureMonkey FIXTURE_MONKEY =
+      FixtureMonkey.builder()
+          .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
+          .pushExactTypeArbitraryIntrospector(
+              BoardGetRequest.class, ConstructorPropertiesArbitraryIntrospector.INSTANCE)
+          .defaultNotNull(true)
+          .build();
 
-  @Mock private IssueService issueService;
-  @Mock private PullService pullService;
-  @Mock private IssueCommentService issueCommentService;
-  @Mock private PullCommentService pullCommentService;
-  @Mock private ReviewService reviewService;
+  @Mock private IssueRetrieveService issueRetrieveService;
+
+  @Mock private PullRetrieveService pullRetrieveService;
 
   @InjectMocks private BoardFacadeService boardFacadeService;
 
-  private static final Instant NOW = Instant.now();
-
-  private User createDummyUser() {
-    UserSignUpCommand command =
-        new UserSignUpCommand("test@example.com", "password", "TestNick", null, "testUser");
-
-    User user = User.from(command);
-
-    ReflectionTestUtils.setField(user, "id", 1L);
-    ReflectionTestUtils.setField(user, "createdAt", NOW);
-    ReflectionTestUtils.setField(user, "updatedAt", NOW);
-
-    return user;
-  }
-
-  private Issue createDummyIssue(Long id, User user) {
-    BoardBaseCommand command = new BoardBaseCommand();
-    command.setId(id);
-    command.setCreatedAt(NOW);
-    command.setUpdatedAt(NOW);
-    command.setAuthor(user);
-    command.setIsOpened(true);
-    command.setCommentCount(5L);
-    command.setTitle("Test Issue Title");
-    command.setBody("Test Issue Body");
-    command.setTagId(101L);
-
-    return Issue.from(command);
-  }
-
-  private Pull createDummyPull(Long id, User user) {
-    PullCommand command = new PullCommand();
-    command.setId(id);
-    command.setCreatedAt(NOW);
-    command.setUpdatedAt(NOW);
-    command.setAuthor(user);
-    command.setIsOpened(true);
-    command.setCommentCount(3L);
-    command.setTitle("Test Pull Title");
-    command.setBody("Test Pull Body");
-    command.setTagId(202L);
-    command.setReviewCount(2L);
-
-    return Pull.from(command);
-  }
-
-  private Review createDummyReview(Long id, Pull pull, User user) {
-    ReviewCommand command = new ReviewCommand();
-    command.setId(id);
-    command.setCreatedAt(NOW);
-    command.setUpdatedAt(NOW);
-    command.setAuthor(user);
-    command.setPull(pull);
-
-    return Review.from(command);
-  }
-
   @Test
-  @DisplayName("findAllByRepositoryId: 이슈와 PR을 모두 조회하여 미리보기 리스트로 반환한다.")
-  void findAllPreviewByRepositoryId_Success() {
-    // [Given]
-    Long repoId = 100L;
-    BoardGetRequest request = new BoardGetRequest(repoId);
+  @DisplayName("이슈와 PR을 모두 조회하여 미리보기 리스트로 반환한다")
+  void givenRequest_thenSuccess() {
+    // given
+    BoardGetRequest request = FIXTURE_MONKEY.giveMeOne(BoardGetRequest.class);
 
-    User user = createDummyUser();
+    Issue issue = FIXTURE_MONKEY.giveMeOne(Issue.class);
+    Pull pull = FIXTURE_MONKEY.giveMeOne(Pull.class);
 
-    Issue issue = createDummyIssue(1L, user);
-    Pull pull = createDummyPull(2L, user);
+    given(issueRetrieveService.findIssuesByRepositoryId(request.repositoryId(), true))
+        .willReturn(List.of(issue, pull));
 
-    Review review = createDummyReview(3L, pull, user);
-    ReflectionTestUtils.setField(review, "id", 10L);
-
-    given(issueService.findAllByRepositoryId(repoId, true)).willReturn(List.of(issue));
-    given(pullService.findAllByRepositoryId(repoId, true)).willReturn(List.of(pull));
-
-    // [When]
+    // when
     List<BoardPreviewResponse> result = boardFacadeService.findAllPreviewByRepositoryId(request);
 
-    // [Then]
+    // then
     assertThat(result).hasSize(2);
-    assertThat(result.get(0).title()).isEqualTo("Test Issue Title");
-    assertThat(result.get(1).title()).isEqualTo("Test Pull Title");
-  }
-
-  @Test
-  @DisplayName("findByTagId: Issue가 존재할 경우 BoardIssueResponse를 반환한다.")
-  void findByTagId_ReturnIssue() {
-    // [Given]
-    Long tagId = 123L;
-    Long repoId = 100L;
-    BoardGetRequest request = new BoardGetRequest(repoId);
-
-    User user = createDummyUser();
-
-    given(issueService.existedByTagId(repoId, tagId)).willReturn(true);
-    given(pullService.existedByTagId(repoId, tagId)).willReturn(false);
-
-    Issue issue = createDummyIssue(1L, user);
-    ReflectionTestUtils.setField(issue, "tagId", tagId);
-
-    given(issueService.findByTagId(repoId, tagId)).willReturn(issue);
-    given(issueCommentService.findAllByIssueId(issue.getId())).willReturn(new ArrayList<>());
-
-    // [When]
-    BoardBaseResponse response = boardFacadeService.findByTagId(tagId, request);
-
-    // [Then]
-    assertThat(response).isInstanceOf(BoardIssueResponse.class);
-    BoardIssueResponse issueRes = (BoardIssueResponse) response;
-    assertThat(issueRes.getBoardAuthor().nickname()).isEqualTo("TestNick");
-  }
-
-  @Test
-  @DisplayName("findByTagId: Pull이 존재할 경우 BoardPullResponse를 반환한다.")
-  void findByTagId_ReturnPull() {
-    // [Given]
-    Long tagId = 456L;
-    Long repoId = 100L;
-    BoardGetRequest request = new BoardGetRequest(repoId);
-
-    User user = createDummyUser();
-
-    given(issueService.existedByTagId(repoId, tagId)).willReturn(false);
-    given(pullService.existedByTagId(repoId, tagId)).willReturn(true);
-
-    Pull pull = createDummyPull(2L, user);
-    ReflectionTestUtils.setField(pull, "tagId", tagId);
-
-    given(pullService.findByTagId(repoId, tagId)).willReturn(pull);
-    given(reviewService.findAllByPullId(pull.getId())).willReturn(new ArrayList<>());
-
-    // [When]
-    BoardBaseResponse response = boardFacadeService.findByTagId(tagId, request);
-
-    // [Then]
-    assertThat(response).isInstanceOf(BoardPullResponse.class);
+    assertThat(result.get(0).title()).isEqualTo(issue.getTitle());
+    assertThat(result.get(1).title()).isEqualTo(pull.getTitle());
   }
 }

@@ -12,7 +12,6 @@ import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.facade.github.GitHubFacadeService;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.entity.Issue;
-import com.opensourcereader.core.board.entity.Pull;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,12 +35,5 @@ public class AdminController {
     List<Issue> issues = gitHubFacadeService.createIssues(request);
 
     return ResponseEntity.ok(issues);
-  }
-
-  @PostMapping("/pulls")
-  public ResponseEntity<List<Pull>> fetchPulls(@RequestBody GithubRepoRequest request) {
-    List<Pull> pulls = gitHubFacadeService.createPulls(request);
-
-    return ResponseEntity.ok(pulls);
   }
 }
