@@ -42,7 +42,7 @@ public class OpenSourceRepoFacade {
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(request.openSourceUri(), gitRepoLoadResult.files());
     List<ClassMethodCallResult> methodCalls =
-        openSourceRepoMethodCallAnalyzer.createMethodCallResults(
+        openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
             gitRepoLoadResult.savedLocalRepoPath(), request.reference(), workingTreeDirName);
     openSourceRepoClassMethodService.createMethodCallGraph(methodCalls);
     FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());

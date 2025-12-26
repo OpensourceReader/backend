@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoMethodCallAnalyzer;
-import com.opensourcereader.core.analysis.service.impl.callgraph.BuildArtifactCollector;
-import com.opensourcereader.core.analysis.service.impl.callgraph.BuildExecutor;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
-import com.opensourcereader.core.analysis.service.impl.callgraph.GitWorktreeManagerCli;
+import com.opensourcereader.core.analysis.service.impl.support.bytecode.BuildArtifactCollector;
+import com.opensourcereader.core.analysis.service.impl.support.bytecode.BuildExecutor;
+import com.opensourcereader.core.analysis.service.impl.support.git.GitWorktreeManagerCli;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ public class LocalBytecodeMethodCallAnalyzer implements OpenSourceRepoMethodCall
   private final CallGraphAnalyzer callGraphAnalyzer;
 
   @Override
-  public List<ClassMethodCallResult> createMethodCallResults(
+  public List<ClassMethodCallResult> createClassMethodCalls(
       Path savedLocalPath, String reference, String workingTreeDirName) {
     Path worktree =
         gitWorktreeManagerCli.createWorktree(savedLocalPath, reference, workingTreeDirName);

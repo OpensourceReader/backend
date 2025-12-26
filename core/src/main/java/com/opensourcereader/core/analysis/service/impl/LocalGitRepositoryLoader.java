@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
-import com.opensourcereader.core.analysis.service.impl.gitrepo.EclipseJGitService;
+import com.opensourcereader.core.analysis.service.impl.support.git.EclipseJGitService;
 import org.eclipse.jgit.lib.Repository;
 
 import lombok.RequiredArgsConstructor;

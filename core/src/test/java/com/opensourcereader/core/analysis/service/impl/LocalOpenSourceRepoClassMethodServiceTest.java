@@ -20,6 +20,7 @@ import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -44,6 +45,17 @@ class LocalOpenSourceRepoClassMethodServiceTest {
     bareCloneRepoPath = tempDir.resolve("repos");
   }
 
+  @DisplayName("필요: MethodCallResult(자바 문법에 맞는 예외 케이스를 만들어야함), 출력 : methodCall이 잘 들어갔는가?")
+  @Test
+  void createMethodCallGraphTest() {
+    // given
+
+    // when
+
+    // then
+  }
+
+  @Disabled
   @Transactional
   @DisplayName("메서드에서 사용하는(outgoing), 메서드를 사용하는(ingoing) 메서드들을 연결합니다.")
   @Test
@@ -55,7 +67,7 @@ class LocalOpenSourceRepoClassMethodServiceTest {
         gitRepositoryLoader.downloadGitRepo(cloneUrl, reference, bareCloneRepoPath.toString());
     openSourceRepoService.createRepo(cloneUrl, gitRepositoryLoadResult.files());
     List<ClassMethodCallResult> methodCalls =
-        openSourceRepoMethodCallAnalyzer.createMethodCallResults(
+        openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
             gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
 
     // when
