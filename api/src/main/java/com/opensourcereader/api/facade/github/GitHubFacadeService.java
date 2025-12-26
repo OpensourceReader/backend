@@ -60,10 +60,10 @@ public class GitHubFacadeService {
       BoardBaseCommand command;
 
       if (fetched.isPullRequest()) {
-        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
       } else {
         // TODO 일단 저장, 나중에 pull 전부 요청 때릴 때, 그때 Pull 객체 정보를 완전히 만들기
-        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
+        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
       }
       issueSyncService.syncIssue(command);
     }
