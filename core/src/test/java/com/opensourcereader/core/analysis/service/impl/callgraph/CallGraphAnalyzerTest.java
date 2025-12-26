@@ -1,5 +1,16 @@
 package com.opensourcereader.core.analysis.service.impl.callgraph;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-class CallGraphAnalyzerTest {}
+class CallGraphAnalyzerTest {
+  @DisplayName("")
+  @Test
+  void createMethodCallsOfClass() {
+    // given
+
+    // when
+
+    // then
+  }
+}

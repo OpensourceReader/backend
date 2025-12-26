@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
@@ -66,7 +66,7 @@ class LocalOpenSourceRepoClassMethodServiceTest {
     GitRepositoryLoadResult gitRepositoryLoadResult =
         gitRepositoryLoader.downloadGitRepo(cloneUrl, reference, bareCloneRepoPath.toString());
     openSourceRepoService.createRepo(cloneUrl, gitRepositoryLoadResult.files());
-    List<ClassMethodCallResult> methodCalls =
+    List<MethodCallsOfClass> methodCalls =
         openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
             gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
 

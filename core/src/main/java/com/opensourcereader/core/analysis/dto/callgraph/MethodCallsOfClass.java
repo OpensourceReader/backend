@@ -7,14 +7,14 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.entity.Extension;
 
-public record ClassMethodCallResult(
+public record MethodCallsOfClass(
     String classPath, List<String> linkedInterfacePaths, List<MethodCallEdge> methodCallEdges) {
 
-  public static ClassMethodCallResult of(
+  public static MethodCallsOfClass of(
       String classInternalName, String[] interfaces, List<MethodCallEdge> methodCallEdges) {
     List<String> interfacePaths =
         Arrays.stream(interfaces).map(inter -> appendExtension(inter, Extension.JAVA)).toList();
-    return new ClassMethodCallResult(
+    return new MethodCallsOfClass(
         appendExtension(classInternalName, Extension.JAVA), interfacePaths, methodCallEdges);
   }
 }

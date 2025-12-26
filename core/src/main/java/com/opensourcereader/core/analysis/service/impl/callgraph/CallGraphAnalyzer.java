@@ -9,22 +9,22 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import aj.org.objectweb.asm.ClassReader;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
 
 @Component
 public class CallGraphAnalyzer {
 
-  public List<ClassMethodCallResult> analyzeByteCodeFiles(List<Path> byteCodePaths) {
-    return byteCodePaths.stream().map(this::analyzeByteCodeFile).toList();
+  public List<MethodCallsOfClass> createMethodCallsOfClass(List<Path> byteCodePaths) {
+    return byteCodePaths.stream().map(this::createMethodCallOfClass).toList();
   }
 
-  private ClassMethodCallResult analyzeByteCodeFile(Path byteCodeFile) {
+  private MethodCallsOfClass createMethodCallOfClass(Path byteCodeFile) {
     try (InputStream inputStream = Files.newInputStream(byteCodeFile)) {
       ClassReader classReader = new ClassReader(inputStream);
       CallGraphClassVisitor callGraphClassVisitor = new CallGraphClassVisitor();
       classReader.accept(callGraphClassVisitor, ClassReader.SKIP_DEBUG);
 
-      return ClassMethodCallResult.of(
+      return MethodCallsOfClass.of(
           classReader.getClassName(),
           classReader.getInterfaces(),
           callGraphClassVisitor.getMethodCallEdges());

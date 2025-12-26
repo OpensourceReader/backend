@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
@@ -41,7 +41,7 @@ public class OpenSourceRepoFacade {
             request.openSourceUri(), request.reference(), localClonePath);
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(request.openSourceUri(), gitRepoLoadResult.files());
-    List<ClassMethodCallResult> methodCalls =
+    List<MethodCallsOfClass> methodCalls =
         openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
             gitRepoLoadResult.savedLocalRepoPath(), request.reference(), workingTreeDirName);
     openSourceRepoClassMethodService.createMethodCallGraph(methodCalls);
