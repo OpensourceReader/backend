@@ -5,9 +5,11 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Index;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -17,13 +19,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-    name = "issues",
-    indexes = {
-      @Index(name = "idx_issue_repo_status", columnList = "repository_id, is_opened"),
-    })
+@Table(name = "issues")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 public class Issue extends BaseEntity {
 
   @Column(name = "tag_id")
@@ -68,7 +68,7 @@ public class Issue extends BaseEntity {
   }
 
   // 대량의 변화일 가능성이 높기에 통짜로 변경한다.
-  // TODO 단, 로그를 남겨야 한다.(이전 변화, 현재 변화)
+  // TODO 로그를 남겨야 한다.(이전 변화, 현재 변화)
   public void updateBody(String newContent) {
     this.body = newContent;
   }
@@ -85,7 +85,7 @@ public class Issue extends BaseEntity {
     this.commentCount = updateField(this.commentCount, newCommentCount);
   }
 
-  private <T> T updateField(T target, T replace) {
+  protected <T> T updateField(T target, T replace) {
     if (target == null && replace != null) {
       return replace;
     }

@@ -1,6 +1,6 @@
 package com.opensourcereader.core.board.dto;
 
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
 
 import com.opensourcereader.core.board.entity.Review;
 import com.opensourcereader.core.user.dto.UserDto;
@@ -9,18 +9,15 @@ import lombok.Builder;
 
 @Builder
 public record ReviewDto(
-    Long reviewId, String createdAt, String updatedAt, UserDto reviewAuthor, String body) {
+    Long reviewId, Instant createdAt, Instant updatedAt, UserDto author, String body) {
 
-  public static ReviewDto of(Review review, UserDto reviewAuthor) {
-    // time format : yyyy-MM-ddTHH:mm:ss.sssZ
-    String createdAtToString = review.getCreatedAt().truncatedTo(ChronoUnit.SECONDS).toString();
-    String updatedAtToString = review.getUpdatedAt().truncatedTo(ChronoUnit.SECONDS).toString();
+  public static ReviewDto of(UserDto author, Review review) {
 
     return ReviewDto.builder()
         .reviewId(review.getId())
-        .createdAt(createdAtToString)
-        .updatedAt(updatedAtToString)
-        .reviewAuthor(reviewAuthor)
+        .createdAt(review.getCreatedAt())
+        .updatedAt(review.getUpdatedAt())
+        .author(author)
         .body(review.getBody())
         .build();
   }

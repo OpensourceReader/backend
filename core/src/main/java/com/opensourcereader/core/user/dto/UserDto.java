@@ -1,6 +1,6 @@
 package com.opensourcereader.core.user.dto;
 
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
 
 import com.opensourcereader.core.user.entity.Role;
 import com.opensourcereader.core.user.entity.User;
@@ -13,19 +13,16 @@ public record UserDto(
     String email,
     String avatarUrl,
     Role role,
-    String createdAt,
+    Instant createdAt,
     boolean disabled) {
 
   public static UserDto from(User user) {
-    // time format : yyyy-MM-ddTHH:mm:ss.sssZ
-    String createdAtToString = user.getCreatedAt().truncatedTo(ChronoUnit.SECONDS).toString();
-
     return UserDto.builder()
         .nickname(user.getLoginName())
         .email(user.getEmail())
         .avatarUrl(user.getAvatarUrl())
         .role(user.getRole())
-        .createdAt(createdAtToString)
+        .createdAt(user.getCreatedAt())
         .disabled(user.getDisabled())
         .build();
   }
