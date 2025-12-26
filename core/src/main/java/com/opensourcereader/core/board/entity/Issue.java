@@ -2,8 +2,6 @@ package com.opensourcereader.core.board.entity;
 
 import java.time.Instant;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
@@ -40,9 +38,11 @@ public class Issue {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @CreatedDate private Instant createdAt;
+  @Column(name = "created_at")
+  private Instant createdAt;
 
-  @LastModifiedDate private Instant updatedAt;
+  @Column(name = "updated_at")
+  private Instant updatedAt;
 
   @Column(name = "provider_id")
   private Long providerId;
