@@ -39,9 +39,9 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
 
-  // enum 수정필요
   @Column(name = "extension")
-  private String extension;
+  @Enumerated(EnumType.STRING)
+  private Extension extension;
 
   @Lob
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
@@ -72,7 +72,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       List<OpenSourceContentMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
-    this.extension = OpenSourceRepoContentName.getExtension(path);
+    this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
     this.rawText = rawText;
