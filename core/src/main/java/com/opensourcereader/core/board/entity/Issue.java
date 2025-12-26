@@ -1,13 +1,22 @@
 package com.opensourcereader.core.board.entity;
 
-import com.opensourcereader.core.BaseEntity;
+import java.time.Instant;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
@@ -21,10 +30,22 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "issues")
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
-public class Issue extends BaseEntity {
+public class Issue {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @CreatedDate private Instant createdAt;
+
+  @LastModifiedDate private Instant updatedAt;
+
+  @Column(name = "provider_id")
+  private Long providerId;
 
   @Column(name = "tag_id")
   private Long tagId;
@@ -53,7 +74,9 @@ public class Issue extends BaseEntity {
   private Boolean disabled = false;
 
   protected Issue(BoardBaseCommand command) {
-    super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
+    this.providerId = command.getId();
+    this.createdAt = command.getCreatedAt();
+    this.updatedAt = command.getUpdatedAt();
     this.tagId = command.getTagId();
     this.author = command.getAuthor();
     this.repository = command.getRepo();
