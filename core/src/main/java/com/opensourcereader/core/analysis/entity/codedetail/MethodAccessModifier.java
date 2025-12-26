@@ -2,13 +2,13 @@ package com.opensourcereader.core.analysis.entity.codedetail;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 
-public enum MethodModifier {
+public enum MethodAccessModifier {
   PRIVATE,
   PUBLIC,
   PROTECTED,
-  DEFAULT;
+  PACKAGE_PRIVATE;
 
-  public static MethodModifier from(MethodDeclaration methodDeclaration) {
+  public static MethodAccessModifier from(MethodDeclaration methodDeclaration) {
     if (methodDeclaration.isPublic()) {
       return PUBLIC;
     }
@@ -18,6 +18,6 @@ public enum MethodModifier {
     if (methodDeclaration.isProtected()) {
       return PROTECTED;
     }
-    return DEFAULT;
+    return PACKAGE_PRIVATE;
   }
 }

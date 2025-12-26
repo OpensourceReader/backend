@@ -37,7 +37,7 @@ public class CodeMethod extends BaseEntity {
   private List<String> paramTypes;
 
   @Enumerated(EnumType.STRING)
-  private MethodModifier methodModifier;
+  private MethodAccessModifier methodAccessModifier;
 
   @Column(name = "method_signature")
   @Embedded
@@ -72,14 +72,14 @@ public class CodeMethod extends BaseEntity {
   private CodeMethod(
       String methodName,
       List<String> paramTypes,
-      MethodModifier methodModifier,
+      MethodAccessModifier methodAccessModifier,
       CodeMethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
       OpenSourceRepoContent openSourceRepoContent) {
     this.methodName = methodName;
     this.paramTypes = paramTypes;
-    this.methodModifier = methodModifier;
+    this.methodAccessModifier = methodAccessModifier;
     this.methodSignature = methodSignature;
     this.startLine = startLine;
     this.endLine = endLine;

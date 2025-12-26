@@ -136,7 +136,7 @@ class CodeMethodTest {
     static CodeMethod codeMethod(String methodName) {
       OpenSourceContentMethodExtractResult methodExtractResult =
           new OpenSourceContentMethodExtractResult(
-              methodName, MethodModifier.PUBLIC, List.of(), 1, 1);
+              methodName, MethodAccessModifier.PUBLIC, List.of(), 1, 1);
 
       return CodeMethod.of(methodExtractResult, null);
     }

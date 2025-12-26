@@ -62,7 +62,11 @@ public class OpenSourceRepoContent extends BaseEntity {
       List<OpenSourceContentMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
-        fileInfo.path(), fileInfo.type(), fileInfo.rawText(), methodExtractResults, openSourceRepo);
+        fileInfo.path(),
+        fileInfo.typeNumber(),
+        fileInfo.rawText(),
+        methodExtractResults,
+        openSourceRepo);
   }
 
   private OpenSourceRepoContent(

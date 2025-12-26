@@ -31,12 +31,14 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUri);
     List<OpenSourceRepoContent> openSourceRepoContents =
         sourFileInfos.stream()
-            .filter(sourFileInfo -> getContentTypeFromTypeNumber(sourFileInfo.type()).isSupported())
+            .filter(
+                sourFileInfo ->
+                    getContentTypeFromTypeNumber(sourFileInfo.typeNumber()).isSupported())
             .map(
                 sourFileInfo ->
                     OpenSourceRepoContent.of(
                         sourFileInfo,
-                        openSourceMethodExtractor.separateCodeMethods(sourFileInfo),
+                        openSourceMethodExtractor.extractCodeMethods(sourFileInfo),
                         opensourceRepo))
             .toList();
     opensourceRepo.addAllContent(openSourceRepoContents);
