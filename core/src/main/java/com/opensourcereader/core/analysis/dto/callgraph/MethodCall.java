@@ -1,11 +1,12 @@
 package com.opensourcereader.core.analysis.dto.callgraph;
 
-import static com.opensourcereader.core.analysis.dto.callgraph.ExtensionConstant.JAVA_EXTENSION;
+import static com.opensourcereader.core.analysis.entity.Extension.appendExtension;
 
 import java.util.Arrays;
 import java.util.List;
 
 import aj.org.objectweb.asm.Type;
+import com.opensourcereader.core.analysis.entity.Extension;
 
 public record MethodCall(
     String callerClassPath,
@@ -29,11 +30,11 @@ public record MethodCall(
       int operationCode,
       boolean isCalleeMethodInterface) {
     return new MethodCall(
-        callerClassName + JAVA_EXTENSION,
+        appendExtension(callerClassName, Extension.JAVA),
         callerMethodName,
         getReturnType(callerDescriptor),
         getArgumentTypes(callerDescriptor),
-        calleeClassName + JAVA_EXTENSION,
+        appendExtension(calleeClassName, Extension.JAVA),
         calleeMethodName,
         getReturnType(calleeDescription),
         getArgumentTypes(calleeDescription),

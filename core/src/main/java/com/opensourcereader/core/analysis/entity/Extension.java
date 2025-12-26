@@ -31,4 +31,8 @@ public enum Extension {
     int lastIndexOfZero = path.lastIndexOf('.') + 1;
     return JAVA.name().toLowerCase().equals(path.substring(lastIndexOfZero));
   }
+
+  public static String appendExtension(String className, Extension extension) {
+    return className + "." + JAVA.name().toLowerCase();
+  }
 }

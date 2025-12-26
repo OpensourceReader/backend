@@ -1,5 +1,9 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
@@ -7,9 +11,8 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.entity.Extension;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
