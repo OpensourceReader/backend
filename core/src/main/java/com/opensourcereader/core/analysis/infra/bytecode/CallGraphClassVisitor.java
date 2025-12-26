@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.callgraph;
+package com.opensourcereader.core.analysis.infra.bytecode;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.support.git;
+package com.opensourcereader.core.analysis.infra.git;
 
 import java.io.File;
 import java.io.IOException;

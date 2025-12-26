@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
 import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
+import com.opensourcereader.core.analysis.infra.bytecode.CallGraphAnalyzer;
 import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;

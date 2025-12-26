@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 
-public interface CodeMethodMetaDataRepository extends JpaRepository<CodeMethod, Long> {
+public interface CodeMethodRepository extends JpaRepository<CodeMethod, Long> {
 
   @Query(
       """

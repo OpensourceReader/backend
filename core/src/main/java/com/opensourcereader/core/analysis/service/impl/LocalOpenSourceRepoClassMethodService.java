@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
-import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
+import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClassMethodService {
 
-  private final CodeMethodMetaDataRepository codeMethodMetaDataRepository;
+  private final CodeMethodRepository codeMethodRepository;
 
   @Override
   @Transactional
-  public void createMethodCallGraph(List<MethodCallsOfClass> methodCallsOfClasses) {
+  public List<CodeMethod> createMethodCallGraph(List<MethodCallsOfClass> methodCallsOfClasses) {
+    List<CodeMethod> entireCodeMethods = new ArrayList<>();
     for (MethodCallsOfClass methodCallsOfClass : methodCallsOfClasses) {
       Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature =
           groupByCallerSignature(methodCallsOfClass);
@@ -39,10 +41,12 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
             createIngoingCalls(methodCallsOfClass.linkedInterfacePaths(), caller));
       }
 
-      codeMethodMetaDataRepository.saveAll(callers);
+      entireCodeMethods.addAll(codeMethodRepository.saveAll(callers));
     }
+    return entireCodeMethods;
   }
 
+  // map으로 뽑기
   private Map<CodeMethodSignature, List<MethodCallEdge>> groupByCallerSignature(
       MethodCallsOfClass result) {
     return result.methodCallEdges().stream()
@@ -53,18 +57,20 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
                         call.caller().methodName(), call.caller().argumentTypes())));
   }
 
+  // 클래스 메서드의 Caller를 가져옵니다 ->
   private List<CodeMethod> resolveCallers(
       MethodCallsOfClass methodCallsOfClass,
       Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature) {
     return rawCallsByCallerSignature.keySet().stream()
         .map(
             codeMethodSignature ->
-                codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+                codeMethodRepository.findByRepoContentPathAndMethodSignature(
                     methodCallsOfClass.classPath(), codeMethodSignature.methodSignature()))
         .flatMap(Optional::stream)
         .toList();
   }
 
+  // graph연결
   private List<CodeMethodCallEdge> createOutgoingCalls(
       CodeMethod caller, List<MethodCallEdge> calleeMethodCallEdges) {
     return calleeMethodCallEdges.stream()
@@ -72,7 +78,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
             call -> {
               CodeMethodSignature codeMethodSignature =
                   CodeMethodSignature.of(call.callee().methodName(), call.callee().argumentTypes());
-              return codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+              return codeMethodRepository.findByRepoContentPathAndMethodSignature(
                   call.callee().classPath(), codeMethodSignature.methodSignature());
             })
         .flatMap(Optional::stream)
@@ -85,7 +91,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
     return linkedInterfacePaths.stream()
         .map(
             path ->
-                codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
+                codeMethodRepository.findByRepoContentPathAndMethodSignature(
                     path, caller.getMethodSignature().methodSignature()))
         .flatMap(Optional::stream)
         .map(ingoing -> new CodeMethodCallEdge(ingoing, caller))

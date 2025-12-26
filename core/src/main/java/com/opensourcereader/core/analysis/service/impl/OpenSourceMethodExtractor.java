@@ -50,12 +50,10 @@ public class OpenSourceMethodExtractor {
   }
 
   private List<String> getParameterTypes(MethodDeclaration methodDeclaration) {
-    return methodDeclaration.getParameters().stream()
-        .map(OpenSourceMethodExtractor::getParameterType)
-        .toList();
+    return methodDeclaration.getParameters().stream().map(this::getParameterType).toList();
   }
 
-  private static String getParameterType(Parameter methodParameter) {
+  private String getParameterType(Parameter methodParameter) {
     Type type = methodParameter.getType();
     if (methodParameter.isVarArgs()) {
       return type + VAR_ARGS_EXPRESSION;

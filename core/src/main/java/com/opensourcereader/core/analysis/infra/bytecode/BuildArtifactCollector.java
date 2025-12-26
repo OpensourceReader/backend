@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.support.bytecode;
+package com.opensourcereader.core.analysis.infra.bytecode;
 
 import java.io.IOException;
 import java.nio.file.Files;

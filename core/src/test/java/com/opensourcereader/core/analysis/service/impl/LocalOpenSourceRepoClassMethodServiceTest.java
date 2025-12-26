@@ -1,29 +1,20 @@
 package com.opensourcereader.core.analysis.service.impl;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallEdge;
 import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
-import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
-import com.opensourcereader.core.analysis.repository.CodeMethodMetaDataRepository;
+import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoMethodCallAnalyzer;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.groups.Tuple;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 @SpringBootTest
 class LocalOpenSourceRepoClassMethodServiceTest {
@@ -33,83 +24,119 @@ class LocalOpenSourceRepoClassMethodServiceTest {
   @Autowired private OpenSourceRepoMethodCallAnalyzer openSourceRepoMethodCallAnalyzer;
   @Autowired private OpenSourceRepoClassMethodService openSourceRepoClassMethodService;
 
-  @Autowired private CodeMethodMetaDataRepository codeMethodMetaDataRepository;
+  @Autowired private CodeMethodRepository codeMethodRepository;
 
-  @TempDir private Path tempDir;
-
-  private Path bareCloneRepoPath;
-  private static final String WORKING_TREE_DIR_NAME = "workingTreeDirName";
-
-  @BeforeEach
-  void setup() {
-    bareCloneRepoPath = tempDir.resolve("repos");
-  }
-
-  @DisplayName("필요: MethodCallResult(자바 문법에 맞는 예외 케이스를 만들어야함), 출력 : methodCall이 잘 들어갔는가?")
-  @Test
-  void createMethodCallGraphTest() {
-    // given
-
-    // when
-
-    // then
-  }
-
-  @Disabled
   @Transactional
-  @DisplayName("메서드에서 사용하는(outgoing), 메서드를 사용하는(ingoing) 메서드들을 연결합니다.")
+  @DisplayName("outgoing 저장 확인 (A.m(String) -> B.n(int))")
   @Test
-  void createMethodCallGraph() {
+  void outgoingPersistCaseTest() {
     // given
-    String cloneUrl = "https://github.com/OpensourceReader/backend.git";
-    String reference = "HEAD";
-    GitRepositoryLoadResult gitRepositoryLoadResult =
-        gitRepositoryLoader.downloadGitRepo(cloneUrl, reference, bareCloneRepoPath.toString());
-    openSourceRepoService.createRepo(cloneUrl, gitRepositoryLoadResult.files());
-    List<MethodCallsOfClass> methodCalls =
-        openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
-            gitRepositoryLoadResult.savedLocalRepoPath(), reference, WORKING_TREE_DIR_NAME);
+    MethodCallsOfClass outgoingPersistCase =
+        new MethodCallsOfClass(
+            "com/acme/A.java",
+            List.of(),
+            List.of(
+                MethodCallEdge.of(
+                    "com/acme/A.java",
+                    "m",
+                    "(Ljava/lang/String;)V",
+                    "com/acme/B.java",
+                    "n",
+                    "(I)V",
+                    183,
+                    false)));
 
     // when
-    openSourceRepoClassMethodService.createMethodCallGraph(methodCalls);
+    openSourceRepoClassMethodService.createMethodCallGraph(List.of(outgoingPersistCase));
 
     // then
-    String url = "com/opensourcereader/core/analysis/service/impl/LocalOpenSourceRepoService.java";
-    String methodSignature =
-        CodeMethodSignature.of("createRepo", List.of("String", "String", "String"))
-            .methodSignature();
-    Optional<CodeMethod> codeMethodMetaData =
-        codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(url, methodSignature);
 
-    SoftAssertions.assertSoftly(
-        softly -> {
-          softly
-              .assertThat(codeMethodMetaData)
-              .hasValueSatisfying(
-                  meta ->
-                      softly
-                          .assertThat(meta.getOutgoingCalls())
-                          .extracting(edge -> edge.getCallee().getMethodName())
-                          .containsExactlyInAnyOrder(
-                              "getFlatTree",
-                              "createRepositoryBuilder",
-                              "getRawText",
-                              "addContent",
-                              "of",
-                              "validateAlreadyExist"));
-          softly
-              .assertThat(codeMethodMetaData)
-              .hasValueSatisfying(
-                  meta ->
-                      softly
-                          .assertThat(meta.getIngoingCalls())
-                          .extracting(
-                              edge -> edge.getCaller().getOpenSourceRepoContent().getPath(),
-                              edge -> edge.getCaller().getMethodName())
-                          .containsExactlyInAnyOrder(
-                              Tuple.tuple(
-                                  "core/src/main/java/com/opensourcereader/core/analysis/service/OpenSourceRepoService.java",
-                                  "createRepo")));
-        });
+  }
+
+  @DisplayName("ingoing 검증 (B.n(int)를 A.m(String), C.p() 두 군데서 호출)")
+  @Test
+  void ingoingCaseTest() {
+    // given
+    MethodCallsOfClass ingoingCaseA =
+        new MethodCallsOfClass(
+            "com/acme/A.java",
+            List.of(),
+            List.of(
+                MethodCallEdge.of(
+                    "com/acme/A.java",
+                    "m",
+                    "(Ljava/lang/String;)V",
+                    "com/acme/B.java",
+                    "n",
+                    "(I)V",
+                    182, // INVOKEVIRTUAL
+                    false)));
+
+    MethodCallsOfClass ingoingCaseC =
+        new MethodCallsOfClass(
+            "com/acme/C.java",
+            List.of(),
+            List.of(
+                MethodCallEdge.of(
+                    "com/acme/C.java",
+                    "p",
+                    "()V",
+                    "com/acme/B.java",
+                    "n",
+                    "(I)V",
+                    182, // INVOKEVIRTUAL
+                    false)));
+
+    // when
+
+    // then
+  }
+
+  @DisplayName("인터페이스 연결 (PayService implements IPayService)")
+  @Test
+  void interfaceCaseTest() {
+    // given
+    MethodCallsOfClass interfaceLinkCase =
+        new MethodCallsOfClass(
+            "com/acme/PayService.java",
+            List.of("com/acme/IPayService.java"), // linkedInterfacePaths
+            List.of(
+                MethodCallEdge.of(
+                    "com/acme/PayService.java",
+                    "pay",
+                    "(Ljava/lang/String;)V",
+                    "com/acme/Dep.java",
+                    "charge",
+                    "(I)V",
+                    182, // INVOKEVIRTUAL
+                    false)));
+
+    // when
+
+    // then
+  }
+
+  @DisplayName("상속(override 결과가 Child.foo()로 찍히는 edge)")
+  @Test
+  void inheritanceCaseTest() {
+    // given
+    MethodCallsOfClass inheritanceCase =
+        new MethodCallsOfClass(
+            "com/acme/Caller.java",
+            List.of(), // linkedInterfacePaths
+            List.of(
+                MethodCallEdge.of(
+                    "com/acme/Caller.java",
+                    "run",
+                    "()V",
+                    "com/acme/Child.java",
+                    "foo",
+                    "()V",
+                    182, // INVOKEVIRTUAL
+                    false)));
+
+    // when
+
+    // then
   }
 }
