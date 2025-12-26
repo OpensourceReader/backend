@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassMethodCallResult;
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCall;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
@@ -28,7 +28,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
   @Transactional
   public void createMethodCallGraph(List<ClassMethodCallResult> classMethodCallResults) {
     for (ClassMethodCallResult classMethodCallResult : classMethodCallResults) {
-      Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature =
+      Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature =
           groupByCallerSignature(classMethodCallResult);
       List<CodeMethod> callers = resolveCallers(classMethodCallResult, rawCallsByCallerSignature);
       for (CodeMethod caller : callers) {
@@ -43,9 +43,9 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
     }
   }
 
-  private Map<CodeMethodSignature, List<MethodCall>> groupByCallerSignature(
+  private Map<CodeMethodSignature, List<MethodCallEdge>> groupByCallerSignature(
       ClassMethodCallResult result) {
-    return result.methodCalls().stream()
+    return result.methodCallEdges().stream()
         .collect(
             Collectors.groupingBy(
                 call ->
@@ -55,7 +55,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
 
   private List<CodeMethod> resolveCallers(
       ClassMethodCallResult classMethodCallResult,
-      Map<CodeMethodSignature, List<MethodCall>> rawCallsByCallerSignature) {
+      Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature) {
     return rawCallsByCallerSignature.keySet().stream()
         .map(
             codeMethodSignature ->
@@ -66,8 +66,8 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
   }
 
   private List<CodeMethodCallEdge> createOutgoingCalls(
-      CodeMethod caller, List<MethodCall> calleeMethodCalls) {
-    return calleeMethodCalls.stream()
+      CodeMethod caller, List<MethodCallEdge> calleeMethodCallEdges) {
+    return calleeMethodCallEdges.stream()
         .map(
             call -> {
               CodeMethodSignature codeMethodSignature =

@@ -6,14 +6,14 @@ import java.util.List;
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCall;
+import com.opensourcereader.core.analysis.dto.callgraph.MethodCallEdge;
 
 import lombok.Getter;
 
 @Getter
 public class CallGraphClassVisitor extends ClassVisitor {
 
-  private final List<MethodCall> methodCalls = new ArrayList<>();
+  private final List<MethodCallEdge> methodCallEdges = new ArrayList<>();
   private String callerClassName;
 
   public CallGraphClassVisitor() {
@@ -46,8 +46,8 @@ public class CallGraphClassVisitor extends ClassVisitor {
           String calleeMethodName,
           String calleeDescription,
           boolean isInterface) {
-        MethodCall methodCall =
-            MethodCall.of(
+        MethodCallEdge methodCallEdge =
+            MethodCallEdge.of(
                 callerClassName,
                 callerMethodName,
                 callerDescriptor,
@@ -56,7 +56,7 @@ public class CallGraphClassVisitor extends ClassVisitor {
                 calleeDescription,
                 opcode,
                 isInterface);
-        methodCalls.add(methodCall);
+        methodCallEdges.add(methodCallEdge);
       }
     };
   }

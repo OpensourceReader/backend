@@ -8,7 +8,7 @@ import java.util.List;
 import aj.org.objectweb.asm.Type;
 import com.opensourcereader.core.analysis.entity.Extension;
 
-public record MethodCall(
+public record MethodCallEdge(
     String callerClassPath,
     String callerMethodName,
     String callerMethodReturnType,
@@ -20,7 +20,7 @@ public record MethodCall(
     int operationCode,
     boolean isCalleeMethodInterface) {
 
-  public static MethodCall of(
+  public static MethodCallEdge of(
       String callerClassName,
       String callerMethodName,
       String callerDescriptor,
@@ -29,7 +29,7 @@ public record MethodCall(
       String calleeDescription,
       int operationCode,
       boolean isCalleeMethodInterface) {
-    return new MethodCall(
+    return new MethodCallEdge(
         appendExtension(callerClassName, Extension.JAVA),
         callerMethodName,
         getReturnType(callerDescriptor),

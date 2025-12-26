@@ -27,7 +27,7 @@ public class CallGraphAnalyzer {
       return ClassMethodCallResult.of(
           classReader.getClassName(),
           classReader.getInterfaces(),
-          callGraphClassVisitor.getMethodCalls());
+          callGraphClassVisitor.getMethodCallEdges());
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
