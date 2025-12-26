@@ -50,7 +50,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
             Collectors.groupingBy(
                 call ->
                     CodeMethodSignature.of(
-                        call.callerMethodName(), call.callerRawArgumentTypes())));
+                        call.caller().methodName(), call.caller().argumentTypes())));
   }
 
   private List<CodeMethod> resolveCallers(
@@ -71,9 +71,9 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
         .map(
             call -> {
               CodeMethodSignature codeMethodSignature =
-                  CodeMethodSignature.of(call.calleeMethodName(), call.calleeRawArgumentTypes());
+                  CodeMethodSignature.of(call.callee().methodName(), call.callee().argumentTypes());
               return codeMethodMetaDataRepository.findByRepoContentPathAndMethodSignature(
-                  call.calleeClassPath(), codeMethodSignature.methodSignature());
+                  call.callee().classPath(), codeMethodSignature.methodSignature());
             })
         .flatMap(Optional::stream)
         .map(outgoing -> new CodeMethodCallEdge(caller, outgoing))

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
 import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoMethodCallAnalyzer;
 import com.opensourcereader.core.analysis.service.impl.callgraph.CallGraphAnalyzer;
@@ -29,8 +30,8 @@ public class LocalBytecodeMethodCallAnalyzer implements OpenSourceRepoMethodCall
     Path worktree =
         gitWorktreeManagerCli.createWorktree(savedLocalPath, reference, workingTreeDirName);
     buildExecutor.build(worktree);
-    List<Path> byteCodeFiles = buildArtifactCollector.collectClassFiles(worktree);
+    List<ClassBytecode> classBytecodes = buildArtifactCollector.collectClassFiles(worktree);
 
-    return callGraphAnalyzer.createMethodCallsOfClass(byteCodeFiles);
+    return callGraphAnalyzer.createMethodCallsOfClass(classBytecodes);
   }
 }

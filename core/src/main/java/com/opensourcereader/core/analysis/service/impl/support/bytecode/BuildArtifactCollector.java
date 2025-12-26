@@ -8,14 +8,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
+import com.opensourcereader.core.analysis.util.FileUtil;
+
 @Component
 public class BuildArtifactCollector {
 
-  public List<Path> collectClassFiles(Path worktree) {
+  public List<ClassBytecode> collectClassFiles(Path worktree) {
     try {
       return Files.walk(worktree)
-          .filter(p -> p.toString().endsWith(".class"))
-          .filter(p -> !p.toString().contains("/buildSrc/"))
+          .filter(path -> path.toString().endsWith(".class"))
+          .filter(path -> !path.toString().contains("/buildSrc/"))
+          .map(path -> new ClassBytecode(path, FileUtil.readAllBytes(path)))
           .collect(Collectors.toList());
     } catch (IOException e) {
       throw new RuntimeException(e);

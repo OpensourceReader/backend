@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.util;
 
 import java.io.File;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import com.opensourcereader.core.analysis.exception.file.LocalDirectoryCreationException;
@@ -15,6 +16,14 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileUtil {
+
+  public static byte[] readAllBytes(Path path) {
+    try {
+      return Files.readAllBytes(path);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   public static void createDirectory(File localPathFile) {
     validateDirExist(localPathFile);

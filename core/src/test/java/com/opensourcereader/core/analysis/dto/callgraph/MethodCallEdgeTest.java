@@ -39,14 +39,14 @@ class MethodCallEdgeTest {
     softly
         .assertThat(edge)
         .extracting(
-            MethodCallEdge::callerClassPath,
-            MethodCallEdge::callerMethodName,
-            MethodCallEdge::callerMethodReturnType,
-            MethodCallEdge::callerRawArgumentTypes,
-            MethodCallEdge::calleeClassPath,
-            MethodCallEdge::calleeMethodName,
-            MethodCallEdge::calleeMethodReturnType,
-            MethodCallEdge::calleeRawArgumentTypes,
+            methodCallEdge -> methodCallEdge.caller().classPath(),
+            methodCallEdge -> methodCallEdge.caller().methodName(),
+            methodCallEdge -> methodCallEdge.caller().methodReturnType(),
+            methodCallEdge -> methodCallEdge.caller().argumentTypes(),
+            methodCallEdge -> methodCallEdge.callee().classPath(),
+            methodCallEdge -> methodCallEdge.callee().methodName(),
+            methodCallEdge -> methodCallEdge.callee().methodReturnType(),
+            methodCallEdge -> methodCallEdge.callee().argumentTypes(),
             MethodCallEdge::operationCode,
             MethodCallEdge::isCalleeMethodInterface)
         .containsExactly(
@@ -60,8 +60,6 @@ class MethodCallEdgeTest {
             java.util.List.of("java.util.Map"),
             opcode,
             isInterface);
-
-    softly.assertAll();
   }
 
   @Test
@@ -82,12 +80,12 @@ class MethodCallEdgeTest {
     softly
         .assertThat(edge)
         .extracting(
-            MethodCallEdge::callerClassPath,
-            MethodCallEdge::callerRawArgumentTypes,
-            MethodCallEdge::callerMethodReturnType,
-            MethodCallEdge::calleeClassPath,
-            MethodCallEdge::calleeRawArgumentTypes,
-            MethodCallEdge::calleeMethodReturnType,
+            methodCallEdge -> methodCallEdge.caller().classPath(),
+            methodCallEdge -> methodCallEdge.caller().argumentTypes(),
+            methodCallEdge -> methodCallEdge.caller().methodReturnType(),
+            methodCallEdge -> methodCallEdge.callee().classPath(),
+            methodCallEdge -> methodCallEdge.callee().argumentTypes(),
+            methodCallEdge -> methodCallEdge.callee().methodReturnType(),
             MethodCallEdge::isCalleeMethodInterface)
         .containsExactly(
             "a/b/C.java",
@@ -120,10 +118,10 @@ class MethodCallEdgeTest {
     softly
         .assertThat(edge)
         .extracting(
-            MethodCallEdge::callerRawArgumentTypes,
-            MethodCallEdge::callerMethodReturnType,
-            MethodCallEdge::calleeRawArgumentTypes,
-            MethodCallEdge::calleeMethodReturnType)
+            methodCallEdge -> methodCallEdge.caller().argumentTypes(),
+            methodCallEdge -> methodCallEdge.caller().methodReturnType(),
+            methodCallEdge -> methodCallEdge.callee().argumentTypes(),
+            methodCallEdge -> methodCallEdge.callee().methodReturnType())
         .containsExactly(
             java.util.List.of("int[]", "java.lang.String[][]"),
             "java.lang.String[]",
