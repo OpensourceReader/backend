@@ -40,7 +40,6 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
         caller.updateAllIngoingCalls(
             createIngoingCalls(methodCallsOfClass.linkedInterfacePaths(), caller));
       }
-
       entireCodeMethods.addAll(codeMethodRepository.saveAll(callers));
     }
     return entireCodeMethods;
@@ -57,7 +56,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
                         call.caller().methodName(), call.caller().argumentTypes())));
   }
 
-  // 클래스 메서드의 Caller를 가져옵니다 ->
+  // 클래스 메서드의 Caller를 가져옵니다
   private List<CodeMethod> resolveCallers(
       MethodCallsOfClass methodCallsOfClass,
       Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature) {
@@ -70,7 +69,7 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
         .toList();
   }
 
-  // graph연결
+  // graph 연결
   private List<CodeMethodCallEdge> createOutgoingCalls(
       CodeMethod caller, List<MethodCallEdge> calleeMethodCallEdges) {
     return calleeMethodCallEdges.stream()

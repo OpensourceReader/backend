@@ -50,7 +50,6 @@ class LocalOpenSourceRepoClassMethodServiceTest {
     openSourceRepoClassMethodService.createMethodCallGraph(List.of(outgoingPersistCase));
 
     // then
-
   }
 
   @DisplayName("ingoing 검증 (B.n(int)를 A.m(String), C.p() 두 군데서 호출)")
