@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.opensourcereader.api.security.DefaultUserDetailService;
-import com.opensourcereader.core.security.service.JwtService;
+import com.opensourcereader.core.security.TokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-  private final JwtService jwtService;
+  private final TokenProvider tokenProvider;
   private final DefaultUserDetailService userDetailService;
 
   @Override
@@ -32,7 +32,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     if (token != null) {
       try {
         // validate 및 decode
-        String nickname = jwtService.decode(token);
+        String nickname = tokenProvider.decode(token);
         UserDetails user = userDetailService.loadUserByUsername(nickname);
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

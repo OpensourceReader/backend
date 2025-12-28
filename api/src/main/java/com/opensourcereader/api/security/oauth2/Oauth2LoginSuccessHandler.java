@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.opensourcereader.core.security.TokenProvider;
 import com.opensourcereader.core.security.entity.RefreshToken;
-import com.opensourcereader.core.security.service.JwtService;
 import com.opensourcereader.core.security.service.RefreshTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-  private final JwtService jwtService;
+  private final TokenProvider tokenProvider;
   private final RefreshTokenService refreshTokenService;
 
   @Override
@@ -40,7 +40,7 @@ public class Oauth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     String nickname = (String) attributes.get("username");
     String email = (String) attributes.get("email");
 
-    String accessToken = jwtService.encoder(nickname, email);
+    String accessToken = tokenProvider.encoder(nickname, email);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(nickname);
 
     String targetUrl =
