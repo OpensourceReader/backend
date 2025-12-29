@@ -15,7 +15,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.type.Type;
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
+import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
 
 import lombok.RequiredArgsConstructor;
 

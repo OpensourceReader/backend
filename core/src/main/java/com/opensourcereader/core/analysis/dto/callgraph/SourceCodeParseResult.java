@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.dto.callgraph;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
+import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
 
 public record SourceCodeParseResult(
     String methodName,

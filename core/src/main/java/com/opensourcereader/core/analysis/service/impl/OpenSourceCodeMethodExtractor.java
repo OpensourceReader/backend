@@ -12,7 +12,7 @@ import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
 import com.opensourcereader.core.analysis.entity.Extension;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
+import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
 import com.opensourcereader.core.analysis.infra.SourceCodeParser;
 
 import lombok.RequiredArgsConstructor;

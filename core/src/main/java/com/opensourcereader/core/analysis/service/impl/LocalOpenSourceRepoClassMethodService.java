@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
+import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
+import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
 

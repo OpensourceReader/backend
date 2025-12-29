@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
+import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

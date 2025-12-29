@@ -6,7 +6,7 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
+import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

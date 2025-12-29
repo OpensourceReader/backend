@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.codedetail;
+package com.opensourcereader.core.analysis.entity.codemethod;
 
 import aj.org.objectweb.asm.Opcodes;
 import com.github.javaparser.ast.body.MethodDeclaration;
