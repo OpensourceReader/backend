@@ -19,6 +19,13 @@ public record ClassInfo(
       String superName,
       String[] interfaces) {
     return new ClassInfo(
-        version, access, className, signature, superName, Arrays.stream(interfaces).toList());
+        version, access, className, signature, superName, getInterfaces(interfaces));
+  }
+
+  private static List<String> getInterfaces(String[] interfaces) {
+    if (interfaces == null) {
+      return List.of();
+    }
+    return Arrays.asList(interfaces);
   }
 }

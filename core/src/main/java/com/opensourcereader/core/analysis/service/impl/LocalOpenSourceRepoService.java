@@ -30,7 +30,6 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
       List<OpenSourceFileInfo> sourFileInfos,
       List<ClassStructure> classStructures) {
     validateAlreadyExist(cloneUri);
-
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUri);
     List<OpenSourceRepoContent> openSourceRepoContents =
         openSourceContentFactory.create(sourFileInfos, classStructures, opensourceRepo);

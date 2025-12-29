@@ -8,21 +8,35 @@ import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
 import com.opensourcereader.core.analysis.entity.codedetail.NonAccessModifier;
 
 public record DeclaredMethodInfo(
+    String className,
     AccessModifier accessModifier,
     EnumSet<NonAccessModifier> nonAccessModifiers,
-    String className,
     String methodName,
     MethodDescriptor methodDescriptor,
+    String genericSignature,
     List<String> exceptions) {
 
   public static DeclaredMethodInfo of(
-      int access, String className, String methodName, String descriptor, String[] exceptions) {
+      String className,
+      int access,
+      String methodName,
+      String descriptor,
+      String genericSignature,
+      String[] exceptions) {
     return new DeclaredMethodInfo(
+        className,
         AccessModifier.from(access),
         NonAccessModifier.from(access),
-        className,
         methodName,
         MethodDescriptor.from(descriptor),
-        Arrays.stream(exceptions).toList());
+        genericSignature,
+        getExceptions(exceptions));
+  }
+
+  private static List<String> getExceptions(String[] exceptions) {
+    if (exceptions == null) {
+      return List.of();
+    }
+    return Arrays.asList(exceptions);
   }
 }

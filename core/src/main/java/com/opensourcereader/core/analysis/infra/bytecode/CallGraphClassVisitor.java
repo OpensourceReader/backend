@@ -45,10 +45,7 @@ public class CallGraphClassVisitor extends ClassVisitor {
       String genericSignature,
       String[] exceptions) {
     return new MethodVisitor(Opcodes.ASM9) {
-      final DeclaredMethodInfo declaredMethodInfo =
-          DeclaredMethodInfo.of(
-              access, callerMethodName, callerDescriptor, genericSignature, exceptions);
-      final List<MethodCallInfo> methodCalls = new ArrayList<>();
+      List<MethodCallInfo> methodCalls = new ArrayList<>();
 
       @Override
       public void visitMethodInsn(
@@ -65,6 +62,14 @@ public class CallGraphClassVisitor extends ClassVisitor {
 
       @Override
       public void visitEnd() {
+        DeclaredMethodInfo declaredMethodInfo =
+            DeclaredMethodInfo.of(
+                classInfo.className(),
+                access,
+                callerMethodName,
+                callerDescriptor,
+                genericSignature,
+                exceptions);
         methodStructures.add(new MethodStructure(declaredMethodInfo, methodCalls));
       }
     };

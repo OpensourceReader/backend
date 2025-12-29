@@ -2,19 +2,31 @@ package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Path;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.infra.SourceCodeParser;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
+import com.opensourcereader.core.analysis.entity.codedetail.NonAccessModifier;
+import com.opensourcereader.core.analysis.infra.bytecode.CallGraphAnalyzer;
+import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest
 class OpenSourceCodeMethodExtractorTest {
 
-  @Autowired private SourceCodeParser sourceCodeParser;
   @Autowired private OpenSourceCodeMethodExtractor extractor;
+  @Autowired private CallGraphAnalyzer callGraphAnalyzer;
 
   @Test
   @DisplayName("java 파일이 아니면 빈 리스트")
@@ -29,37 +41,61 @@ class OpenSourceCodeMethodExtractorTest {
     assertThat(results).isEmpty();
   }
 
-  // 일단 컴파일을 하고, 소스코드에만 있는 메서드면 진행
-  // 바이트 코드결과를 직접 전달해서, 있는 메서드면 ㄴstartLine기록, 없는 메서드면 null로 기록
-  // 밑에랑 거의 비슷, 컴파일를 한다음에 건네 주는게 맞다.
   @Test
   @DisplayName("바이트코드 메서드 목록을 기준으로 소스 파싱 결과를 매핑 후, start-endLine을 기록합니다.")
   void extract_mapsSourceBySignature() {
     // given
+    String className = "com.example.ossr.A";
     String rawText =
         """
-        package com.example.ossr;
-        public class A {
-          public void m(String s) {}
-          public void n() {}
-        }
-        """;
-    OpenSourceFileInfo sourceFile = new OpenSourceFileInfo("A.java", "1", rawText);
-    String fqcn = sourceCodeParser.extractClassName(rawText);
-    assertThat(fqcn).isEqualTo("com.example.ossr.A");
-  }
+            package com.example.ossr;
+            public class A {
+              public void m(String s) {}
+              public void n() {}
+            }
+            """;
+    Map<String, byte[]> compiled = InMemoryJavaCompilerFixture.compile(className, rawText);
+    byte[] mainBytes = compiled.get(className);
+    OpenSourceFileInfo file = new OpenSourceFileInfo(className + ".java", "1", rawText);
 
-  @Test
-  @DisplayName("바이트코드에만 있고 소스엔 없는 메서드는 start-endLine이 null 입니다.")
-  void extract_bytecodeOnly_method_hasNullSource() {
-    // given
-    String raw =
-        """
-        package com.example.ossr;
-        public class A {
-          public void m(String s) {}
-        }
-        """;
-    OpenSourceFileInfo file = new OpenSourceFileInfo("A.java", "1", raw);
+    List<ClassBytecode> classBytecodes = List.of(new ClassBytecode(Path.of(className), mainBytes));
+    List<ClassStructure> methodCallsOfClass =
+        callGraphAnalyzer.createMethodCallsOfClass(classBytecodes);
+
+    // when
+    List<CodeMethodExtractResult> extractResult =
+        extractor.extract(file, methodCallsOfClass.get(0));
+
+    // then
+    assertThat(extractResult)
+        .extracting(
+            CodeMethodExtractResult::methodName,
+            CodeMethodExtractResult::modifier,
+            CodeMethodExtractResult::nonAccessModifiers,
+            CodeMethodExtractResult::paramTypes,
+            CodeMethodExtractResult::startLine,
+            CodeMethodExtractResult::endLine)
+        .containsExactlyInAnyOrder(
+            Tuple.tuple(
+                "<init>",
+                AccessModifier.PUBLIC,
+                EnumSet.noneOf(NonAccessModifier.class),
+                List.of(),
+                null,
+                null),
+            Tuple.tuple(
+                "m",
+                AccessModifier.PUBLIC,
+                EnumSet.noneOf(NonAccessModifier.class),
+                List.of("java.lang.String"),
+                3,
+                3),
+            Tuple.tuple(
+                "n",
+                AccessModifier.PUBLIC,
+                EnumSet.noneOf(NonAccessModifier.class),
+                List.of(),
+                4,
+                4));
   }
 }

@@ -22,7 +22,21 @@ public record CodeMethodExtractResult(
         declaredMethodInfo.accessModifier(),
         declaredMethodInfo.nonAccessModifiers(),
         declaredMethodInfo.methodDescriptor().argumentTypes(),
-        codeParseResult.startLine(),
-        codeParseResult.endLine());
+        getStartLine(codeParseResult),
+        getEndLine(codeParseResult));
+  }
+
+  private static Integer getStartLine(SourceCodeParseResult codeParseResult) {
+    if (codeParseResult == null) {
+      return null;
+    }
+    return codeParseResult.startLine();
+  }
+
+  private static Integer getEndLine(SourceCodeParseResult codeParseResult) {
+    if (codeParseResult == null) {
+      return null;
+    }
+    return codeParseResult.endLine();
   }
 }
