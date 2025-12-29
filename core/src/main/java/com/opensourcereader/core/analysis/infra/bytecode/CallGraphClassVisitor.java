@@ -1,20 +1,24 @@
 package com.opensourcereader.core.analysis.infra.bytecode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCallEdge;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
 
 import lombok.Getter;
 
 @Getter
 public class CallGraphClassVisitor extends ClassVisitor {
 
-  private final List<MethodCallEdge> methodCallEdges = new ArrayList<>();
-  private String callerClassName;
+  private ClassInfo classInfo;
+  private final List<MethodStructure> methodStructures = new ArrayList<>();
 
   public CallGraphClassVisitor() {
     super(Opcodes.ASM9);
@@ -28,7 +32,9 @@ public class CallGraphClassVisitor extends ClassVisitor {
       String signature,
       String superName,
       String[] interfaces) {
-    this.callerClassName = className;
+    this.classInfo =
+        new ClassInfo(
+            version, access, className, signature, superName, Arrays.stream(interfaces).toList());
   }
 
   @Override
@@ -36,27 +42,30 @@ public class CallGraphClassVisitor extends ClassVisitor {
       int access,
       String callerMethodName,
       String callerDescriptor,
-      String signature,
+      String genericSignature,
       String[] exceptions) {
     return new MethodVisitor(Opcodes.ASM9) {
+      final DeclaredMethodInfo declaredMethodInfo =
+          DeclaredMethodInfo.of(
+              access, callerMethodName, callerDescriptor, genericSignature, exceptions);
+      final List<MethodCallInfo> methodCalls = new ArrayList<>();
+
       @Override
       public void visitMethodInsn(
           int opcode,
-          String ownerClassName,
+          String calleeOwnerClassName,
           String calleeMethodName,
           String calleeDescription,
           boolean isInterface) {
-        MethodCallEdge methodCallEdge =
-            MethodCallEdge.of(
-                callerClassName,
-                callerMethodName,
-                callerDescriptor,
-                ownerClassName,
-                calleeMethodName,
-                calleeDescription,
-                opcode,
-                isInterface);
-        methodCallEdges.add(methodCallEdge);
+        MethodCallInfo methodCallInfo =
+            MethodCallInfo.of(
+                opcode, calleeOwnerClassName, calleeMethodName, calleeDescription, isInterface);
+        methodCalls.add(methodCallInfo);
+      }
+
+      @Override
+      public void visitEnd() {
+        methodStructures.add(new MethodStructure(declaredMethodInfo, methodCalls));
       }
     };
   }

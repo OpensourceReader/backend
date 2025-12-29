@@ -2,9 +2,10 @@ package com.opensourcereader.core.analysis.entity.codedetail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -134,9 +135,14 @@ class CodeMethodTest {
   static class Fixtures {
 
     static CodeMethod codeMethod(String methodName) {
-      OpenSourceContentMethodExtractResult methodExtractResult =
-          new OpenSourceContentMethodExtractResult(
-              methodName, MethodAccessModifier.PUBLIC, List.of(), 1, 1);
+      CodeMethodExtractResult methodExtractResult =
+          new CodeMethodExtractResult(
+              methodName,
+              AccessModifier.PUBLIC,
+              EnumSet.of(NonAccessModifier.NATIVE),
+              List.of(),
+              1,
+              1);
 
       return CodeMethod.of(methodExtractResult, null);
     }

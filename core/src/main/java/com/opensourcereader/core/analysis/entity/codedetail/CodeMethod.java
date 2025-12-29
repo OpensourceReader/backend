@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,7 +37,7 @@ public class CodeMethod extends BaseEntity {
   private List<String> paramTypes;
 
   @Enumerated(EnumType.STRING)
-  private MethodAccessModifier methodAccessModifier;
+  private AccessModifier accessModifier;
 
   @Column(name = "method_signature")
   @Embedded
@@ -57,8 +57,7 @@ public class CodeMethod extends BaseEntity {
   private OpenSourceRepoContent openSourceRepoContent;
 
   public static CodeMethod of(
-      OpenSourceContentMethodExtractResult methodExtractResult,
-      OpenSourceRepoContent openSourceRepoContent) {
+      CodeMethodExtractResult methodExtractResult, OpenSourceRepoContent openSourceRepoContent) {
     return new CodeMethod(
         methodExtractResult.methodName(),
         methodExtractResult.paramTypes(),
@@ -72,14 +71,14 @@ public class CodeMethod extends BaseEntity {
   private CodeMethod(
       String methodName,
       List<String> paramTypes,
-      MethodAccessModifier methodAccessModifier,
+      AccessModifier accessModifier,
       CodeMethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
       OpenSourceRepoContent openSourceRepoContent) {
     this.methodName = methodName;
     this.paramTypes = paramTypes;
-    this.methodAccessModifier = methodAccessModifier;
+    this.accessModifier = accessModifier;
     this.methodSignature = methodSignature;
     this.startLine = startLine;
     this.endLine = endLine;

@@ -29,7 +29,7 @@ public class OpenSourceRepo extends BaseEntity {
     this.cloneUrl = cloneUrl;
   }
 
-  public void addAllContent(List<OpenSourceRepoContent> contents) {
+  public void addAllContents(List<OpenSourceRepoContent> contents) {
     this.contents = contents;
   }
 

@@ -9,8 +9,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCallEdge;
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethodSignature;
@@ -27,58 +28,62 @@ public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClas
 
   @Override
   @Transactional
-  public List<CodeMethod> createMethodCallGraph(List<MethodCallsOfClass> methodCallsOfClasses) {
+  public List<CodeMethod> createMethodCallGraph(List<ClassStructure> classStructures) {
     List<CodeMethod> entireCodeMethods = new ArrayList<>();
-    for (MethodCallsOfClass methodCallsOfClass : methodCallsOfClasses) {
-      Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature =
-          groupByCallerSignature(methodCallsOfClass);
-      List<CodeMethod> callers = resolveCallers(methodCallsOfClass, rawCallsByCallerSignature);
-      for (CodeMethod caller : callers) {
+    for (ClassStructure classStructure : classStructures) {
+      Map<CodeMethodSignature, MethodStructure> methods =
+          getByMethodSignature(classStructure.methods());
+
+      List<CodeMethod> callers = resolveCallers(classStructure.methods());
+      for (CodeMethod caller : callers) { // 두개 한번에 넣는 메서드 있어도됨
         caller.updateAllOutgoingCalls(
             createOutgoingCalls(
-                caller, rawCallsByCallerSignature.get(caller.getMethodSignature())));
+                caller, methods.get(caller.getMethodSignature()).calleeMethods())); // callee추출
         caller.updateAllIngoingCalls(
-            createIngoingCalls(methodCallsOfClass.linkedInterfacePaths(), caller));
+            createIngoingCalls(classStructure.classInfo().interfacePaths(), caller));
       }
       entireCodeMethods.addAll(codeMethodRepository.saveAll(callers));
     }
     return entireCodeMethods;
   }
 
-  // map으로 뽑기
-  private Map<CodeMethodSignature, List<MethodCallEdge>> groupByCallerSignature(
-      MethodCallsOfClass result) {
-    return result.methodCallEdges().stream()
+  public Map<CodeMethodSignature, MethodStructure> getByMethodSignature(
+      List<MethodStructure> methods) {
+    return methods.stream()
         .collect(
-            Collectors.groupingBy(
-                call ->
+            Collectors.toMap(
+                cms ->
                     CodeMethodSignature.of(
-                        call.caller().methodName(), call.caller().argumentTypes())));
+                        cms.declaredMethodInfo().methodName(),
+                        cms.declaredMethodInfo().methodDescriptor().argumentTypes()),
+                cms -> cms));
   }
 
-  // 클래스 메서드의 Caller를 가져옵니다
-  private List<CodeMethod> resolveCallers(
-      MethodCallsOfClass methodCallsOfClass,
-      Map<CodeMethodSignature, List<MethodCallEdge>> rawCallsByCallerSignature) {
-    return rawCallsByCallerSignature.keySet().stream()
+  // 클래스 메서드의 Caller를 가져옵니다, 수정필요
+  private List<CodeMethod> resolveCallers(List<MethodStructure> methods) {
+    return methods.stream()
         .map(
-            codeMethodSignature ->
-                codeMethodRepository.findByRepoContentPathAndMethodSignature(
-                    methodCallsOfClass.classPath(), codeMethodSignature.methodSignature()))
+            methodStructure -> {
+              CodeMethodSignature codeMethodSignature =
+                  CodeMethodSignature.of(methodStructure.declaredMethodInfo());
+              return codeMethodRepository.findByRepoContentPathAndMethodSignature(
+                  methodStructure.declaredMethodInfo().className(),
+                  codeMethodSignature.methodSignature());
+            })
         .flatMap(Optional::stream)
         .toList();
   }
 
   // graph 연결
   private List<CodeMethodCallEdge> createOutgoingCalls(
-      CodeMethod caller, List<MethodCallEdge> calleeMethodCallEdges) {
-    return calleeMethodCallEdges.stream()
+      CodeMethod caller, List<MethodCallInfo> calleeMethods) {
+    return calleeMethods.stream()
         .map(
             call -> {
               CodeMethodSignature codeMethodSignature =
-                  CodeMethodSignature.of(call.callee().methodName(), call.callee().argumentTypes());
+                  CodeMethodSignature.of(call.methodName(), call.descriptor().argumentTypes());
               return codeMethodRepository.findByRepoContentPathAndMethodSignature(
-                  call.callee().classPath(), codeMethodSignature.methodSignature());
+                  call.className(), codeMethodSignature.methodSignature());
             })
         .flatMap(Optional::stream)
         .map(outgoing -> new CodeMethodCallEdge(caller, outgoing))

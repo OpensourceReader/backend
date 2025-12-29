@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.infra;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,38 +11,55 @@ import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.type.Type;
-import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
-import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.entity.Extension;
-import com.opensourcereader.core.analysis.entity.codedetail.MethodAccessModifier;
+import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
+import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OpenSourceMethodExtractor {
+public class SourceCodeParser {
 
   private static final String VAR_ARGS_EXPRESSION = "...";
-
   private final JavaParser javaParser;
 
-  public List<OpenSourceContentMethodExtractResult> extractCodeMethods(
-      OpenSourceFileInfo openSourceFileInfo) {
-    if (!Extension.isJavaFile(openSourceFileInfo.path())) {
-      return List.of();
+  public String extractClassName(String rawText) {
+    ParseResult<CompilationUnit> result = javaParser.parse(rawText);
+    if (!result.isSuccessful() || result.getResult().isEmpty()) {
+      return "";
     }
 
-    ParseResult<CompilationUnit> compilationUnit = javaParser.parse(openSourceFileInfo.rawText());
+    CompilationUnit cu = result.getResult().get();
+
+    String pkg = cu.getPackageDeclaration().map(NodeWithName::getNameAsString).orElse("");
+
+    for (TypeDeclaration<?> t : cu.findAll(TypeDeclaration.class)) {
+      if (!t.isTopLevelType()) continue;
+      String className = t.getNameAsString();
+      if (pkg.isEmpty()) {
+        return className;
+      } else {
+        return pkg + "." + className;
+      }
+    }
+
+    return "";
+  }
+
+  public List<SourceCodeParseResult> extractCodeMethods(String rawText) {
+    ParseResult<CompilationUnit> compilationUnit = javaParser.parse(rawText);
     if (!compilationUnit.isSuccessful() || compilationUnit.getResult().isEmpty()) {
       return List.of();
     }
     return compilationUnit.getResult().get().findAll(MethodDeclaration.class).stream()
         .map(
             methodDeclaration ->
-                new OpenSourceContentMethodExtractResult(
+                new SourceCodeParseResult(
                     methodDeclaration.getNameAsString(),
-                    MethodAccessModifier.from(methodDeclaration),
+                    AccessModifier.from(methodDeclaration),
                     getParameterTypes(methodDeclaration),
                     getStartLine(methodDeclaration),
                     getEndLine(methodDeclaration)))

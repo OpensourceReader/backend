@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.OpenSourceContentMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.codedetail.CodeMethod;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,7 +59,7 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   public static OpenSourceRepoContent of(
       OpenSourceFileInfo fileInfo,
-      List<OpenSourceContentMethodExtractResult> methodExtractResults,
+      List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
@@ -73,7 +73,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       String path,
       String contentTypeNumber,
       String rawText,
-      List<OpenSourceContentMethodExtractResult> methodExtractResults,
+      List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
@@ -84,8 +84,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.openSourceRepo = openSourceRepo;
   }
 
-  private List<CodeMethod> getCodeMethods(
-      List<OpenSourceContentMethodExtractResult> methodExtractResults) {
+  private List<CodeMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
     return methodExtractResults.stream()
         .map(extractResult -> CodeMethod.of(extractResult, this))
         .toList();

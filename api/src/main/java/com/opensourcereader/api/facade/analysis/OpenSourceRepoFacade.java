@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
-import com.opensourcereader.core.analysis.dto.callgraph.MethodCallsOfClass;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
@@ -39,12 +39,13 @@ public class OpenSourceRepoFacade {
     GitRepositoryLoadResult gitRepoLoadResult =
         gitRepositoryLoader.downloadGitRepo(
             request.openSourceUri(), request.reference(), localClonePath);
-    OpenSourceRepo openSourceRepo =
-        opensourceRepoService.createRepo(request.openSourceUri(), gitRepoLoadResult.files());
-    List<MethodCallsOfClass> methodCalls =
-        openSourceRepoMethodCallAnalyzer.createClassMethodCalls(
+    List<ClassStructure> classStructures =
+        openSourceRepoMethodCallAnalyzer.createClassStructures(
             gitRepoLoadResult.savedLocalRepoPath(), request.reference(), workingTreeDirName);
-    openSourceRepoClassMethodService.createMethodCallGraph(methodCalls);
+    OpenSourceRepo openSourceRepo =
+        opensourceRepoService.createRepo(
+            request.openSourceUri(), gitRepoLoadResult.files(), classStructures);
+    openSourceRepoClassMethodService.createMethodCallGraph(classStructures);
     FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
 
     return OpenSourceRepoResponse.from(openSourceRepo);
