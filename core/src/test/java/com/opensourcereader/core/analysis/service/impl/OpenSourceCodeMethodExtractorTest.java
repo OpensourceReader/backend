@@ -16,7 +16,7 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.codedetail.AccessModifier;
 import com.opensourcereader.core.analysis.entity.codedetail.NonAccessModifier;
-import com.opensourcereader.core.analysis.infra.bytecode.CallGraphAnalyzer;
+import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
 import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 class OpenSourceCodeMethodExtractorTest {
 
   @Autowired private OpenSourceCodeMethodExtractor extractor;
-  @Autowired private CallGraphAnalyzer callGraphAnalyzer;
+  @Autowired private ClassStructureExtractor classStructureExtractor;
 
   @Test
   @DisplayName("java 파일이 아니면 빈 리스트")
@@ -59,8 +59,7 @@ class OpenSourceCodeMethodExtractorTest {
     OpenSourceFileInfo file = new OpenSourceFileInfo(className + ".java", "1", rawText);
 
     List<ClassBytecode> classBytecodes = List.of(new ClassBytecode(Path.of(className), mainBytes));
-    List<ClassStructure> methodCallsOfClass =
-        callGraphAnalyzer.createMethodCallsOfClass(classBytecodes);
+    List<ClassStructure> methodCallsOfClass = classStructureExtractor.extract(classBytecodes);
 
     // when
     List<CodeMethodExtractResult> extractResult =

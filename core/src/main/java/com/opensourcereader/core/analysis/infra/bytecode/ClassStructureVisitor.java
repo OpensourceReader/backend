@@ -15,12 +15,12 @@ import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
 import lombok.Getter;
 
 @Getter
-public class CallGraphClassVisitor extends ClassVisitor {
+public class ClassStructureVisitor extends ClassVisitor {
 
   private ClassInfo classInfo;
   private final List<MethodStructure> methodStructures = new ArrayList<>();
 
-  public CallGraphClassVisitor() {
+  public ClassStructureVisitor() {
     super(Opcodes.ASM9);
   }
 
