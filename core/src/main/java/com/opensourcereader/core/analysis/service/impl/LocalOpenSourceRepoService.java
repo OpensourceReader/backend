@@ -1,16 +1,11 @@
 package com.opensourcereader.core.analysis.service.impl;
 
-import static com.opensourcereader.core.analysis.entity.ContentType.getContentTypeFromTypeNumber;
-
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
@@ -25,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LocalOpenSourceRepoService implements OpenSourceRepoService {
 
-  private final OpenSourceCodeMethodExtractor openSourceCodeMethodExtractor;
+  private final OpenSourceContentFactory openSourceContentFactory;
   private final OpenSourceRepoRepository opensourceRepoRepository;
 
   @Transactional
@@ -37,27 +32,11 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
     validateAlreadyExist(cloneUri);
 
     OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUri);
-    Map<String, ClassStructure> structures = getByClassName(classStructures);
     List<OpenSourceRepoContent> openSourceRepoContents =
-        sourFileInfos.stream()
-            .filter(
-                sourFileInfo ->
-                    getContentTypeFromTypeNumber(sourFileInfo.typeNumber()).isSupported())
-            .map(
-                sourFileInfo -> {
-                  List<CodeMethodExtractResult> methods =
-                      openSourceCodeMethodExtractor.extract(sourFileInfo, structures);
-                  return OpenSourceRepoContent.of(sourFileInfo, methods, opensourceRepo);
-                })
-            .toList();
+        openSourceContentFactory.create(sourFileInfos, classStructures, opensourceRepo);
     opensourceRepo.addAllContents(openSourceRepoContents);
 
     return opensourceRepoRepository.save(opensourceRepo);
-  }
-
-  private Map<String, ClassStructure> getByClassName(List<ClassStructure> classStructures) {
-    return classStructures.stream()
-        .collect(Collectors.toMap(cs -> cs.classInfo().className(), cs -> cs));
   }
 
   @Override

@@ -23,16 +23,15 @@ public class OpenSourceCodeMethodExtractor {
   private final SourceCodeParser sourceCodeParser;
 
   public List<CodeMethodExtractResult> extract(
-      OpenSourceFileInfo sourceFile, Map<String, ClassStructure> structures) {
-    if (!Extension.isJavaFile(sourceFile.path())) {
+      OpenSourceFileInfo sourceFile, ClassStructure classStructure) {
+    if (!Extension.isJavaFile(sourceFile.path()) || classStructure == null) {
       return List.of();
     }
-    ClassStructure byteCodeClassStructure =
-        structures.get(sourceCodeParser.extractClassName(sourceFile.rawText()));
+
     Map<CodeMethodSignature, SourceCodeParseResult> sourceCodeMethods =
         getByMethodSignature(sourceFile.rawText());
 
-    return byteCodeClassStructure.methods().stream()
+    return classStructure.methods().stream()
         .map(
             method -> {
               CodeMethodSignature methodSignature =

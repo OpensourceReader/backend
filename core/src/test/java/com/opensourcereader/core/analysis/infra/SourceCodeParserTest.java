@@ -19,6 +19,23 @@ class SourceCodeParserTest {
 
   @Autowired private SourceCodeParser sourceCodeParser;
 
+  @Test
+  @DisplayName("패키지명+클래스명칭을 클래스이름으로 반환합니다.")
+  void extract_mapsSourceBySignature() {
+    // given
+    String rawText =
+        """
+        package com.example.ossr;
+        public class A {
+          public void m(String s) {}
+          public void n() {}
+        }
+        """;
+    String fqcn = sourceCodeParser.extractClassName(rawText);
+
+    assertThat(fqcn).isEqualTo("com.example.ossr.A");
+  }
+
   @Nested
   @DisplayName("유효성 검사 조건")
   class ValidationCase {
