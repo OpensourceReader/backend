@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 import jakarta.persistence.CascadeType;
@@ -30,6 +31,9 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   @Column(name = "path", nullable = false)
   private String path;
+
+  @Column(name = "class_internal_name", nullable = false)
+  private String classInternalName;
 
   @Column(name = "name", nullable = false)
   @Embedded
@@ -59,12 +63,14 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   public static OpenSourceRepoContent of(
       OpenSourceFileInfo fileInfo,
+      ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
         fileInfo.typeNumber(),
         fileInfo.rawText(),
+        classInfo,
         methodExtractResults,
         openSourceRepo);
   }
@@ -73,6 +79,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       String path,
       String contentTypeNumber,
       String rawText,
+      ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
@@ -80,6 +87,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
     this.rawText = rawText;
+    this.classInternalName = classInfo.className();
     this.codeMethods = getCodeMethods(methodExtractResults);
     this.openSourceRepo = openSourceRepo;
   }

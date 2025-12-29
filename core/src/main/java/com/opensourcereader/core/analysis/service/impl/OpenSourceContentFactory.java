@@ -48,6 +48,7 @@ public class OpenSourceContentFactory {
         structures.get(sourceCodeParser.extractClassName(sourFileInfo.rawText()));
     List<CodeMethodExtractResult> methods =
         openSourceCodeMethodExtractor.extract(sourFileInfo, classStructure);
-    return OpenSourceRepoContent.of(sourFileInfo, methods, opensourceRepo);
+    return OpenSourceRepoContent.of(
+        sourFileInfo, classStructure.classInfo(), methods, opensourceRepo);
   }
 }
