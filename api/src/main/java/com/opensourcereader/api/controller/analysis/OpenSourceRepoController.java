@@ -1,5 +1,6 @@
 package com.opensourcereader.api.controller.analysis;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +23,20 @@ public class OpenSourceRepoController {
   private final OpenSourceRepoFacade opensourceRepoFacade;
 
   @PostMapping
-  public OpenSourceRepoResponse createRepo(
+  public ResponseEntity<OpenSourceRepoResponse> createRepo(
       @RequestBody OpenSourceRepoCreateRequest repoCreateRequest) {
-    return opensourceRepoFacade.createRepo(repoCreateRequest);
+    return ResponseEntity.ok(opensourceRepoFacade.createRepo(repoCreateRequest));
   }
 
   @GetMapping("/{repoId}")
-  public OpenSourceRepoResponse getRepoById(@PathVariable(value = "repoId") Long repoId) {
-    return opensourceRepoFacade.getRepoById(repoId);
+  public ResponseEntity<OpenSourceRepoResponse> getRepoById(
+      @PathVariable(value = "repoId") Long repoId) {
+    return ResponseEntity.ok(opensourceRepoFacade.getRepoById(repoId));
   }
 
   @DeleteMapping("/{repoId}")
-  public void deleteRepoById(@PathVariable(value = "repoId") Long repoId) {
+  public ResponseEntity<Void> deleteRepoById(@PathVariable(value = "repoId") Long repoId) {
     opensourceRepoFacade.deleteRepoById(repoId);
+    return ResponseEntity.ok().build();
   }
 }

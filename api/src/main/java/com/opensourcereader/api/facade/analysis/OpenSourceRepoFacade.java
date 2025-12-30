@@ -10,8 +10,8 @@ import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
 import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassStructureExtractor;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.util.FileUtil;
@@ -32,7 +32,7 @@ public class OpenSourceRepoFacade {
   private final GitRepositoryLoader gitRepositoryLoader;
   private final OpenSourceRepoService opensourceRepoService;
   private final OpenSourceRepoClassStructureExtractor openSourceRepoClassStructureExtractor;
-  private final OpenSourceRepoClassMethodService openSourceRepoClassMethodService;
+  private final CodeMethodGraphCommandService codeMethodGraphCommandService;
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
@@ -45,7 +45,7 @@ public class OpenSourceRepoFacade {
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(
             request.openSourceUri(), gitRepoLoadResult.files(), classStructures);
-    openSourceRepoClassMethodService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
+    codeMethodGraphCommandService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
     FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
 
     return OpenSourceRepoResponse.from(openSourceRepo);

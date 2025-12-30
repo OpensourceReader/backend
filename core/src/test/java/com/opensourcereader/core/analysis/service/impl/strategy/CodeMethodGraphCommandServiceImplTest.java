@@ -26,16 +26,16 @@ import com.opensourcereader.core.analysis.entity.codemethod.NonAccessModifier;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.impl.LocalOpenSourceRepoClassMethodService;
+import com.opensourcereader.core.analysis.service.impl.CodeMethodGraphCommandServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest
-class LocalOpenSourceRepoClassMethodServiceTest {
+class CodeMethodGraphCommandServiceImplTest {
 
-  @Autowired private LocalOpenSourceRepoClassMethodService service;
+  @Autowired private CodeMethodGraphCommandServiceImpl service;
   @Autowired private CodeMethodRepository codeMethodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private OpenSourceContentRepository openSourceContentRepository;

@@ -5,7 +5,7 @@ import java.util.List;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 
-public interface OpenSourceRepoClassMethodService {
+public interface CodeMethodGraphCommandService {
 
   List<CodeMethod> createMethodCallGraph(Long repoId, List<ClassStructure> classStructures);
 }

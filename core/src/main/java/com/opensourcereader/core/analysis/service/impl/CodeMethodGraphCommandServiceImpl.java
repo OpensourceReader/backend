@@ -15,7 +15,7 @@ import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
+import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
 import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodIngoingStrategy;
 import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodOutgoingStrategy;
 
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LocalOpenSourceRepoClassMethodService implements OpenSourceRepoClassMethodService {
+public class CodeMethodGraphCommandServiceImpl implements CodeMethodGraphCommandService {
 
   private final CodeMethodRepository codeMethodRepository;
   private final CodeMethodOutgoingStrategy codeMethodOutgoingStrategy;

@@ -23,4 +23,26 @@ public interface CodeMethodRepository extends JpaRepository<CodeMethod, Long> {
       @Param("repoId") Long repoId,
       @Param("classInternalName") String classInternalName,
       @Param("methodSignature") String methodSignature);
+
+  @Query(
+      """
+       SELECT DISTINCT m
+        FROM CodeMethod m
+        LEFT JOIN FETCH m.openSourceRepoContent c
+        LEFT JOIN FETCH m.outgoingCalls oc
+        LEFT JOIN FETCH oc.callee
+        WHERE m.id = :codeMethodId
+       """)
+  Optional<CodeMethod> findWithOutgoingGraphById(Long codeMethodId);
+
+  @Query(
+      """
+       SELECT DISTINCT m
+        FROM CodeMethod m
+        LEFT JOIN FETCH m.openSourceRepoContent c
+        LEFT JOIN FETCH m.ingoingCalls ic
+        LEFT JOIN FETCH ic.caller
+        WHERE m.id = :codeMethodId
+       """)
+  Optional<CodeMethod> findWithIngoingGraphById(Long codeMethodId);
 }
