@@ -94,7 +94,7 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   private List<CodeMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
     return methodExtractResults.stream()
-        .map(extractResult -> CodeMethod.of(extractResult, this))
+        .map(extractResult -> CodeMethod.internal(extractResult, this))
         .toList();
   }
 

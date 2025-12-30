@@ -9,7 +9,7 @@ public record ClassInfo(
     String className,
     String signature,
     String superName,
-    List<String> interfacePaths) {
+    List<String> interfaceNames) {
 
   public static ClassInfo of(
       int version,

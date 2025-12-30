@@ -45,7 +45,7 @@ public class OpenSourceRepoFacade {
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(
             request.openSourceUri(), gitRepoLoadResult.files(), classStructures);
-    openSourceRepoClassMethodService.createMethodCallGraph(classStructures);
+    openSourceRepoClassMethodService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
     FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
 
     return OpenSourceRepoResponse.from(openSourceRepo);

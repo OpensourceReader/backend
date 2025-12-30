@@ -7,5 +7,5 @@ import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 
 public interface OpenSourceRepoClassMethodService {
 
-  List<CodeMethod> createMethodCallGraph(List<ClassStructure> classStructures);
+  List<CodeMethod> createMethodCallGraph(Long repoId, List<ClassStructure> classStructures);
 }

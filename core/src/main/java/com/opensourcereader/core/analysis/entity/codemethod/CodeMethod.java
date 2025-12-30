@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,6 +30,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CodeMethod extends BaseEntity {
 
+  @Column(name = "class_internal_name")
+  private String classInternalName;
+
   @Column(name = "method_name")
   private String methodName;
 
@@ -46,64 +50,100 @@ public class CodeMethod extends BaseEntity {
   private Integer startLine;
   private Integer endLine;
 
-  @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  @Enumerated(EnumType.STRING)
+  private MethodOrigin origin;
+
+  @OneToMany(
+      mappedBy = "caller",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private List<CodeMethodCallEdge> outgoingCalls = new ArrayList<>();
 
-  @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  @OneToMany(
+      mappedBy = "callee",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "open_source_repo_content_id", nullable = false)
+  @JoinColumn(name = "open_source_repo_content_id")
   private OpenSourceRepoContent openSourceRepoContent;
 
-  public static CodeMethod of(
+  public static CodeMethod internal(
       CodeMethodExtractResult methodExtractResult, OpenSourceRepoContent openSourceRepoContent) {
     return new CodeMethod(
+        openSourceRepoContent.getClassInternalName(),
         methodExtractResult.methodName(),
         methodExtractResult.paramTypes(),
         methodExtractResult.modifier(),
         CodeMethodSignature.of(methodExtractResult.methodName(), methodExtractResult.paramTypes()),
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
+        MethodOrigin.INTERNAL,
         openSourceRepoContent);
   }
 
+  public static CodeMethod external(MethodCallInfo callee, CodeMethodSignature methodSignature) {
+    return new CodeMethod(
+        callee.className(),
+        callee.methodName(),
+        callee.descriptor().argumentTypes(),
+        null,
+        methodSignature,
+        null,
+        null,
+        MethodOrigin.EXTERNAL,
+        null);
+  }
+
+  public static CodeMethod external(String interfaceName, CodeMethod caller) {
+    return new CodeMethod(
+        interfaceName,
+        caller.methodName,
+        caller.paramTypes,
+        caller.accessModifier,
+        caller.methodSignature,
+        caller.startLine,
+        caller.endLine,
+        MethodOrigin.EXTERNAL,
+        null);
+  }
+
   private CodeMethod(
+      String classInternalName,
       String methodName,
       List<String> paramTypes,
       AccessModifier accessModifier,
       CodeMethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
+      MethodOrigin methodOrigin,
       OpenSourceRepoContent openSourceRepoContent) {
+    this.classInternalName = classInternalName;
     this.methodName = methodName;
     this.paramTypes = paramTypes;
     this.accessModifier = accessModifier;
     this.methodSignature = methodSignature;
     this.startLine = startLine;
     this.endLine = endLine;
+    this.origin = methodOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
   }
 
-  public void updateAllOutgoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
-    this.outgoingCalls.removeIf(edge -> !methodCallEdges.contains(edge));
-
-    for (CodeMethodCallEdge edge : methodCallEdges) {
-      if (this.outgoingCalls.contains(edge)) {
-        continue;
-      }
-      this.outgoingCalls.add(edge);
-    }
+  public void updateAllCalls(
+      List<CodeMethodCallEdge> newOutgoingCalls, List<CodeMethodCallEdge> newIngoingCalls) {
+    syncEdges(this.outgoingCalls, newOutgoingCalls);
+    syncEdges(this.ingoingCalls, newIngoingCalls);
   }
 
-  public void updateAllIngoingCalls(List<CodeMethodCallEdge> methodCallEdges) {
-    this.ingoingCalls.removeIf(edge -> !methodCallEdges.contains(edge));
+  private static void syncEdges(
+      List<CodeMethodCallEdge> current, List<CodeMethodCallEdge> incoming) {
+    current.removeIf(edge -> !incoming.contains(edge));
 
-    for (CodeMethodCallEdge edge : methodCallEdges) {
-      if (this.ingoingCalls.contains(edge)) {
-        continue;
+    for (CodeMethodCallEdge edge : incoming) {
+      if (!current.contains(edge)) {
+        current.add(edge);
       }
-      this.ingoingCalls.add(edge);
     }
   }
 

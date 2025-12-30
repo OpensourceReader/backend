@@ -12,11 +12,15 @@ public interface CodeMethodRepository extends JpaRepository<CodeMethod, Long> {
 
   @Query(
       """
-      SELECT meta
-      FROM CodeMethod meta
-      WHERE meta.openSourceRepoContent.path LIKE %:path
-          AND meta.methodSignature.methodSignature = :methodSignature
-      """)
-  Optional<CodeMethod> findByRepoContentPathAndMethodSignature(
-      @Param("path") String path, @Param("methodSignature") String methodSignature);
+          SELECT m
+          FROM CodeMethod m
+          WHERE m.openSourceRepoContent.openSourceRepo.id = :repoId
+              AND m.openSourceRepoContent.classInternalName = :classInternalName
+              AND m.methodSignature.methodSignature = :methodSignature
+
+          """)
+  Optional<CodeMethod> findByRepoIdAndClassInternalNameAndMethodSignature(
+      @Param("repoId") Long repoId,
+      @Param("classInternalName") String classInternalName,
+      @Param("methodSignature") String methodSignature);
 }
