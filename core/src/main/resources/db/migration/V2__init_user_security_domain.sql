@@ -12,8 +12,7 @@ CREATE TABLE users
     created_at  TIMESTAMP(6) NOT NULL,
     updated_at  TIMESTAMP(6),
 
-    CONSTRAINT pk_users PRIMARY KEY (id),
-    CONSTRAINT uq_users_email UNIQUE (email)
+    CONSTRAINT pk_users PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

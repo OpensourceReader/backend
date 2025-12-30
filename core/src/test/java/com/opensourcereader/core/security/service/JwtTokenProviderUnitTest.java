@@ -12,12 +12,13 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.opensourcereader.core.security.infra.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class JwtServiceUnitTest {
-  private JwtService jwtService;
+public class JwtTokenProviderUnitTest {
+  private JwtTokenProvider jwtTokenProvider;
 
   // 테스트용 비밀키와 만료 시간
   private static final String TEST_SECRET_KEY = "testing";
@@ -25,12 +26,13 @@ public class JwtServiceUnitTest {
 
   @BeforeEach
   void setUp() {
-    jwtService = new JwtService();
+    jwtTokenProvider = new JwtTokenProvider();
 
-    ReflectionTestUtils.setField(jwtService, "secretKey", TEST_SECRET_KEY);
-    ReflectionTestUtils.setField(jwtService, "accessTokenExpireSeconds", TEST_EXPIRATION_SECONDS);
+    ReflectionTestUtils.setField(jwtTokenProvider, "secretKey", TEST_SECRET_KEY);
+    ReflectionTestUtils.setField(
+        jwtTokenProvider, "accessTokenExpireSeconds", TEST_EXPIRATION_SECONDS);
 
-    jwtService.init();
+    jwtTokenProvider.init();
   }
 
   @Test
@@ -41,8 +43,8 @@ public class JwtServiceUnitTest {
     String email = "test@example.com";
 
     // when
-    String token = jwtService.encoder(nickname, email);
-    String decodedNickname = jwtService.decode(token);
+    String token = jwtTokenProvider.encoder(nickname, email);
+    String decodedNickname = jwtTokenProvider.decode(token);
 
     // then
     assertThat(token).isNotNull();
@@ -53,10 +55,10 @@ public class JwtServiceUnitTest {
   @DisplayName("토큰 검증 성공: 유효한 토큰")
   void validateJwt_Success() {
     // given
-    String token = jwtService.encoder("user", "email@test.com");
+    String token = jwtTokenProvider.encoder("user", "email@test.com");
 
     // when
-    DecodedJWT result = jwtService.validateJwt(token);
+    DecodedJWT result = jwtTokenProvider.validateJwt(token);
 
     // then
     assertThat(result.getSubject()).isEqualTo("email@test.com");
@@ -75,7 +77,7 @@ public class JwtServiceUnitTest {
             .sign(Algorithm.HMAC256(TEST_SECRET_KEY));
 
     // when & then
-    assertThatThrownBy(() -> jwtService.validateJwt(expiredToken))
+    assertThatThrownBy(() -> jwtTokenProvider.validateJwt(expiredToken))
         .isInstanceOf(JWTVerificationException.class)
         .hasMessage("Token Expired");
   }
@@ -92,7 +94,7 @@ public class JwtServiceUnitTest {
             .sign(Algorithm.HMAC256(fakeSecretKey));
 
     // when & then
-    assertThatThrownBy(() -> jwtService.validateJwt(forgedToken))
+    assertThatThrownBy(() -> jwtTokenProvider.validateJwt(forgedToken))
         .isInstanceOf(JWTVerificationException.class)
         .hasMessage("Invalid Signature");
   }
@@ -104,7 +106,7 @@ public class JwtServiceUnitTest {
     String garbageToken = "not-valid-token";
 
     // when & then
-    assertThatThrownBy(() -> jwtService.validateJwt(garbageToken))
+    assertThatThrownBy(() -> jwtTokenProvider.validateJwt(garbageToken))
         .isInstanceOf(JWTVerificationException.class);
   }
 }

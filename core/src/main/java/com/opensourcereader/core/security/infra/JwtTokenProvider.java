@@ -1,9 +1,9 @@
-package com.opensourcereader.core.security.service;
+package com.opensourcereader.core.security.infra;
 
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -12,10 +12,11 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.opensourcereader.core.security.TokenProvider;
 import jakarta.annotation.PostConstruct;
 
-@Service
-public class JwtService {
+@Component
+public class JwtTokenProvider implements TokenProvider {
 
   @Value("${jwt.secretKey}")
   private String secretKey;
@@ -34,6 +35,7 @@ public class JwtService {
     jwtVerifier = JWT.require(algorithm).build();
   }
 
+  @Override
   public String encoder(String nickname, String email) {
     Instant accessExpireDate = Instant.now().plusSeconds(accessTokenExpireSeconds);
 
@@ -44,6 +46,7 @@ public class JwtService {
         .sign(algorithm);
   }
 
+  @Override
   public String decode(String token) {
     DecodedJWT decodedJWT = validateJwt(token);
     return decode(decodedJWT);

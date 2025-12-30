@@ -1,0 +1,39 @@
+package com.opensourcereader.core.board.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.opensourcereader.core.board.entity.Issue;
+import com.opensourcereader.core.board.entity.Pull;
+import com.opensourcereader.core.board.exception.BoardNotFoundException;
+import com.opensourcereader.core.board.repository.IssueRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class IssueRetrieveService {
+
+  private final IssueRepository issueRepository;
+
+  @Transactional(readOnly = true)
+  public List<Issue> findIssuesByRepositoryId(Long repositoryId, Boolean isOpened) {
+    return issueRepository.findAllByRepositoryIdAndIsOpenedOrderByCreatedAtDesc(
+        repositoryId, isOpened);
+  }
+
+  @Transactional(readOnly = true)
+  public Issue findIssueOrPullByTagId(Long repositoryId, Long tagId) {
+    Issue entity =
+        issueRepository
+            .findByRepositoryIdAndTagId(repositoryId, tagId)
+            .orElseThrow(BoardNotFoundException::new);
+    if (entity instanceof Pull pull) {
+      return pull;
+    } else {
+      return entity;
+    }
+  }
+}
