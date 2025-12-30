@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.method;
+package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import java.util.List;
 

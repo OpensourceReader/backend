@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.method;
+package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

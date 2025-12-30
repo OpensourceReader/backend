@@ -12,6 +12,7 @@ import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRep
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.analysis.service.impl.factory.OpenSourceContentFactory;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;

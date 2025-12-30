@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.method;
+package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -26,6 +26,7 @@ import com.opensourcereader.core.analysis.entity.codemethod.NonAccessModifier;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.service.impl.LocalOpenSourceRepoClassMethodService;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;

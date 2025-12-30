@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.method;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,8 @@ import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoClassMethodService;
+import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodIngoingStrategy;
+import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodOutgoingStrategy;
 
 import lombok.RequiredArgsConstructor;
 

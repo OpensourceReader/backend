@@ -11,13 +11,13 @@ import com.opensourcereader.core.analysis.infra.bytecode.BuildArtifactCollector;
 import com.opensourcereader.core.analysis.infra.bytecode.BuildExecutor;
 import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.git.GitWorktreeManagerCli;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoMethodCallAnalyzer;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoClassStructureExtractor;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class LocalBytecodeMethodCallAnalyzer implements OpenSourceRepoMethodCallAnalyzer {
+public class BytecodeClassStructureExtractor implements OpenSourceRepoClassStructureExtractor {
 
   private final GitWorktreeManagerCli gitWorktreeManagerCli;
   private final BuildExecutor buildExecutor;

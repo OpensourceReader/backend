@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.service.impl.factory;
 
 import static com.opensourcereader.core.analysis.entity.ContentType.getContentTypeFromTypeNumber;
 

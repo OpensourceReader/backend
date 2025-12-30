@@ -17,6 +17,7 @@ import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
 import com.opensourcereader.core.analysis.entity.codemethod.NonAccessModifier;
 import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
+import com.opensourcereader.core.analysis.service.impl.factory.OpenSourceCodeMethodExtractor;
 import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;

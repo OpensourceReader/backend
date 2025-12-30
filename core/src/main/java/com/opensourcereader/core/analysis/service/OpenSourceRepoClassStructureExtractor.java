@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 
-public interface OpenSourceRepoMethodCallAnalyzer {
+public interface OpenSourceRepoClassStructureExtractor {
   List<ClassStructure> createClassStructures(
       Path savedLocalPath, String reference, String workingTreeDirName);
 }
