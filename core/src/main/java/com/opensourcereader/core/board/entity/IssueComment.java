@@ -12,7 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
@@ -38,7 +37,7 @@ public class IssueComment {
   @Column(name = "provider_id")
   private Long providerId;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
   private User author;
 
@@ -46,11 +45,8 @@ public class IssueComment {
   @JoinColumn(name = "issue_id", nullable = false)
   private Issue issue;
 
-  @Column(nullable = false)
+  @Column(columnDefinition = "LONGTEXT")
   private String body;
-
-  @Column(nullable = false)
-  private Boolean disabled = false;
 
   private IssueComment(IssueCommentCommand command) {
     this.providerId = command.getId();
@@ -65,7 +61,4 @@ public class IssueComment {
     return new IssueComment(command);
   }
 
-  public void updateDisabled(Boolean newDisabled) {
-    this.disabled = newDisabled;
-  }
 }

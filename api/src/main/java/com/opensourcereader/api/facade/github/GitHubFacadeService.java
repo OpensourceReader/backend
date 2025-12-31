@@ -75,15 +75,16 @@ public class GitHubFacadeService {
       Boolean isOpened = isOpened(fetched.state());
       BoardBaseCommand command;
 
-      if (fetched.commentCount() >= 1) {
-        issueCommentRequest.add(
-            new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
-      }
-
       if (fetched.isPullRequest()) {
         log.info(String.valueOf(fetched.tagId()));
         pullTagNumbers.add(fetched.tagId());
       } else {
+        // TODO Pull 생성하는 로직을 완성시키면 위로 빼야함
+        if (fetched.commentCount() >= 1) {
+          issueCommentRequest.add(
+              new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
+        }
+
         command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
         issueCommands.add(command);
       }
