@@ -60,6 +60,7 @@ public class SourceCodeParser {
                 new SourceCodeParseResult(
                     methodDeclaration.getNameAsString(),
                     AccessModifier.from(methodDeclaration),
+                    methodDeclaration.getType().asString(),
                     getParameterTypes(methodDeclaration),
                     getStartLine(methodDeclaration),
                     getEndLine(methodDeclaration)))

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
@@ -71,9 +72,10 @@ class CodeMethodGraphQueryServiceTest {
             }
             """);
 
-    CodeMethod target = saveInternalMethod(targetContent, "target", List.of(), 3, 3);
-    CodeMethod outgoingMethod = saveInternalMethod(utilContent, "help", List.of(), 3, 3);
-    CodeMethod ingoingMethod = saveInternalMethod(otherContent, "run", List.of("t.Main"), 3, 3);
+    CodeMethod target = saveInternalMethod(targetContent, "void", "target", List.of(), 3, 3);
+    CodeMethod outgoingMethod = saveInternalMethod(utilContent, "void", "help", List.of(), 3, 3);
+    CodeMethod ingoingMethod =
+        saveInternalMethod(otherContent, "void", "run", List.of("t.Main"), 3, 3);
     target.updateAllCalls(
         List.of(CodeMethodCallEdge.of(target, outgoingMethod)),
         List.of(CodeMethodCallEdge.of(ingoingMethod, target)));
@@ -96,14 +98,16 @@ class CodeMethodGraphQueryServiceTest {
   private OpenSourceRepoContent saveContent(
       OpenSourceRepo repo, String classInternalName, String rawText) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "java/lang/Object", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", "1", rawText);
 
     return openSourceContentRepository.save(
-        OpenSourceRepoContent.of(fileInfo, classInfo, List.of(), repo));
+        OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));
   }
 
   private CodeMethod saveInternalMethod(
       OpenSourceRepoContent content,
+      String returnType,
       String methodName,
       List<String> paramTypes,
       Integer startLine,
@@ -113,6 +117,7 @@ class CodeMethodGraphQueryServiceTest {
             methodName,
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
+            returnType,
             paramTypes,
             startLine,
             endLine);

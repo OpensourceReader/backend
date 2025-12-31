@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
@@ -43,8 +44,8 @@ class CodeMethodOutgoingStrategyTest {
   void getOutgoings_reuse_existing_callee() {
     // given
     OpenSourceRepo openSourceRepo = openSourceRepoRepository.save(new OpenSourceRepo("clone-url"));
-    CodeMethod caller = getCodeMethod("t/Main", "run", openSourceRepo);
-    CodeMethod callee = getCodeMethod("t/Util", "help", openSourceRepo);
+    CodeMethod caller = getCodeMethod("t/Main", "void", "run", openSourceRepo);
+    CodeMethod callee = getCodeMethod("t/Util", "void", "help", openSourceRepo);
     MethodCallInfo call = MethodCallInfo.of(184, "t/Util", "help", "()V", false);
 
     // when
@@ -64,7 +65,11 @@ class CodeMethodOutgoingStrategyTest {
                 caller.getId(),
                 callee.getId(),
                 callee.getOrigin(),
-                CodeMethodSignature.of("help", List.of()).methodSignature()));
+                CodeMethodSignature.of(
+                        "help",
+                        call.descriptor().argumentTypes(),
+                        call.descriptor().methodReturnType())
+                    .methodSignature()));
   }
 
   @Transactional
@@ -73,7 +78,7 @@ class CodeMethodOutgoingStrategyTest {
   void getOutgoings_create_external_when_missing() {
     // given
     OpenSourceRepo openSourceRepo = openSourceRepoRepository.save(new OpenSourceRepo("clone-url"));
-    CodeMethod caller = getCodeMethod("t/Main", "run", openSourceRepo);
+    CodeMethod caller = getCodeMethod("t/Main", "void", "run", openSourceRepo);
     MethodCallInfo missing =
         MethodCallInfo.of(184, "java/lang/String", "valueOf", "(I)Ljava/lang/String;", false);
 
@@ -94,17 +99,20 @@ class CodeMethodOutgoingStrategyTest {
   }
 
   private CodeMethod getCodeMethod(
-      String className, String methodName, OpenSourceRepo openSourceRepo) {
+      String className, String returnType, String methodName, OpenSourceRepo openSourceRepo) {
     ClassInfo classInfo = new ClassInfo(1, 1, className, "", "", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo openSourceFileInfo = new OpenSourceFileInfo("", "", "");
     OpenSourceRepoContent openSourceRepoContent =
         openSourceContentRepository.save(
-            OpenSourceRepoContent.of(openSourceFileInfo, classInfo, List.of(), openSourceRepo));
+            OpenSourceRepoContent.of(
+                openSourceFileInfo, classStructure, List.of(), openSourceRepo));
     CodeMethodExtractResult codeMethodExtractResult =
         new CodeMethodExtractResult(
             methodName,
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
+            returnType,
             List.of(),
             null,
             null);

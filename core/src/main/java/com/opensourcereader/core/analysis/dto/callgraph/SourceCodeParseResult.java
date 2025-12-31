@@ -7,6 +7,7 @@ import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
 public record SourceCodeParseResult(
     String methodName,
     AccessModifier modifier,
+    String returnType,
     List<String> paramTypes,
     Integer startLine,
     Integer endLine) {}

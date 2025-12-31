@@ -2,7 +2,10 @@ package com.opensourcereader.core.analysis.entity.codemethod;
 
 import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -16,6 +19,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CodeMethodCallEdge extends BaseEntity {
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "method_call_origin")
   private MethodCallOrigin methodCallOrigin;
 
   @ManyToOne(

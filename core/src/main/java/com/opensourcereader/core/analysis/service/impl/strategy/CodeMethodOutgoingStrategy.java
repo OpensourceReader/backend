@@ -28,7 +28,10 @@ public class CodeMethodOutgoingStrategy {
 
   private CodeMethod resolveOrCreateCallee(Long repoId, MethodCallInfo callee) {
     CodeMethodSignature signature =
-        CodeMethodSignature.of(callee.methodName(), callee.descriptor().argumentTypes());
+        CodeMethodSignature.of(
+            callee.methodName(),
+            callee.descriptor().argumentTypes(),
+            callee.descriptor().methodReturnType());
     return codeMethodRepository
         .findByRepoIdAndClassInternalNameAndMethodSignature(
             repoId, callee.className(), signature.methodSignature())

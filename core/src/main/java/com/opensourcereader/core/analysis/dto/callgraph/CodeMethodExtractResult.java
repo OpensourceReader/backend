@@ -11,6 +11,7 @@ public record CodeMethodExtractResult(
     String methodName,
     AccessModifier modifier,
     EnumSet<NonAccessModifier> nonAccessModifiers,
+    String returnType,
     List<String> paramTypes,
     Integer startLine,
     Integer endLine) {
@@ -21,6 +22,7 @@ public record CodeMethodExtractResult(
         declaredMethodInfo.methodName(),
         declaredMethodInfo.accessModifier(),
         declaredMethodInfo.nonAccessModifiers(),
+        declaredMethodInfo.methodDescriptor().methodReturnType(),
         declaredMethodInfo.methodDescriptor().argumentTypes(),
         getStartLine(codeParseResult),
         getEndLine(codeParseResult));

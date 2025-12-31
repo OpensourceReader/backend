@@ -17,9 +17,11 @@ class CodeMethodSignatureTest {
   void codeSignatureParameterizedTest(List<String> rawParamTypes, String expectedSignature) {
     // given
     String methodName = "methodName";
+    String returnType = "void";
 
     // when
-    CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodName, rawParamTypes);
+    CodeMethodSignature codeMethodSignature =
+        CodeMethodSignature.of(methodName, rawParamTypes, returnType);
 
     // then
     Assertions.assertThat(codeMethodSignature.methodSignature()).isEqualTo(expectedSignature);
@@ -27,7 +29,7 @@ class CodeMethodSignatureTest {
 
   static Stream<Arguments> methodSignatureTestCases() {
     String methodName = "methodName";
-    String expected = methodName + "(String,OpenSourceRepo)";
+    String expected = methodName + "(String,OpenSourceRepo)void";
 
     return Stream.of(
         // 1) 단순 클래스명

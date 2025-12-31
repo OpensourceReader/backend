@@ -13,12 +13,17 @@ public record CodeMethodSignature(String methodSignature) {
   private static final String PACKAGE_SEPARATOR = ".";
 
   public static CodeMethodSignature of(DeclaredMethodInfo method) {
-    return of(method.methodName(), method.methodDescriptor().argumentTypes());
+    return of(
+        method.methodName(),
+        method.methodDescriptor().argumentTypes(),
+        method.methodDescriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(String methodName, List<String> rawArgumentTypes) {
+  public static CodeMethodSignature of(
+      String methodName, List<String> rawArgumentTypes, String returnType) {
     List<String> paramTypes = extractParamTypes(rawArgumentTypes);
-    return new CodeMethodSignature(methodName + "(" + String.join(",", paramTypes) + ")");
+    return new CodeMethodSignature(
+        methodName + "(" + String.join(",", paramTypes) + ")" + returnType);
   }
 
   private static List<String> extractParamTypes(List<String> rawArgumentTypes) {

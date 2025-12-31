@@ -40,7 +40,9 @@ public class OpenSourceCodeMethodExtractor {
     return sourceCodeParser.extractCodeMethods(rawText).stream()
         .collect(
             Collectors.toMap(
-                result -> CodeMethodSignature.of(result.methodName(), result.paramTypes()),
+                result ->
+                    CodeMethodSignature.of(
+                        result.methodName(), result.paramTypes(), result.returnType()),
                 extractResult -> extractResult));
   }
 

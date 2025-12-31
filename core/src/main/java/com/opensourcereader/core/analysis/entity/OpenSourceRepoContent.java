@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
 import jakarta.persistence.CascadeType;
@@ -32,7 +32,7 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "path", nullable = false)
   private String path;
 
-  @Column(name = "class_internal_name", nullable = false)
+  @Column(name = "class_internal_name")
   private String classInternalName;
 
   @Column(name = "name", nullable = false)
@@ -63,14 +63,14 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   public static OpenSourceRepoContent of(
       OpenSourceFileInfo fileInfo,
-      ClassInfo classInfo,
+      ClassStructure classStructure,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
         fileInfo.typeNumber(),
         fileInfo.rawText(),
-        classInfo,
+        classStructure,
         methodExtractResults,
         openSourceRepo);
   }
@@ -79,7 +79,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       String path,
       String contentTypeNumber,
       String rawText,
-      ClassInfo classInfo,
+      ClassStructure classStructure,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
@@ -87,9 +87,16 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.name = OpenSourceRepoContentName.from(path);
     this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
     this.rawText = rawText;
-    this.classInternalName = classInfo.className();
+    this.classInternalName = extractedClassName(classStructure);
     this.codeMethods = getCodeMethods(methodExtractResults);
     this.openSourceRepo = openSourceRepo;
+  }
+
+  private String extractedClassName(ClassStructure classStructure) {
+    if (classStructure == null) {
+      return null;
+    }
+    return classStructure.classInfo().className();
   }
 
   private List<CodeMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {

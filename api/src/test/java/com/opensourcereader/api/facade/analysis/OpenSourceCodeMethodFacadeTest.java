@@ -15,6 +15,7 @@ import com.opensourcereader.api.dto.CodeMethodResponse;
 import com.opensourcereader.api.dto.CodeMethodSummary;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodDescriptor;
@@ -78,14 +79,14 @@ class OpenSourceCodeMethodFacadeTest {
             """);
 
     // visible caller (ingoing에 남아야 함)
-    CodeMethod visibleCaller = saveInternalMethod(aContent, "a", List.of(), 3, 3);
+    CodeMethod visibleCaller = saveInternalMethod(aContent, "a", "void", List.of(), 3, 3);
     // hidden caller (<init> 이라 policy로 제외되어야 함)
-    CodeMethod hiddenCaller = saveInternalMethod(bContent, "<init>", List.of(), 3, 3);
+    CodeMethod hiddenCaller = saveInternalMethod(bContent, "<init>", "void", List.of(), 3, 3);
     // external callee (outgoing에서 제외되어야 함)
     CodeMethod externalCallee = saveExternalMethod("t/C", "c", "()V");
 
     // target
-    CodeMethod target = saveInternalMethod(mainContent, "run", List.of(), 3, 3);
+    CodeMethod target = saveInternalMethod(mainContent, "run", "void", List.of(), 3, 3);
     target.updateAllCalls(
         List.of(CodeMethodCallEdge.of(target, externalCallee)), // outgoing: external -> 제외 기대
         List.of(
@@ -106,15 +107,17 @@ class OpenSourceCodeMethodFacadeTest {
   private OpenSourceRepoContent saveContent(
       OpenSourceRepo repo, String classInternalName, String rawText) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "java/lang/Object", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", "1", rawText);
 
     return openSourceContentRepository.save(
-        OpenSourceRepoContent.of(fileInfo, classInfo, List.of(), repo));
+        OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));
   }
 
   private CodeMethod saveInternalMethod(
       OpenSourceRepoContent content,
       String methodName,
+      String returnType,
       List<String> paramTypes,
       Integer startLine,
       Integer endLine) {
@@ -123,6 +126,7 @@ class OpenSourceCodeMethodFacadeTest {
             methodName,
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
+            returnType,
             paramTypes,
             startLine,
             endLine);
@@ -134,7 +138,10 @@ class OpenSourceCodeMethodFacadeTest {
     MethodCallInfo callInfo =
         new MethodCallInfo(184, className, methodName, MethodDescriptor.from(descriptor), false);
     CodeMethodSignature sig =
-        CodeMethodSignature.of(methodName, callInfo.descriptor().argumentTypes());
+        CodeMethodSignature.of(
+            methodName,
+            callInfo.descriptor().argumentTypes(),
+            callInfo.descriptor().methodReturnType());
 
     CodeMethod external = CodeMethod.external(callInfo, sig);
     return codeMethodRepository.save(external);

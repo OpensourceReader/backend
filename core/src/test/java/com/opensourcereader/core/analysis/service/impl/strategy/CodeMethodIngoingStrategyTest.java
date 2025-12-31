@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 @SpringBootTest
 class CodeMethodIngoingStrategyTest {
+
   @Autowired private CodeMethodIngoingStrategy strategy;
   @Autowired private CodeMethodRepository codeMethodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
@@ -94,17 +96,19 @@ class CodeMethodIngoingStrategyTest {
 
   private CodeMethod getCodeMethod(String className, String methodName, OpenSourceRepo repo) {
     ClassInfo classInfo = new ClassInfo(1, 1, className, "", "", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(
-            OpenSourceRepoContent.of(fileInfo, classInfo, List.of(), repo));
+            OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));
 
     CodeMethodExtractResult extract =
         new CodeMethodExtractResult(
             methodName,
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
+            "void",
             List.of(),
             null,
             null);
@@ -118,23 +122,21 @@ class CodeMethodIngoingStrategyTest {
    */
   private CodeMethod seedMethodWithSignature(
       String interfaceName, CodeMethod caller, OpenSourceRepo repo) {
-    // caller의 methodName/paramTypes로 signature 동일하게 만들기
-    String methodName = caller.getMethodName();
-    List<String> paramTypes = caller.getParamTypes();
-
     ClassInfo classInfo = new ClassInfo(1, 1, interfaceName, "", "", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(
-            OpenSourceRepoContent.of(fileInfo, classInfo, List.of(), repo));
+            OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));
 
     CodeMethodExtractResult extract =
         new CodeMethodExtractResult(
-            methodName,
+            caller.getMethodName(),
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
-            paramTypes,
+            caller.getReturnType(),
+            caller.getParamTypes(),
             null,
             null);
 

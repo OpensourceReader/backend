@@ -46,11 +46,12 @@ class CodeMethodGraphCommandServiceImplTest {
       "서비스는 caller를 찾아 outgoing/ingoing(edge)을 동기화하고, missing callee/interface는 external로 연결한다")
   void createMethodCallGraph_connects_outgoing_and_ingoing_and_handles_external() {
     // given
+    String returnType = "void";
     OpenSourceRepo repo = openSourceRepoRepository.save(new OpenSourceRepo("clone-url"));
     String callerClassName = "t/Main";
     String callerDeclaredMethodName = "run";
     CodeMethod caller =
-        saveInternalMethod(repo, callerClassName, callerDeclaredMethodName, List.of());
+        saveInternalMethod(repo, callerClassName, returnType, callerDeclaredMethodName, List.of());
     DeclaredMethodInfo runInfo =
         DeclaredMethodInfo.of(
             callerClassName, /*access*/ 0x0001, callerDeclaredMethodName, "()V", null, null);
@@ -84,8 +85,10 @@ class CodeMethodGraphCommandServiceImplTest {
                   e -> e.getCallee().getOrigin())
               .contains(
                   Tuple.tuple(
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of()).methodSignature(),
-                      CodeMethodSignature.of(outgoingMethodName, List.of()).methodSignature(),
+                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
+                          .methodSignature(),
+                      CodeMethodSignature.of(outgoingMethodName, List.of(), returnType)
+                          .methodSignature(),
                       MethodOrigin.EXTERNAL));
 
           // ingoing: I.run -> Main.run (caller external(interface method))
@@ -97,27 +100,34 @@ class CodeMethodGraphCommandServiceImplTest {
                   e -> e.getCallee().getMethodSignature().methodSignature())
               .contains(
                   Tuple.tuple(
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of()).methodSignature(),
+                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
+                          .methodSignature(),
                       MethodOrigin.EXTERNAL,
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of())
+                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
                           .methodSignature()));
         });
   }
 
   private CodeMethod saveInternalMethod(
-      OpenSourceRepo repo, String classInternalName, String methodName, List<String> paramTypes) {
+      OpenSourceRepo repo,
+      String classInternalName,
+      String returnType,
+      String methodName,
+      List<String> paramTypes) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "", List.of());
+    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
     OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(
-            OpenSourceRepoContent.of(fileInfo, classInfo, List.of(), repo));
+            OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));
 
     CodeMethodExtractResult extract =
         new CodeMethodExtractResult(
             methodName,
             AccessModifier.PUBLIC,
             EnumSet.noneOf(NonAccessModifier.class),
+            returnType,
             paramTypes,
             null,
             null);

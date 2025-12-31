@@ -36,6 +36,9 @@ public class CodeMethod extends BaseEntity {
   @Column(name = "method_name")
   private String methodName;
 
+  @Column(name = "return_type")
+  private String returnType;
+
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "param_types", columnDefinition = "json", nullable = false)
   private List<String> paramTypes;
@@ -74,9 +77,13 @@ public class CodeMethod extends BaseEntity {
     return new CodeMethod(
         openSourceRepoContent.getClassInternalName(),
         methodExtractResult.methodName(),
+        methodExtractResult.returnType(),
         methodExtractResult.paramTypes(),
         methodExtractResult.modifier(),
-        CodeMethodSignature.of(methodExtractResult.methodName(), methodExtractResult.paramTypes()),
+        CodeMethodSignature.of(
+            methodExtractResult.methodName(),
+            methodExtractResult.paramTypes(),
+            methodExtractResult.returnType()),
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
         MethodOrigin.INTERNAL,
@@ -87,6 +94,7 @@ public class CodeMethod extends BaseEntity {
     return new CodeMethod(
         callee.className(),
         callee.methodName(),
+        callee.descriptor().methodReturnType(),
         callee.descriptor().argumentTypes(),
         null,
         methodSignature,
@@ -100,6 +108,7 @@ public class CodeMethod extends BaseEntity {
     return new CodeMethod(
         interfaceName,
         caller.methodName,
+        caller.returnType,
         caller.paramTypes,
         caller.accessModifier,
         caller.methodSignature,
@@ -112,6 +121,7 @@ public class CodeMethod extends BaseEntity {
   private CodeMethod(
       String classInternalName,
       String methodName,
+      String returnType,
       List<String> paramTypes,
       AccessModifier accessModifier,
       CodeMethodSignature methodSignature,
@@ -121,6 +131,7 @@ public class CodeMethod extends BaseEntity {
       OpenSourceRepoContent openSourceRepoContent) {
     this.classInternalName = classInternalName;
     this.methodName = methodName;
+    this.returnType = returnType;
     this.paramTypes = paramTypes;
     this.accessModifier = accessModifier;
     this.methodSignature = methodSignature;

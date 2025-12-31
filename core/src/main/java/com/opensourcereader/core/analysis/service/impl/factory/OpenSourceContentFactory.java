@@ -28,27 +28,24 @@ public class OpenSourceContentFactory {
       List<OpenSourceFileInfo> sourFileInfos,
       List<ClassStructure> classStructures,
       OpenSourceRepo opensourceRepo) {
-    Map<String, ClassStructure> structures = getByClassName(classStructures);
+    Map<String, ClassStructure> structures =
+        classStructures.stream()
+            .collect(Collectors.toMap(cs -> cs.classInfo().className(), cs -> cs));
     return sourFileInfos.stream()
         .filter(sourFile -> getContentTypeFromTypeNumber(sourFile.typeNumber()).isSupported())
         .map(sourFile -> getOpenSourceRepoContent(structures, opensourceRepo, sourFile))
         .toList();
   }
 
-  private Map<String, ClassStructure> getByClassName(List<ClassStructure> classStructures) {
-    return classStructures.stream()
-        .collect(Collectors.toMap(cs -> cs.classInfo().className(), cs -> cs));
-  }
-
   private OpenSourceRepoContent getOpenSourceRepoContent(
       Map<String, ClassStructure> structures,
       OpenSourceRepo opensourceRepo,
       OpenSourceFileInfo sourFileInfo) {
-    ClassStructure classStructure =
-        structures.get(sourceCodeParser.extractClassName(sourFileInfo.rawText()));
+    String sourceCodeClassName =
+        sourceCodeParser.extractClassName(sourFileInfo.rawText()).replace('.', '/');
+    ClassStructure classStructure = structures.get(sourceCodeClassName);
     List<CodeMethodExtractResult> methods =
         openSourceCodeMethodExtractor.extract(sourFileInfo, classStructure);
-    return OpenSourceRepoContent.of(
-        sourFileInfo, classStructure.classInfo(), methods, opensourceRepo);
+    return OpenSourceRepoContent.of(sourFileInfo, classStructure, methods, opensourceRepo);
   }
 }
