@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodOutgoingEdgeFactory;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CodeMethodOutgoingEdgeFactory;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -34,10 +35,14 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class CodeMethodOutgoingEdgeFactoryTest {
 
-  @Autowired private CodeMethodOutgoingEdgeFactory strategy;
-  @Autowired private CodeMethodRepository codeMethodRepository;
-  @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
-  @Autowired private OpenSourceContentRepository openSourceContentRepository;
+  @Autowired
+  private CodeMethodOutgoingEdgeFactory strategy;
+  @Autowired
+  private CodeMethodRepository codeMethodRepository;
+  @Autowired
+  private OpenSourceRepoRepository openSourceRepoRepository;
+  @Autowired
+  private OpenSourceContentRepository openSourceContentRepository;
 
   @Transactional
   @Test
@@ -54,6 +59,10 @@ class CodeMethodOutgoingEdgeFactoryTest {
         strategy.getOutgoings(openSourceRepo.getId(), caller, List.of(call));
 
     // then
+    CodeMethodExtractResult extractResult = new CodeMethodExtractResult(
+        "help", null, null, call.descriptor().methodReturnType(), call.descriptor().argumentTypes(),
+        null,
+        null);
     assertThat(edges)
         .hasSize(1)
         .extracting(
@@ -66,11 +75,7 @@ class CodeMethodOutgoingEdgeFactoryTest {
                 caller.getId(),
                 callee.getId(),
                 callee.getOrigin(),
-                CodeMethodSignature.of(
-                        "help",
-                        call.descriptor().argumentTypes(),
-                        call.descriptor().methodReturnType())
-                    .methodSignature()));
+                CodeMethodSignature.of(extractResult).methodSignature()));
   }
 
   @Transactional
@@ -103,7 +108,7 @@ class CodeMethodOutgoingEdgeFactoryTest {
       String className, String returnType, String methodName, OpenSourceRepo openSourceRepo) {
     ClassInfo classInfo = new ClassInfo(1, 1, className, "", "", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo openSourceFileInfo = new OpenSourceFileInfo("", "", "");
+    OpenSourceFileInfo openSourceFileInfo = new OpenSourceFileInfo("", ContentType.FILE, "");
     OpenSourceRepoContent openSourceRepoContent =
         openSourceContentRepository.save(
             OpenSourceRepoContent.of(

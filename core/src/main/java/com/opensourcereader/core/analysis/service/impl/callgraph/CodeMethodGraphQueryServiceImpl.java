@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.service.impl.callgraph;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

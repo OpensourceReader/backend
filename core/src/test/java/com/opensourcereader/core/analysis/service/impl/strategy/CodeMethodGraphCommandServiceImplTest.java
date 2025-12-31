@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
+import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.impl.CodeMethodGraphCommandServiceImpl;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CodeMethodGraphCommandServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
@@ -35,10 +36,14 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class CodeMethodGraphCommandServiceImplTest {
 
-  @Autowired private CodeMethodGraphCommandServiceImpl service;
-  @Autowired private CodeMethodRepository codeMethodRepository;
-  @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
-  @Autowired private OpenSourceContentRepository openSourceContentRepository;
+  @Autowired
+  private CodeMethodGraphCommandServiceImpl service;
+  @Autowired
+  private CodeMethodRepository codeMethodRepository;
+  @Autowired
+  private OpenSourceRepoRepository openSourceRepoRepository;
+  @Autowired
+  private OpenSourceContentRepository openSourceContentRepository;
 
   @Transactional
   @Test
@@ -75,6 +80,13 @@ class CodeMethodGraphCommandServiceImplTest {
     // then
     Assertions.assertThat(savedCaller).isNotEmpty();
     // outgoing: Main.run -> Util.help (callee external)
+
+    CodeMethodExtractResult callerExtract = new CodeMethodExtractResult(
+        callerDeclaredMethodName, null, null, returnType, List.of(), null,
+        null);
+    CodeMethodExtractResult outgoingExtract = new CodeMethodExtractResult(
+        outgoingMethodName, null, null, returnType, List.of(), null,
+        null);
     assertSoftly(
         softly -> {
           softly
@@ -85,10 +97,8 @@ class CodeMethodGraphCommandServiceImplTest {
                   e -> e.getCallee().getOrigin())
               .contains(
                   Tuple.tuple(
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
-                          .methodSignature(),
-                      CodeMethodSignature.of(outgoingMethodName, List.of(), returnType)
-                          .methodSignature(),
+                      CodeMethodSignature.of(callerExtract).methodSignature(),
+                      CodeMethodSignature.of(outgoingExtract).methodSignature(),
                       MethodOrigin.EXTERNAL));
 
           // ingoing: I.run -> Main.run (caller external(interface method))
@@ -100,11 +110,9 @@ class CodeMethodGraphCommandServiceImplTest {
                   e -> e.getCallee().getMethodSignature().methodSignature())
               .contains(
                   Tuple.tuple(
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
-                          .methodSignature(),
+                      CodeMethodSignature.of(callerExtract).methodSignature(),
                       MethodOrigin.EXTERNAL,
-                      CodeMethodSignature.of(callerDeclaredMethodName, List.of(), returnType)
-                          .methodSignature()));
+                      CodeMethodSignature.of(callerExtract).methodSignature()));
         });
   }
 
@@ -116,7 +124,7 @@ class CodeMethodGraphCommandServiceImplTest {
       List<String> paramTypes) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
+    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", ContentType.FILE, "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(

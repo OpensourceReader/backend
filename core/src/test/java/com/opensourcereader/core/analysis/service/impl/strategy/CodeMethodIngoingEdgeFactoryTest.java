@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.service.impl.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodIngoingEdgeFactory;
+import com.opensourcereader.core.analysis.service.impl.callgraph.CodeMethodIngoingEdgeFactory;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
@@ -98,7 +99,7 @@ class CodeMethodIngoingEdgeFactoryTest {
   private CodeMethod getCodeMethod(String className, String methodName, OpenSourceRepo repo) {
     ClassInfo classInfo = new ClassInfo(1, 1, className, "", "", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
+    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", ContentType.FILE, "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(
@@ -125,7 +126,7 @@ class CodeMethodIngoingEdgeFactoryTest {
       String interfaceName, CodeMethod caller, OpenSourceRepo repo) {
     ClassInfo classInfo = new ClassInfo(1, 1, interfaceName, "", "", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", "", "");
+    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo("", ContentType.FILE, "");
 
     OpenSourceRepoContent content =
         openSourceContentRepository.save(

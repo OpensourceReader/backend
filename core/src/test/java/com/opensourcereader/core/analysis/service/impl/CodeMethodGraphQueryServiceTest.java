@@ -2,6 +2,7 @@ package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -99,7 +100,7 @@ class CodeMethodGraphQueryServiceTest {
       OpenSourceRepo repo, String classInternalName, String rawText) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "java/lang/Object", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", "1", rawText);
+    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", ContentType.FILE, rawText);
 
     return openSourceContentRepository.save(
         OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));

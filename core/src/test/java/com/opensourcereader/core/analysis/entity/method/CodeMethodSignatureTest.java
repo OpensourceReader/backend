@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity.method;
 
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,12 +17,18 @@ class CodeMethodSignatureTest {
   @MethodSource("methodSignatureTestCases")
   void codeSignatureParameterizedTest(List<String> rawParamTypes, String expectedSignature) {
     // given
-    String methodName = "methodName";
-    String returnType = "void";
+    CodeMethodExtractResult methodExtractResult = new CodeMethodExtractResult(
+        "methodName",
+        null,
+        null,
+        "void",
+        rawParamTypes,
+        null,
+        null
+    );
 
     // when
-    CodeMethodSignature codeMethodSignature =
-        CodeMethodSignature.of(methodName, rawParamTypes, returnType);
+    CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodExtractResult);
 
     // then
     Assertions.assertThat(codeMethodSignature.methodSignature()).isEqualTo(expectedSignature);

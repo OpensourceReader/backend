@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.service.impl.callgraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,6 @@ import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
-import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodIngoingEdgeFactory;
-import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodOutgoingEdgeFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +32,10 @@ public class CodeMethodGraphCommandServiceImpl implements CodeMethodGraphCommand
   public List<CodeMethod> createMethodCallGraph(Long repoId, List<ClassStructure> classStructures) {
     List<CodeMethod> entireCodeMethods = new ArrayList<>();
     for (ClassStructure classStructure : classStructures) {
-      Map<CodeMethodSignature, MethodStructure> methods =
-          getByMethodSignature(classStructure.methods());
+      Map<CodeMethodSignature, MethodStructure> methods = classStructure.methods().stream()
+          .collect(
+              Collectors.toMap(cms -> CodeMethodSignature.of(cms.declaredMethodInfo()),
+                  cms -> cms));
 
       List<CodeMethod> callers = resolveCallers(repoId, classStructure.methods());
       callers.forEach(
@@ -51,13 +51,6 @@ public class CodeMethodGraphCommandServiceImpl implements CodeMethodGraphCommand
       entireCodeMethods.addAll(codeMethodRepository.saveAll(callers));
     }
     return entireCodeMethods;
-  }
-
-  private Map<CodeMethodSignature, MethodStructure> getByMethodSignature(
-      List<MethodStructure> methods) {
-    return methods.stream()
-        .collect(
-            Collectors.toMap(cms -> CodeMethodSignature.of(cms.declaredMethodInfo()), cms -> cms));
   }
 
   private List<CodeMethod> resolveCallers(Long repoId, List<MethodStructure> methods) {

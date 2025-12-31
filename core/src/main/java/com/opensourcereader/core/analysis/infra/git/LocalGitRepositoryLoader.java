@@ -34,7 +34,7 @@ public class LocalGitRepositoryLoader implements GitRepositoryLoader {
         .map(
             fileInfo -> {
               String rawText = eclipseJGitService.getRawText(fileInfo.blobId(), repo);
-              return new OpenSourceFileInfo(fileInfo.path(), fileInfo.type(), rawText);
+              return OpenSourceFileInfo.of(fileInfo.path(), fileInfo.type(), rawText);
             })
         .toList();
   }

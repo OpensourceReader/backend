@@ -17,7 +17,7 @@ public enum ContentType {
     this.typeNumber = typeNumber;
   }
 
-  public static ContentType getContentTypeFromTypeNumber(String typeNumber) {
+  public static ContentType from(String typeNumber) {
     for (ContentType contentType : ContentType.values()) {
       if (typeNumber.equals(contentType.typeNumber)) {
         return contentType;

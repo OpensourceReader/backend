@@ -1,5 +1,11 @@
 package com.opensourcereader.core.analysis.entity.method;
 
+import static com.opensourcereader.core.analysis.entity.method.NameSeparators.PACKAGE_SEPARATOR;
+import static com.opensourcereader.core.analysis.entity.method.NameSeparators.PATH_SEPARATOR;
+
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +15,12 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public record CodeMethodSignature(String methodSignature) {
 
-  private static final String PATH_SEPARATOR = "/";
-  private static final String PACKAGE_SEPARATOR = ".";
+  public static CodeMethodSignature of(MethodCallInfo callee) {
+    return of(
+        callee.methodName(),
+        callee.descriptor().argumentTypes(),
+        callee.descriptor().methodReturnType());
+  }
 
   public static CodeMethodSignature of(DeclaredMethodInfo method) {
     return of(
@@ -19,7 +29,21 @@ public record CodeMethodSignature(String methodSignature) {
         method.methodDescriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(
+  public static CodeMethodSignature of(CodeMethodExtractResult methodExtractResult) {
+    return of(
+        methodExtractResult.methodName(),
+        methodExtractResult.paramTypes(),
+        methodExtractResult.returnType());
+  }
+
+  public static CodeMethodSignature of(SourceCodeParseResult codeParseResult) {
+    return of(
+        codeParseResult.methodName(),
+        codeParseResult.argumentTypes(),
+        codeParseResult.returnType());
+  }
+
+  private static CodeMethodSignature of(
       String methodName, List<String> rawArgumentTypes, String returnType) {
     List<String> paramTypes = extractParamTypes(rawArgumentTypes);
     return new CodeMethodSignature(

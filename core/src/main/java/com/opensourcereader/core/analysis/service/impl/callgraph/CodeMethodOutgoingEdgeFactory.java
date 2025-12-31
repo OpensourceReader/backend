@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.factory;
+package com.opensourcereader.core.analysis.service.impl.callgraph;
 
 import java.util.List;
 
@@ -27,11 +27,7 @@ public class CodeMethodOutgoingEdgeFactory {
   }
 
   private CodeMethod resolveOrCreateCallee(Long repoId, MethodCallInfo callee) {
-    CodeMethodSignature signature =
-        CodeMethodSignature.of(
-            callee.methodName(),
-            callee.descriptor().argumentTypes(),
-            callee.descriptor().methodReturnType());
+    CodeMethodSignature signature = CodeMethodSignature.of(callee);
     return codeMethodRepository
         .findByRepoIdAndClassInternalNameAndMethodSignature(
             repoId, callee.className(), signature.methodSignature())

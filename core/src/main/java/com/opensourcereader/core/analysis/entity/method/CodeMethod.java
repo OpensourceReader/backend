@@ -86,10 +86,7 @@ public class CodeMethod extends BaseEntity {
         methodExtractResult.returnType(),
         methodExtractResult.paramTypes(),
         methodExtractResult.modifier(),
-        CodeMethodSignature.of(
-            methodExtractResult.methodName(),
-            methodExtractResult.paramTypes(),
-            methodExtractResult.returnType()),
+        CodeMethodSignature.of(methodExtractResult),
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
         MethodOrigin.INTERNAL,

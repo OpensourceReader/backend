@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.factory;
+package com.opensourcereader.core.analysis.service.impl.callgraph;
 
 import java.util.List;
 

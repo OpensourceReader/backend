@@ -179,7 +179,7 @@ class SourceCodeParserTest {
         .extracting(
             SourceCodeParseResult::methodName,
             SourceCodeParseResult::modifier,
-            SourceCodeParseResult::paramTypes)
+            SourceCodeParseResult::argumentTypes)
         .containsExactlyInAnyOrder(
             List.of(expected).stream()
                 .map(e -> tuple(e.name, e.modifier, e.paramTypes))

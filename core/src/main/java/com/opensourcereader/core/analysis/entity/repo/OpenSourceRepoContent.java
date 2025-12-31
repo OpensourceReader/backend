@@ -68,7 +68,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
-        fileInfo.typeNumber(),
+        fileInfo.contentType(),
         fileInfo.rawText(),
         classStructure,
         methodExtractResults,
@@ -77,7 +77,7 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   private OpenSourceRepoContent(
       String path,
-      String contentTypeNumber,
+      ContentType contentType,
       String rawText,
       ClassStructure classStructure,
       List<CodeMethodExtractResult> methodExtractResults,
@@ -85,7 +85,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
-    this.contentType = ContentType.getContentTypeFromTypeNumber(contentTypeNumber);
+    this.contentType = contentType;
     this.rawText = rawText;
     this.classInternalName = extractedClassName(classStructure);
     this.codeMethods = getCodeMethods(methodExtractResults);

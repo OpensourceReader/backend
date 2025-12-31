@@ -8,6 +8,6 @@ public record SourceCodeParseResult(
     String methodName,
     AccessModifier modifier,
     String returnType,
-    List<String> paramTypes,
+    List<String> argumentTypes,
     Integer startLine,
     Integer endLine) {}
