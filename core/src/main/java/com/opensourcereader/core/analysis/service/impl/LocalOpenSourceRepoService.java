@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;

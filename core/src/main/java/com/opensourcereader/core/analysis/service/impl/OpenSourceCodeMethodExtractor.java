@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.factory;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -11,9 +11,9 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import com.opensourcereader.core.analysis.entity.Extension;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
-import com.opensourcereader.core.analysis.infra.SourceCodeParser;
+import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
+import com.opensourcereader.core.analysis.entity.repo.Extension;
+import com.opensourcereader.core.analysis.infra.parser.SourceCodeParser;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.infra.bytecode;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -7,22 +7,20 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.infra.bytecode.BuildArtifactCollector;
-import com.opensourcereader.core.analysis.infra.bytecode.BuildExecutor;
-import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
+import com.opensourcereader.core.analysis.infra.ClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.git.GitWorktreeManagerCli;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoClassStructureExtractor;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class BytecodeClassStructureExtractor implements OpenSourceRepoClassStructureExtractor {
+public class BytecodeClassStructureExtractor implements ClassStructureExtractor {
 
   private final GitWorktreeManagerCli gitWorktreeManagerCli;
   private final BuildExecutor buildExecutor;
   private final BuildArtifactCollector buildArtifactCollector;
-  private final ClassStructureExtractor classStructureExtractor;
+  private final com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor
+      classStructureExtractor;
 
   @Override
   public List<ClassStructure> createClassStructures(

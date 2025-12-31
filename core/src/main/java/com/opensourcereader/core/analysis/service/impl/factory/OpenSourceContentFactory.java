@@ -1,6 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl.factory;
 
-import static com.opensourcereader.core.analysis.entity.ContentType.getContentTypeFromTypeNumber;
+import static com.opensourcereader.core.analysis.entity.repo.ContentType.getContentTypeFromTypeNumber;
 
 import java.util.List;
 import java.util.Map;
@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
-import com.opensourcereader.core.analysis.infra.SourceCodeParser;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.infra.parser.SourceCodeParser;
+import com.opensourcereader.core.analysis.service.impl.OpenSourceCodeMethodExtractor;
 
 import lombok.RequiredArgsConstructor;
 

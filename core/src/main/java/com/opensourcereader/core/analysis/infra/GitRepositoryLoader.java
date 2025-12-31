@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service;
+package com.opensourcereader.core.analysis.infra;
 
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 

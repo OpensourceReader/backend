@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.infra;
+package com.opensourcereader.core.analysis.infra.parser;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.type.Type;
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 
 import lombok.RequiredArgsConstructor;
 

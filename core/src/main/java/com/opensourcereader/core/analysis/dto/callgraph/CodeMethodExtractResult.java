@@ -4,8 +4,8 @@ import java.util.EnumSet;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
-import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
-import com.opensourcereader.core.analysis.entity.codemethod.NonAccessModifier;
+import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
 
 public record CodeMethodExtractResult(
     String methodName,

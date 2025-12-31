@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.codemethod;
+package com.opensourcereader.core.analysis.entity.method;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,7 +42,9 @@ class CodeMethodSignatureTest {
 
         // 3) FQN ( . )
         Arguments.of(
-            List.of("java.lang.String", "com.opensourcereader.core.analysis.entity.OpenSourceRepo"),
+            List.of(
+                "java.lang.String",
+                "com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo"),
             expected));
   }
 }

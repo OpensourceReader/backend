@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.codemethod;
+package com.opensourcereader.core.analysis.entity.method;
 
 import java.util.EnumSet;
 

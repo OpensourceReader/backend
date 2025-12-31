@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.codemethod;
+package com.opensourcereader.core.analysis.entity.method;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,8 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -44,16 +45,21 @@ public class CodeMethod extends BaseEntity {
   private List<String> paramTypes;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "method_modifier")
   private AccessModifier accessModifier;
 
   @Column(name = "method_signature")
   @Embedded
   private CodeMethodSignature methodSignature;
 
+  @Column(name = "start_line")
   private Integer startLine;
+
+  @Column(name = "end_line")
   private Integer endLine;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "origin")
   private MethodOrigin origin;
 
   @OneToMany(

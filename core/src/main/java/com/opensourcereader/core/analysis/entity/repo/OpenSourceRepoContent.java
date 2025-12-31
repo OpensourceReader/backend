@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.entity.repo;
 
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +7,7 @@ import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -35,16 +35,16 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "class_internal_name")
   private String classInternalName;
 
-  @Column(name = "name", nullable = false)
   @Embedded
+  @Column(name = "name", nullable = false)
   private OpenSourceRepoContentName name;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "content_type", nullable = false)
   private ContentType contentType;
 
-  @Column(name = "extension")
   @Enumerated(EnumType.STRING)
+  @Column(name = "extension")
   private Extension extension;
 
   @Lob

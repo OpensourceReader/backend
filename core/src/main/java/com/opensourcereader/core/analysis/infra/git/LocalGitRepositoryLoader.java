@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.infra.git;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
-import com.opensourcereader.core.analysis.infra.git.EclipseJGitService;
-import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
+import com.opensourcereader.core.analysis.infra.GitRepositoryLoader;
 import org.eclipse.jgit.lib.Repository;
 
 import lombok.RequiredArgsConstructor;

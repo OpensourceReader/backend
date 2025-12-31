@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 
 public interface OpenSourceRepoService {
 

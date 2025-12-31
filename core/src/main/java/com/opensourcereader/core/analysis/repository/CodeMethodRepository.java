@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
 
 public interface CodeMethodRepository extends JpaRepository<CodeMethod, Long> {
 

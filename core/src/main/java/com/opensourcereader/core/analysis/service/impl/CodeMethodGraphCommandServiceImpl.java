@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodSignature;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
+import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
-import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodIngoingStrategy;
-import com.opensourcereader.core.analysis.service.impl.strategy.CodeMethodOutgoingStrategy;
+import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodIngoingEdgeFactory;
+import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodOutgoingEdgeFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,8 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class CodeMethodGraphCommandServiceImpl implements CodeMethodGraphCommandService {
 
   private final CodeMethodRepository codeMethodRepository;
-  private final CodeMethodOutgoingStrategy codeMethodOutgoingStrategy;
-  private final CodeMethodIngoingStrategy codeMethodIngoingStrategy;
+  private final CodeMethodOutgoingEdgeFactory codeMethodOutgoingEdgeFactory;
+  private final CodeMethodIngoingEdgeFactory codeMethodIngoingEdgeFactory;
 
   @Override
   @Transactional
@@ -41,10 +41,10 @@ public class CodeMethodGraphCommandServiceImpl implements CodeMethodGraphCommand
       callers.forEach(
           caller -> {
             List<CodeMethodCallEdge> outgoing =
-                codeMethodOutgoingStrategy.getOutgoings(
+                codeMethodOutgoingEdgeFactory.getOutgoings(
                     repoId, caller, methods.get(caller.getMethodSignature()).calleeMethods());
             List<CodeMethodCallEdge> ingoing =
-                codeMethodIngoingStrategy.getIngoing(
+                codeMethodIngoingEdgeFactory.getIngoing(
                     repoId, classStructure.classInfo().interfaceNames(), caller);
             caller.updateAllCalls(outgoing, ingoing);
           });

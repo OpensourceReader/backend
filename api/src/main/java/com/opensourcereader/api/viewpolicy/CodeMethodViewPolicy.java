@@ -1,10 +1,10 @@
-package com.opensourcereader.api.facade.analysis.viewpolicy;
+package com.opensourcereader.api.viewpolicy;
 
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.dto.CodeMethodRequest;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codemethod.MethodOrigin;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 
 @Component
 public class CodeMethodViewPolicy {

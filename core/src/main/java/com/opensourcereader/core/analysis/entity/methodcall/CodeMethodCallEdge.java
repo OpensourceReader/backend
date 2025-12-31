@@ -1,6 +1,8 @@
-package com.opensourcereader.core.analysis.entity.codemethod;
+package com.opensourcereader.core.analysis.entity.methodcall;
 
 import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

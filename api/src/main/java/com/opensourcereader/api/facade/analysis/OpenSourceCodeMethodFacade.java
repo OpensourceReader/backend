@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.api.dto.CodeMethodRequest;
 import com.opensourcereader.api.dto.CodeMethodResponse;
 import com.opensourcereader.api.dto.CodeMethodSummary;
-import com.opensourcereader.api.facade.analysis.viewpolicy.CodeMethodViewPolicy;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
+import com.opensourcereader.api.viewpolicy.CodeMethodViewPolicy;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.service.CodeMethodGraphQueryService;
 
 import lombok.RequiredArgsConstructor;

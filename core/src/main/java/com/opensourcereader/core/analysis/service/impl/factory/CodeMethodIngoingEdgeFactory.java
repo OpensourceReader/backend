@@ -1,18 +1,18 @@
-package com.opensourcereader.core.analysis.service.impl.strategy;
+package com.opensourcereader.core.analysis.service.impl.factory;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CodeMethodIngoingStrategy {
+public class CodeMethodIngoingEdgeFactory {
 
   private final CodeMethodRepository codeMethodRepository;
 

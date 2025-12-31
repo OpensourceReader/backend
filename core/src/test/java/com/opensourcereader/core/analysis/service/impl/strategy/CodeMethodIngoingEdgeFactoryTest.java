@@ -12,16 +12,17 @@ import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
-import com.opensourcereader.core.analysis.entity.codemethod.AccessModifier;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethod;
-import com.opensourcereader.core.analysis.entity.codemethod.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.codemethod.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.codemethod.NonAccessModifier;
+import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
+import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.service.impl.factory.CodeMethodIngoingEdgeFactory;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.groups.Tuple;
@@ -29,9 +30,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest
-class CodeMethodIngoingStrategyTest {
+class CodeMethodIngoingEdgeFactoryTest {
 
-  @Autowired private CodeMethodIngoingStrategy strategy;
+  @Autowired private CodeMethodIngoingEdgeFactory strategy;
   @Autowired private CodeMethodRepository codeMethodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private OpenSourceContentRepository openSourceContentRepository;

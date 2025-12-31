@@ -9,10 +9,10 @@ import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.infra.ClassStructureExtractor;
+import com.opensourcereader.core.analysis.infra.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
-import com.opensourcereader.core.analysis.service.GitRepositoryLoader;
-import com.opensourcereader.core.analysis.service.OpenSourceRepoClassStructureExtractor;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
@@ -31,7 +31,7 @@ public class OpenSourceRepoFacade {
 
   private final GitRepositoryLoader gitRepositoryLoader;
   private final OpenSourceRepoService opensourceRepoService;
-  private final OpenSourceRepoClassStructureExtractor openSourceRepoClassStructureExtractor;
+  private final ClassStructureExtractor classStructureExtractor;
   private final CodeMethodGraphCommandService codeMethodGraphCommandService;
 
   @Transactional
@@ -40,7 +40,7 @@ public class OpenSourceRepoFacade {
         gitRepositoryLoader.downloadGitRepo(
             request.openSourceUri(), request.reference(), localClonePath);
     List<ClassStructure> classStructures =
-        openSourceRepoClassStructureExtractor.createClassStructures(
+        classStructureExtractor.createClassStructures(
             gitRepoLoadResult.savedLocalRepoPath(), request.reference(), workingTreeDirName);
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(
