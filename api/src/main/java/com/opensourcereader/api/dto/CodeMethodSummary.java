@@ -21,7 +21,7 @@ public record CodeMethodSummary(Long id, String classInternalName, String method
         .toList();
   }
 
-  private static CodeMethodSummary from(CodeMethod codeMethod) {
+  public static CodeMethodSummary from(CodeMethod codeMethod) {
     return new CodeMethodSummary(
         codeMethod.getId(), codeMethod.getClassInternalName(), codeMethod.getMethodName());
   }
