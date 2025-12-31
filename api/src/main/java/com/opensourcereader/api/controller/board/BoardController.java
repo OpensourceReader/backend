@@ -33,7 +33,7 @@ public class BoardController {
 
   @GetMapping("/{tagId}")
   public ResponseEntity<BoardBaseResponse> findByTagId(
-      @PathVariable Long tagId, @RequestBody BoardGetRequest request) {
+      @PathVariable Integer tagId, @RequestBody BoardGetRequest request) {
 
     BoardBaseResponse response = boardFacadeService.findByTagId(tagId, request);
 

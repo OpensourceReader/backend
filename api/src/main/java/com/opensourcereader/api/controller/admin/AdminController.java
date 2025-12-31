@@ -1,7 +1,5 @@
 package com.opensourcereader.api.controller.admin;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.facade.github.GitHubFacadeService;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.board.entity.Issue;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,9 +28,9 @@ public class AdminController {
   }
 
   @PostMapping("/issues")
-  public ResponseEntity<List<Issue>> fetchIssues(@RequestBody GithubRepoRequest request) {
-    List<Issue> issues = gitHubFacadeService.createIssues(request);
+  public ResponseEntity<Boolean> fetchIssues(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createIssues(request);
 
-    return ResponseEntity.ok(issues);
+    return ResponseEntity.ok(success);
   }
 }

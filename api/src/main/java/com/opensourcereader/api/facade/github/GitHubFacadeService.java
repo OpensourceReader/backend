@@ -1,13 +1,17 @@
 package com.opensourcereader.api.facade.github;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 
 import org.springframework.stereotype.Service;
 
 import com.opensourcereader.api.client.GithubClient;
+import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
+import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
@@ -15,7 +19,10 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
+import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.board.entity.Issue;
+import com.opensourcereader.core.board.service.IssueCommentService;
+import com.opensourcereader.core.board.service.IssueRetrieveService;
 import com.opensourcereader.core.board.service.IssueSyncService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
@@ -23,7 +30,9 @@ import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GitHubFacadeService {
@@ -36,6 +45,9 @@ public class GitHubFacadeService {
   private final OpenSourceRepoService openSourceRepoService;
   private final UserService userService;
   private final IssueSyncService issueSyncService;
+  private final IssueRetrieveService issueRetrieveService;
+
+  private final IssueCommentService issueCommentService;
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
     try {
@@ -47,28 +59,64 @@ public class GitHubFacadeService {
     }
   }
 
-  public List<Issue> createIssues(GithubRepoRequest request) {
+  public boolean createIssues(GithubRepoRequest request) {
     OpenSourceRepo repo =
         openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
 
     List<GithubIssueResponse> fetchedRepoIssues = githubClient.fetchRepoIssues(request);
 
-    List<Issue> responses = new ArrayList<>();
+    Queue<GithubIssueCommentRequest> issueCommentRequest = new ArrayDeque<>();
+    Queue<BoardBaseCommand> issueCommands = new ArrayDeque<>();
+
+    Queue<Integer> pullTagNumbers = new ArrayDeque<>();
+
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
       User author = findByUser(fetched.user());
       Boolean isOpened = isOpened(fetched.state());
       BoardBaseCommand command;
 
-      if (fetched.isPullRequest()) {
-        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
-      } else {
-        // TODO 일단 저장, 나중에 pull 전부 요청 때릴 때, 그때 Pull 객체 정보를 완전히 만들기
-        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+      if (fetched.commentCount() >= 1) {
+        issueCommentRequest.add(
+            new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
       }
-      issueSyncService.syncIssue(command);
+
+      if (fetched.isPullRequest()) {
+        log.info(String.valueOf(fetched.tagId()));
+        pullTagNumbers.add(fetched.tagId());
+      } else {
+        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+        issueCommands.add(command);
+      }
+    }
+    boolean issuesSuccess = issueSyncService.syncIssues(issueCommands);
+    boolean commentsSuccess = true;
+    if (issuesSuccess && !issueCommentRequest.isEmpty()) {
+      commentsSuccess = createIssueComments0(issueCommentRequest);
     }
 
-    return responses;
+    return issuesSuccess && commentsSuccess;
+  }
+
+  private boolean createIssueComments0(Queue<GithubIssueCommentRequest> request) {
+    List<IssueCommentCommand> commands = new ArrayList<>();
+
+    while (!request.isEmpty()) {
+      GithubIssueCommentRequest commentRequest = request.poll();
+
+      Issue issue =
+          issueRetrieveService.findIssueOrPullByTagId(
+              commentRequest.owner(), commentRequest.repoName(), commentRequest.tagNumber());
+
+      List<GithubIssueCommentResponse> responses =
+          githubClient.fetchRepoIssueComments(commentRequest);
+
+      for (GithubIssueCommentResponse response : responses) {
+        User author = findByUser(response.user());
+        IssueCommentCommand command = modelMapper.toIssueCommentCommand(response, author, issue);
+        commands.add(command);
+      }
+    }
+    return issueCommentService.saveIssueComments(commands);
   }
 
   private User findByUser(GithubUserResponse response) {

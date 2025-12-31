@@ -6,12 +6,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record GithubIssueResponse(
     Long id,
-    @JsonProperty("number") Long tagId,
+    @JsonProperty("number") Integer tagId,
     String title,
     @JsonProperty("user") GithubUserResponse user,
     String body,
     String state,
-    @JsonProperty("comments") Long commentCount,
+    @JsonProperty("comments") Integer commentCount,
     @JsonProperty("created_at") Instant createdAt,
     @JsonProperty("updated_at") Instant updatedAt,
     @JsonProperty("pull_request") GithubPullRequestInfo pullRequest) {

@@ -25,10 +25,23 @@ public class IssueRetrieveService {
   }
 
   @Transactional(readOnly = true)
-  public Issue findIssueOrPullByTagId(Long repositoryId, Long tagId) {
+  public Issue findIssueOrPullByTagId(Long repositoryId, Integer tagId) {
     Issue entity =
         issueRepository
             .findByRepositoryIdAndTagId(repositoryId, tagId)
+            .orElseThrow(BoardNotFoundException::new);
+    if (entity instanceof Pull pull) {
+      return pull;
+    } else {
+      return entity;
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public Issue findIssueOrPullByTagId(String owner, String repoName, Integer tagId) {
+    Issue entity =
+        issueRepository
+            .findByRepositoryOwnerLoginNameAndTitleAndTagId(owner, repoName, tagId)
             .orElseThrow(BoardNotFoundException::new);
     if (entity instanceof Pull pull) {
       return pull;

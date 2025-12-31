@@ -7,7 +7,7 @@ import com.opensourcereader.core.user.dto.UserDto;
 import lombok.Builder;
 
 @Builder
-public record BoardBaseResponse(Long id, Long tagId, String title, UserDto author) {
+public record BoardBaseResponse(Long id, Integer tagId, String title, UserDto author) {
 
   public static BoardBaseResponse ofIssue(Issue entity, UserDto user) {
     return BoardBaseResponse.builder()

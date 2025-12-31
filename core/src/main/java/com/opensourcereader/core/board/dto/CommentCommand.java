@@ -4,9 +4,18 @@ import java.time.Instant;
 
 import com.opensourcereader.core.user.entity.User;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
-@Data
+@Getter
+@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
 public class CommentCommand {
   private Long id;
   private Instant createdAt;

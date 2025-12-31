@@ -21,11 +21,11 @@ public class BoardBaseCommand {
   private Long id;
   private User author;
   private OpenSourceRepo repo;
-  private Long tagId;
+  private Integer tagId;
   private Instant createdAt;
   private Instant updatedAt;
   private String title;
   private String body;
   private Boolean isOpened;
-  private Long commentCount;
+  private Integer commentCount;
 }

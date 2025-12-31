@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class PullCommand extends BoardBaseCommand {
 
-  private Long reviewCount;
+  private Integer reviewCount;
 }

@@ -48,7 +48,7 @@ public class Issue {
   private Long providerId;
 
   @Column(name = "tag_id")
-  private Long tagId;
+  private Integer tagId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
@@ -68,7 +68,7 @@ public class Issue {
   private Boolean isOpened;
 
   @Column(name = "comment_count", nullable = false)
-  private Long commentCount;
+  private Integer commentCount;
 
   @Column(nullable = false)
   private Boolean disabled = false;
@@ -104,7 +104,7 @@ public class Issue {
     this.isOpened = updateField(this.isOpened, newStatus);
   }
 
-  public void updateCommentCount(Long newCommentCount) {
+  public void updateCommentCount(Integer newCommentCount) {
     this.commentCount = updateField(this.commentCount, newCommentCount);
   }
 

@@ -3,25 +3,27 @@ package com.opensourcereader.api.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
+import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
+import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.controller.auth.response.GitHubApiEmailResponse;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.client.RestClientException;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -36,8 +38,8 @@ public class GithubClient {
 
   private final RestClient restClient;
 
-  //TODO 실패 태그 번호 한꺼번에 보내는 로직 만들어야함
-  List<Integer> failedTags = new ArrayList<>();
+  // TODO 실패 태그 번호 한꺼번에 보내는 로직 만들어야함
+  List<String> failedTags = new ArrayList<>();
 
   public GithubRepoResponse fetchRepo(GithubRepoRequest request) {
     ResponseEntity<GithubRepoResponse> response =
@@ -80,8 +82,8 @@ public class GithubClient {
     return response.getBody();
   }
 
-  public List<GithubPullResponse> fetchRepoPulls(GithubRepoRequest request,
-      Queue<Integer> tagNumbers) {
+  public List<GithubPullResponse> fetchRepoPulls(
+      GithubRepoRequest request, Queue<Integer> tagNumbers) {
     List<GithubPullResponse> response = new ArrayList<>();
     Map<Integer, Integer> retryCounts = new HashMap<>();
 
@@ -89,12 +91,17 @@ public class GithubClient {
       Integer tagNumber = tagNumbers.poll();
 
       try {
-        GithubPullResponse body = restClient.get()
-            .uri("/repos/{owner}/{repoName}/pulls/{tagNumber}", request.owner(), request.repoName(),
-                tagNumber)
-            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
-            .retrieve()
-            .body(GithubPullResponse.class);
+        GithubPullResponse body =
+            restClient
+                .get()
+                .uri(
+                    "/repos/{owner}/{repoName}/pulls/{tagNumber}",
+                    request.owner(),
+                    request.repoName(),
+                    tagNumber)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                .retrieve()
+                .body(GithubPullResponse.class);
         response.add(body);
         retryCounts.remove(tagNumber);
 
@@ -105,18 +112,85 @@ public class GithubClient {
           retryCounts.put(tagNumber, currentRetry + 1);
           tagNumbers.offer(tagNumber);
 
-          log.warn("재시도 예약(Tag: {}, Count: {} )", tagNumber, currentRetry + 1);
+          log.warn("이슈 재시도 예약(Tag: {}, Count: {} )", tagNumber, currentRetry + 1);
 
           // 서버 보호를 위한 지연 시간
-          try { TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS); }
-          catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+          try {
+            TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+          }
         } else {
-          log.error("최대 재시도 초과, 건너뜀 (Tag: {}): {}", tagNumber, e.getMessage());
-          failedTags.add(tagNumber);
+          log.error("이슈 최대 재시도 초과, 건너뜀 (Tag: {}): {}", tagNumber, e.getMessage());
+          failedTags.add("I" + request.owner() + request.repoName() + tagNumber);
         }
-
       }
     }
+    return response;
+  }
+
+  public List<GithubIssueCommentResponse> fetchRepoIssueComments(
+      GithubIssueCommentRequest request) {
+    return restClient
+        .get()
+        .uri(
+            "/repos/{owner}/{repoName}/issues/{tagNumber}/comments",
+            request.owner(),
+            request.repoName(),
+            request.tagNumber())
+        .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+        .retrieve()
+        .toEntity(new ParameterizedTypeReference<List<GithubIssueCommentResponse>>() {})
+        .getBody();
+  }
+
+  public Map<Integer, List<GithubIssueCommentResponse>> fetchRepoIssueComments(
+      Queue<GithubIssueCommentRequest> requests) {
+    Map<Integer, List<GithubIssueCommentResponse>> response = new HashMap<>();
+    Map<Integer, Integer> retryCounts = new HashMap<>();
+
+    while (!requests.isEmpty()) {
+      GithubIssueCommentRequest request = requests.poll();
+      Integer tagNumber = request.tagNumber();
+
+      try {
+        List<GithubIssueCommentResponse> body =
+            restClient
+                .get()
+                .uri(
+                    "/repos/{owner}/{repoName}/issues/{tagNumber}/comments",
+                    request.owner(),
+                    request.repoName(),
+                    tagNumber)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<List<GithubIssueCommentResponse>>() {})
+                .getBody();
+
+        response.put(tagNumber, body);
+        retryCounts.remove(tagNumber);
+      } catch (RestClientException e) {
+        int currentRetry = retryCounts.getOrDefault(tagNumber, 0);
+        if (currentRetry < MAX_RETRY_LIMIT) {
+          retryCounts.put(tagNumber, currentRetry + 1);
+          requests.add(request);
+
+          log.warn("이슈 코멘트 재시도 예약(Tag: {}, Count: {} )", tagNumber, currentRetry + 1);
+
+          // 서버 보호를 위한 지연 시간
+          try {
+            TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+          }
+
+        } else {
+          log.error("이슈 코멘트 최대 재시도 초과, 건너뜀 (Tag: {}): {}", tagNumber, e.getMessage());
+          failedTags.add("IC" + request.owner() + request.repoName() + tagNumber);
+        }
+      }
+    }
+
     return response;
   }
 

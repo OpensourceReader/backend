@@ -1,11 +1,15 @@
 package com.opensourcereader.core.board.entity;
 
-import com.opensourcereader.core.BaseEntity;
+import java.time.Instant;
+
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -19,7 +23,20 @@ import lombok.NoArgsConstructor;
 @Table(name = "IssueComments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IssueComment extends BaseEntity {
+public class IssueComment {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "created_at")
+  private Instant createdAt;
+
+  @Column(name = "updated_at")
+  private Instant updatedAt;
+
+  @Column(name = "provider_id")
+  private Long providerId;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
@@ -36,7 +53,9 @@ public class IssueComment extends BaseEntity {
   private Boolean disabled = false;
 
   private IssueComment(IssueCommentCommand command) {
-    super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
+    this.providerId = command.getId();
+    this.createdAt = command.getCreatedAt();
+    this.updatedAt = command.getUpdatedAt();
     this.author = command.getAuthor();
     this.issue = command.getIssue();
     this.body = command.getBody();
