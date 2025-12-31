@@ -41,7 +41,7 @@ public class IssueRetrieveService {
   public Issue findIssueOrPullByTagId(String owner, String repoName, Integer tagId) {
     Issue entity =
         issueRepository
-            .findByRepositoryOwnerLoginNameAndTitleAndTagId(owner, repoName, tagId)
+            .findByRepositoryOwnerLoginNameAndRepositoryTitleAndTagId(owner, repoName, tagId)
             .orElseThrow(BoardNotFoundException::new);
     if (entity instanceof Pull pull) {
       return pull;

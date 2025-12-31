@@ -14,6 +14,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
   List<Issue> findAllByRepositoryIdAndIsOpenedOrderByCreatedAtDesc(
       Long repositoryId, Boolean isOpened);
 
-  Optional<Issue> findByRepositoryOwnerLoginNameAndTitleAndTagId(
-      String repositoryOwnerLoginName, String title, Integer tagId);
+  Optional<Issue> findByRepositoryOwnerLoginNameAndRepositoryTitleAndTagId(
+      String repositoryOwnerLoginName, String repositoryTitle, Integer tagId);
 }
