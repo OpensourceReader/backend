@@ -63,4 +63,9 @@ public class IssueRetrieveService {
       return entity;
     }
   }
+
+  @Transactional(readOnly = true)
+  public List<Issue> findIssueOrPullWithComments(String owner, String repoName) {
+    return issueRepository.findAllIssuesByRepo(owner, repoName, 1);
+  }
 }

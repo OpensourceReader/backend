@@ -1,12 +1,12 @@
 package com.opensourcereader.api.facade.user;
 
-import com.opensourcereader.core.user.service.UserRetrieveService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.api.controller.user.request.UserGetRequest;
 import com.opensourcereader.core.user.dto.UserDto;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.service.UserRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,16 +1,19 @@
 package com.opensourcereader.core.user.service;
 
+import java.util.UUID;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.Role;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
-import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +40,7 @@ public class UserSignUpService {
   @Transactional
   public User signup(UserInfo userInfo) {
     User user =
-        userRepository
-            .findByProviderId(userInfo.providerId())
-            .orElseGet(() -> User.from(userInfo));
+        userRepository.findByProviderId(userInfo.providerId()).orElseGet(() -> User.from(userInfo));
 
     user.updateAvatar(userInfo.avatarUrl());
     user.linkSocialProvider(userInfo.providerId());

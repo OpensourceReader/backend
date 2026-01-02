@@ -1,6 +1,5 @@
 package com.opensourcereader.api.security.oauth2;
 
-import com.opensourcereader.core.user.service.UserSignUpService;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +17,7 @@ import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.dto.UserConnection;
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.service.UserSignUpService;
 
 import lombok.RequiredArgsConstructor;
 

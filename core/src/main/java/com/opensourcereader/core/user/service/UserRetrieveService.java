@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserRetrieveService{
+public class UserRetrieveService {
 
   private final UserRepository userRepository;
 

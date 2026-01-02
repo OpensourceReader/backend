@@ -42,6 +42,13 @@ public class AdminController {
     return ResponseEntity.ok(success);
   }
 
+  @PostMapping("/comments")
+  public ResponseEntity<Boolean> fetchComments(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createIssueComments(request);
+
+    return ResponseEntity.ok(success);
+  }
+
   @PostMapping("/pulls/comments")
   public ResponseEntity<Boolean> fetchPullComments(@RequestBody GithubIssueCommentRequest request) {
     boolean success = gitHubFacadeService.createPullComments(request);

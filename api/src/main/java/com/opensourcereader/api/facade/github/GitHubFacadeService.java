@@ -1,6 +1,5 @@
 package com.opensourcereader.api.facade.github;
 
-import com.opensourcereader.core.user.service.UserSignUpService;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +36,7 @@ import com.opensourcereader.core.board.service.PullCommentService;
 import com.opensourcereader.core.board.service.ReviewService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.service.UserSignUpService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +76,6 @@ public class GitHubFacadeService {
 
     List<GithubIssueResponse> fetchedRepoIssues = githubClient.fetchRepoIssues(request);
 
-    Queue<GithubIssueCommentRequest> issueCommentRequest = new ArrayDeque<>();
     Queue<BoardBaseCommand> issueCommands = new ArrayDeque<>();
     Queue<BoardBaseCommand> pullCommands = new ArrayDeque<>();
     Queue<Integer> pullTagNumbers = new ArrayDeque<>();
@@ -85,11 +84,6 @@ public class GitHubFacadeService {
       User author = findByUser(fetched.user());
       Boolean isOpened = isOpened(fetched.state());
       BoardBaseCommand command;
-
-      if (fetched.commentCount() >= 1) {
-        issueCommentRequest.add(
-            new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
-      }
 
       if (fetched.isPullRequest()) {
         pullTagNumbers.add(fetched.tagId());
@@ -110,26 +104,19 @@ public class GitHubFacadeService {
     boolean issuesSuccess = issueSyncService.syncIssues(issueCommands);
     boolean pullSuccess = issueSyncService.syncIssues(pullCommands);
 
-    boolean commentsSuccess = true;
-    if (issuesSuccess && pullSuccess && !issueCommentRequest.isEmpty()) {
-      commentsSuccess = createIssueComments0(issueCommentRequest);
-    }
-
-    return issuesSuccess && commentsSuccess;
+    return issuesSuccess && pullSuccess;
   }
 
-  private boolean createIssueComments0(Queue<GithubIssueCommentRequest> request) {
+  public boolean createIssueComments(GithubRepoRequest request) {
     List<IssueCommentCommand> commands = new ArrayList<>();
 
-    while (!request.isEmpty()) {
-      GithubIssueCommentRequest commentRequest = request.poll();
-
-      Issue issue =
-          issueRetrieveService.findIssueOrPullByTagId(
-              commentRequest.owner(), commentRequest.repoName(), commentRequest.tagNumber());
-
+    List<Issue> entities =
+        issueRetrieveService.findIssueOrPullWithComments(request.owner(), request.repoName());
+    for (Issue issue : entities) {
       List<GithubIssueCommentResponse> responses =
-          githubClient.fetchRepoIssueComments(commentRequest);
+          githubClient.fetchRepoIssueComments(
+              new GithubIssueCommentRequest(
+                  request.owner(), request.repoName(), issue.getTagId()));
 
       for (GithubIssueCommentResponse response : responses) {
         User author = findByUser(response.user());
