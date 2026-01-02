@@ -5,7 +5,7 @@ import com.opensourcereader.core.user.entity.User;
 
 public interface OpenSourceRepoService {
 
-  OpenSourceRepo createRepoInDB(User owner, String title);
+  OpenSourceRepo getOrCreateRepoInDB(User owner, String title);
 
   OpenSourceRepo createRepo(String savedLocalPath, String cloneUrl, String repoReference);
 

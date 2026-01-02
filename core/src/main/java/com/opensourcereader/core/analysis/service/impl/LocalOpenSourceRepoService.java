@@ -26,8 +26,11 @@ public class LocalOpenSourceRepoService implements OpenSourceRepoService {
   private final OpenSourceRepoRepository opensourceRepoRepository;
 
   @Override
-  public OpenSourceRepo createRepoInDB(User owner, String title) {
-    OpenSourceRepo openSourceRepo = new OpenSourceRepo(owner, title);
+  public OpenSourceRepo getOrCreateRepoInDB(User owner, String title) {
+    OpenSourceRepo openSourceRepo =
+        opensourceRepoRepository
+            .findByOwnerAndTitle(owner, title)
+            .orElseGet(() -> new OpenSourceRepo(owner, title));
     return opensourceRepoRepository.save(openSourceRepo);
   }
 

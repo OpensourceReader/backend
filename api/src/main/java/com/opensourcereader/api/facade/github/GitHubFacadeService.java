@@ -19,7 +19,6 @@ import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubReviewResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
@@ -61,13 +60,9 @@ public class GitHubFacadeService {
   private final PullCommentService pullCommentService;
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
-    try {
-      return openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
-    } catch (OpenSourceRepoNotFoundException e) {
-      GithubRepoResponse response = githubClient.fetchRepo(request);
-      User owner = findByUser(response.owner());
-      return openSourceRepoService.createRepoInDB(owner, response.name());
-    }
+    GithubRepoResponse response = githubClient.fetchRepo(request);
+    User owner = findByUser(response.owner());
+    return openSourceRepoService.getOrCreateRepoInDB(owner, response.name());
   }
 
   public boolean createIssues(GithubRepoRequest request) {
@@ -115,8 +110,7 @@ public class GitHubFacadeService {
     for (Issue issue : entities) {
       List<GithubIssueCommentResponse> responses =
           githubClient.fetchRepoIssueComments(
-              new GithubIssueCommentRequest(
-                  request.owner(), request.repoName(), issue.getTagId()));
+              new GithubIssueCommentRequest(request.owner(), request.repoName(), issue.getTagId()));
 
       for (GithubIssueCommentResponse response : responses) {
         User author = findByUser(response.user());
