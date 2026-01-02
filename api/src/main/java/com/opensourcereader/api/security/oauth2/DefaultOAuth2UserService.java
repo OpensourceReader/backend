@@ -1,5 +1,6 @@
 package com.opensourcereader.api.security.oauth2;
 
+import com.opensourcereader.core.user.service.UserSignUpService;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,13 @@ import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.dto.UserConnection;
 import com.opensourcereader.core.security.dto.UserInfo;
 import com.opensourcereader.core.user.entity.User;
-import com.opensourcereader.core.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-  private final UserService userService;
+  private final UserSignUpService userSignUpService;
   private final OAuth2UserService<OAuth2UserRequest, OAuth2User> internalOAuth2UserService;
   private final GithubClient githubClient;
 
@@ -49,12 +49,7 @@ public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserReq
 
   private User processOAuth2User(Map<String, Object> attributes) {
     UserInfo userInfo = extractGitHubUserInfo(attributes);
-
-    try {
-      return userService.findByProviderId(userInfo.providerId());
-    } catch (Exception e) {
-      return userService.signup(userInfo);
-    }
+    return userSignUpService.signup(userInfo);
   }
 
   private UserInfo extractGitHubUserInfo(Map<String, Object> attributes) {

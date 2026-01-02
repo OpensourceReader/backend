@@ -1,5 +1,6 @@
 package com.opensourcereader.api.facade.github;
 
+import com.opensourcereader.core.user.service.UserSignUpService;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,6 @@ import com.opensourcereader.core.board.service.PullCommentService;
 import com.opensourcereader.core.board.service.ReviewService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
-import com.opensourcereader.core.user.exception.UserNotFoundException;
-import com.opensourcereader.core.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +52,7 @@ public class GitHubFacadeService {
   private final GithubModelMapper modelMapper;
 
   private final OpenSourceRepoService openSourceRepoService;
-  private final UserService userService;
+  private final UserSignUpService userSignUpService;
   private final IssueSyncService issueSyncService;
   private final IssueRetrieveService issueRetrieveService;
 
@@ -175,13 +174,9 @@ public class GitHubFacadeService {
   }
 
   private User findByUser(GithubUserResponse response) {
-    try {
-      return userService.findByProviderId(response.id());
-    } catch (UserNotFoundException e) {
-      GithubUserCommand command =
-          new GithubUserCommand(response.id(), response.login(), response.avatarUrl());
-      return userService.guest(command);
-    }
+    GithubUserCommand command =
+        new GithubUserCommand(response.id(), response.login(), response.avatarUrl());
+    return userSignUpService.guest(command);
   }
 
   private Boolean isOpened(String state) {
