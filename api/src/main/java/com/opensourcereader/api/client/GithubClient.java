@@ -18,6 +18,7 @@ import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
+import com.opensourcereader.api.client.response.GithubPullCommentResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubReviewResponse;
@@ -206,6 +207,20 @@ public class GithubClient {
         .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
         .retrieve()
         .toEntity(new ParameterizedTypeReference<List<GithubReviewResponse>>() {})
+        .getBody();
+  }
+
+  public List<GithubPullCommentResponse> fetchRepoPullComments(GithubIssueCommentRequest request) {
+    return restClient
+        .get()
+        .uri(
+            "/repos/{owner}/{repoName}/pulls/{tagNumber}/comments",
+            request.owner(),
+            request.repoName(),
+            request.tagNumber())
+        .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+        .retrieve()
+        .toEntity(new ParameterizedTypeReference<List<GithubPullCommentResponse>>() {})
         .getBody();
   }
 

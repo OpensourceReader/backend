@@ -1,11 +1,15 @@
 package com.opensourcereader.core.board.entity;
 
-import com.opensourcereader.core.BaseEntity;
+import java.time.Instant;
+
 import com.opensourcereader.core.board.dto.PullCommentCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,7 +22,18 @@ import lombok.NoArgsConstructor;
 @Table(name = "PullComments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PullComment extends BaseEntity {
+public class PullComment {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "created_at")
+  private Instant createdAt;
+
+  @Column(name = "updated_at")
+  private Instant updatedAt;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
   private User author;
@@ -37,7 +52,8 @@ public class PullComment extends BaseEntity {
   private String path;
 
   private PullComment(PullCommentCommand command) {
-    super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
+    this.createdAt = command.getCreatedAt();
+    this.updatedAt = command.getUpdatedAt();
     this.author = command.getAuthor();
     this.review = command.getReview();
     this.diffHunk = command.getDiffHunk();

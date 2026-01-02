@@ -13,6 +13,7 @@ import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
+import com.opensourcereader.api.client.response.GithubPullCommentResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubReviewResponse;
@@ -23,12 +24,15 @@ import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.board.dto.PullCommand;
+import com.opensourcereader.core.board.dto.PullCommentCommand;
 import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
+import com.opensourcereader.core.board.entity.Review;
 import com.opensourcereader.core.board.service.IssueCommentService;
 import com.opensourcereader.core.board.service.IssueRetrieveService;
 import com.opensourcereader.core.board.service.IssueSyncService;
+import com.opensourcereader.core.board.service.PullCommentService;
 import com.opensourcereader.core.board.service.ReviewService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
@@ -55,6 +59,7 @@ public class GitHubFacadeService {
 
   private final IssueCommentService issueCommentService;
   private final ReviewService reviewService;
+  private final PullCommentService pullCommentService;
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
     try {
@@ -156,7 +161,17 @@ public class GitHubFacadeService {
   }
 
   public boolean createPullComments(GithubIssueCommentRequest request) {
-    return true;
+    List<PullCommentCommand> commands = new ArrayList<>();
+    List<GithubPullCommentResponse> responses = githubClient.fetchRepoPullComments(request);
+
+    for (GithubPullCommentResponse response : responses) {
+      User author = findByUser(response.user());
+      Review review = reviewService.findByProviderId(response.reviewId());
+      PullCommentCommand command = modelMapper.toPullCommentCommand(response, author, review);
+      commands.add(command);
+    }
+
+    return pullCommentService.savePullComments(commands);
   }
 
   private User findByUser(GithubUserResponse response) {

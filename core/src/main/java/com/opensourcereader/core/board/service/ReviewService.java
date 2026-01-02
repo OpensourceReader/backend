@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Review;
+import com.opensourcereader.core.board.exception.BoardNotFoundException;
 import com.opensourcereader.core.board.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,5 +33,10 @@ public class ReviewService {
   @Transactional(readOnly = true)
   public List<Review> findAllByPullId(Long pullId) {
     return reviewRepository.findAllByPullId(pullId);
+  }
+
+  @Transactional(readOnly = true)
+  public Review findByProviderId(Long reviewId) {
+    return reviewRepository.findByProviderId(reviewId).orElseThrow(BoardNotFoundException::new);
   }
 }

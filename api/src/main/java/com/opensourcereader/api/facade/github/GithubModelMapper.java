@@ -4,15 +4,18 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
+import com.opensourcereader.api.client.response.GithubPullCommentResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubReviewResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.board.dto.PullCommand;
+import com.opensourcereader.core.board.dto.PullCommentCommand;
 import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
+import com.opensourcereader.core.board.entity.Review;
 import com.opensourcereader.core.user.entity.User;
 
 @Component
@@ -85,6 +88,20 @@ public class GithubModelMapper {
         .body(response.body())
         .author(author)
         .pull(pull)
+        .build();
+  }
+
+  public PullCommentCommand toPullCommentCommand(
+      GithubPullCommentResponse response, User author, Review review) {
+    return PullCommentCommand.builder()
+        .id(response.id())
+        .createdAt(response.createdAt())
+        .updatedAt(response.updatedAt())
+        .author(author)
+        .body(response.body())
+        .review(review)
+        .diffHunk(response.diffHunk())
+        .path(response.path())
         .build();
   }
 }

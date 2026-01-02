@@ -28,6 +28,9 @@ public class Review {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
+  private Long providerId;
+
   @Column(name = "submitted_at")
   private Instant submittedAt;
 
@@ -43,6 +46,7 @@ public class Review {
   private String body;
 
   private Review(ReviewCommand command) {
+    this.providerId = command.id();
     this.submittedAt = command.submittedAt();
     this.author = command.author();
     this.pull = command.pull();
