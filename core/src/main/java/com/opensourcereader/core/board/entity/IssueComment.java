@@ -60,5 +60,4 @@ public class IssueComment {
   public static IssueComment from(IssueCommentCommand command) {
     return new IssueComment(command);
   }
-
 }

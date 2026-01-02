@@ -1,7 +1,5 @@
 package com.opensourcereader.api.facade.github;
 
-import com.opensourcereader.api.client.response.GithubPullResponse;
-import com.opensourcereader.core.board.dto.PullCommand;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +13,7 @@ import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
+import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
@@ -22,6 +21,7 @@ import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRep
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
+import com.opensourcereader.core.board.dto.PullCommand;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.service.IssueCommentService;
 import com.opensourcereader.core.board.service.IssueRetrieveService;
@@ -90,8 +90,7 @@ public class GitHubFacadeService {
       }
     }
 
-    List<GithubPullResponse> pullResponses = githubClient.fetchRepoPulls(request,
-        pullTagNumbers);
+    List<GithubPullResponse> pullResponses = githubClient.fetchRepoPulls(request, pullTagNumbers);
 
     for (GithubPullResponse pullResponse : pullResponses) {
       User author = findByUser(pullResponse.user());

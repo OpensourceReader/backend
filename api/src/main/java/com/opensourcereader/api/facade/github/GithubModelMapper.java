@@ -1,10 +1,10 @@
 package com.opensourcereader.api.facade.github;
 
-import com.opensourcereader.api.client.response.GithubPullResponse;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
+import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
