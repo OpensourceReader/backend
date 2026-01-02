@@ -77,7 +77,12 @@ public class GitHubFacadeService {
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
       User author = findByUser(fetched.user());
       Boolean isOpened = isOpened(fetched.state());
-      BoardBaseCommand command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+      BoardBaseCommand command = null;
+      if (fetched.isPullRequest()) {
+        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
+      } else {
+        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+      }
       issueCommands.add(command);
     }
 

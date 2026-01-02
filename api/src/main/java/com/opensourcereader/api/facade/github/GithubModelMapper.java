@@ -53,6 +53,22 @@ public class GithubModelMapper {
         .build();
   }
 
+  public PullCommand toPullCommand(
+      GithubIssueResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
+    return PullCommand.builder()
+        .id(response.id())
+        .createdAt(response.createdAt())
+        .updatedAt(response.updatedAt())
+        .tagId(response.tagId())
+        .author(author)
+        .repo(repo)
+        .title(response.title())
+        .body(response.body())
+        .isOpened(isOpened)
+        .commentCount(response.commentCount())
+        .build();
+  }
+
   public PullCommand toPullCommand(BoardBaseCommand command, Integer reviewCommentCounts) {
     return PullCommand.builder()
         .id(command.getId())
