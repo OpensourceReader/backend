@@ -66,29 +66,32 @@ public class GitHubFacadeService {
   }
 
   public boolean createIssues(GithubRepoRequest request) {
+    //TODO repo와 유저는 캐시를 구현해서 바로바로 가져오게끔 만들어야함 - 캐시 자료구조 하나 만들어야할 듯(생각나는 건 블롬필터)
     OpenSourceRepo repo =
         openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
 
     List<GithubIssueResponse> fetchedRepoIssues = githubClient.fetchRepoIssues(request);
 
     Queue<BoardBaseCommand> issueCommands = new ArrayDeque<>();
-    Queue<BoardBaseCommand> pullCommands = new ArrayDeque<>();
-    Queue<Integer> pullTagNumbers = new ArrayDeque<>();
 
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
       User author = findByUser(fetched.user());
       Boolean isOpened = isOpened(fetched.state());
-      BoardBaseCommand command;
-
-      if (fetched.isPullRequest()) {
-        pullTagNumbers.add(fetched.tagId());
-      } else {
-        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
-        issueCommands.add(command);
-      }
+      BoardBaseCommand command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+      issueCommands.add(command);
     }
 
+    return issueSyncService.syncIssues(issueCommands);
+  }
+
+  public boolean createPulls(GithubRepoRequest request) {
+    OpenSourceRepo repo =
+        openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
+
+    Queue<Integer> pullTagNumbers = issueRetrieveService.findPullByRepository(repo);
     List<GithubPullResponse> pullResponses = githubClient.fetchRepoPulls(request, pullTagNumbers);
+
+    Queue<BoardBaseCommand> pullCommands = new ArrayDeque<>();
 
     for (GithubPullResponse pullResponse : pullResponses) {
       User author = findByUser(pullResponse.user());
@@ -96,10 +99,8 @@ public class GitHubFacadeService {
       PullCommand command = modelMapper.toPullCommand(pullResponse, author, repo, isOpened);
       pullCommands.add(command);
     }
-    boolean issuesSuccess = issueSyncService.syncIssues(issueCommands);
-    boolean pullSuccess = issueSyncService.syncIssues(pullCommands);
 
-    return issuesSuccess && pullSuccess;
+    return issueSyncService.syncIssues(pullCommands);
   }
 
   public boolean createIssueComments(GithubRepoRequest request) {
@@ -160,6 +161,7 @@ public class GitHubFacadeService {
     return userSignUpService.guest(command);
   }
 
+  //TODO enum 타입으로 변경해야함
   private Boolean isOpened(String state) {
     if (state.toLowerCase(Locale.ROOT).equals("open")) {
       return true;

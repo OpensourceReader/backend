@@ -21,6 +21,24 @@ public class AdminController {
 
   private final GitHubFacadeService gitHubFacadeService;
 
+  @PostMapping("/all")
+  public ResponseEntity<Boolean> fetchAll(@RequestBody GithubRepoRequest request) {
+    gitHubFacadeService.createRepo(request);
+    gitHubFacadeService.createIssues(request);
+    gitHubFacadeService.createPulls(request);
+    gitHubFacadeService.createIssueComments(request);
+
+    return ResponseEntity.ok(true);
+  }
+
+  @PostMapping("/all/comments")
+  public ResponseEntity<Boolean> fetchAllComments(@RequestBody GithubIssueCommentRequest request) {
+    gitHubFacadeService.createReviews(request);
+    gitHubFacadeService.createPullComments(request);
+
+    return ResponseEntity.ok(true);
+  }
+
   @PostMapping("/repo")
   public ResponseEntity<OpenSourceRepo> fetchRepo(@RequestBody GithubRepoRequest request) {
     OpenSourceRepo repo = gitHubFacadeService.createRepo(request);
@@ -31,6 +49,13 @@ public class AdminController {
   @PostMapping("/issues")
   public ResponseEntity<Boolean> fetchIssues(@RequestBody GithubRepoRequest request) {
     boolean success = gitHubFacadeService.createIssues(request);
+
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/pulls")
+  public ResponseEntity<Boolean> fetchPulls(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createPulls(request);
 
     return ResponseEntity.ok(success);
   }

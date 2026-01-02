@@ -1,7 +1,10 @@
 package com.opensourcereader.core.board.service;
 
+import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.board.repository.PullRepository;
 import java.util.List;
 
+import java.util.Queue;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,12 @@ import lombok.RequiredArgsConstructor;
 public class IssueRetrieveService {
 
   private final IssueRepository issueRepository;
+  private final PullRepository pullRepository;
+
+  @Transactional(readOnly = true)
+  public Queue<Integer> findPullByRepository(OpenSourceRepo repo) {
+    return pullRepository.findAllByRepository(repo);
+  }
 
   @Transactional(readOnly = true)
   public List<Issue> findIssuesByRepositoryId(Long repositoryId, Boolean isOpened) {
