@@ -1,5 +1,7 @@
 package com.opensourcereader.api.facade.github;
 
+import com.opensourcereader.api.client.response.GithubPullResponse;
+import com.opensourcereader.core.board.dto.PullCommand;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +69,7 @@ public class GitHubFacadeService {
 
     Queue<GithubIssueCommentRequest> issueCommentRequest = new ArrayDeque<>();
     Queue<BoardBaseCommand> issueCommands = new ArrayDeque<>();
-
+    Queue<BoardBaseCommand> pullCommands = new ArrayDeque<>();
     Queue<Integer> pullTagNumbers = new ArrayDeque<>();
 
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
@@ -75,23 +77,33 @@ public class GitHubFacadeService {
       Boolean isOpened = isOpened(fetched.state());
       BoardBaseCommand command;
 
+      if (fetched.commentCount() >= 1) {
+        issueCommentRequest.add(
+            new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
+      }
+
       if (fetched.isPullRequest()) {
-        log.info(String.valueOf(fetched.tagId()));
         pullTagNumbers.add(fetched.tagId());
       } else {
-        // TODO Pull 생성하는 로직을 완성시키면 위로 빼야함
-        if (fetched.commentCount() >= 1) {
-          issueCommentRequest.add(
-              new GithubIssueCommentRequest(request.owner(), request.repoName(), fetched.tagId()));
-        }
-
         command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
         issueCommands.add(command);
       }
     }
+
+    List<GithubPullResponse> pullResponses = githubClient.fetchRepoPulls(request,
+        pullTagNumbers);
+
+    for (GithubPullResponse pullResponse : pullResponses) {
+      User author = findByUser(pullResponse.user());
+      Boolean isOpened = isOpened(pullResponse.state());
+      PullCommand command = modelMapper.toPullCommand(pullResponse, author, repo, isOpened);
+      pullCommands.add(command);
+    }
     boolean issuesSuccess = issueSyncService.syncIssues(issueCommands);
+    boolean pullSuccess = issueSyncService.syncIssues(pullCommands);
+
     boolean commentsSuccess = true;
-    if (issuesSuccess && !issueCommentRequest.isEmpty()) {
+    if (issuesSuccess && pullSuccess && !issueCommentRequest.isEmpty()) {
       commentsSuccess = createIssueComments0(issueCommentRequest);
     }
 

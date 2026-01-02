@@ -54,7 +54,7 @@ public class GithubFacadeServiceTest {
   @Autowired private GitHubFacadeService gitHubFacadeService;
 
   @Test
-  @DisplayName("")
+  @DisplayName("레포지토리 JSON 데이터를 요청해서 성공적으로 받는다.")
   void createRepoTest() {
     // given
     GithubRepoRequest request = new GithubRepoRequest("OpensourceReader", "backend");

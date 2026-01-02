@@ -12,5 +12,6 @@ public record GithubPullResponse(
     String body,
     String state,
     @JsonProperty("comments") Integer commentCount,
+    @JsonProperty("review_comments") Integer reviewCount,
     @JsonProperty("created_at") Instant createdAt,
     @JsonProperty("updated_at") Instant updatedAt) {}

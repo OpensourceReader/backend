@@ -1,5 +1,6 @@
 package com.opensourcereader.api.facade.github;
 
+import com.opensourcereader.api.client.response.GithubPullResponse;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
@@ -30,8 +31,7 @@ public class GithubModelMapper {
   }
 
   public PullCommand toPullCommand(
-      GithubIssueResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
-    // TODO 리뷰수 카운팅해야함
+      GithubPullResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
     return PullCommand.builder()
         .id(response.id())
         .createdAt(response.createdAt())
@@ -43,6 +43,7 @@ public class GithubModelMapper {
         .body(response.body())
         .isOpened(isOpened)
         .commentCount(response.commentCount())
+        .reviewCount(response.reviewCount())
         .build();
   }
 
