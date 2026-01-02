@@ -1,17 +1,18 @@
 package com.opensourcereader.core.board.service;
 
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.board.repository.PullRepository;
+import java.util.ArrayDeque;
 import java.util.List;
-
 import java.util.Queue;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.exception.BoardNotFoundException;
 import com.opensourcereader.core.board.repository.IssueRepository;
+import com.opensourcereader.core.board.repository.PullRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +25,9 @@ public class IssueRetrieveService {
 
   @Transactional(readOnly = true)
   public Queue<Integer> findPullByRepository(OpenSourceRepo repo) {
-    return pullRepository.findAllByRepository(repo);
+    List<Integer> pullTagNumbers = pullRepository.findAllByRepository(repo);
+
+    return new ArrayDeque<>(pullTagNumbers);
   }
 
   @Transactional(readOnly = true)

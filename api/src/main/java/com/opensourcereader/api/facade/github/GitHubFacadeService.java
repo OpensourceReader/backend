@@ -66,7 +66,7 @@ public class GitHubFacadeService {
   }
 
   public boolean createIssues(GithubRepoRequest request) {
-    //TODO repo와 유저는 캐시를 구현해서 바로바로 가져오게끔 만들어야함 - 캐시 자료구조 하나 만들어야할 듯(생각나는 건 블롬필터)
+    // TODO repo와 유저는 캐시를 구현해서 바로바로 가져오게끔 만들어야함 - 캐시 자료구조 하나 만들어야할 듯(생각나는 건 블롬필터)
     OpenSourceRepo repo =
         openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
 
@@ -161,7 +161,7 @@ public class GitHubFacadeService {
     return userSignUpService.guest(command);
   }
 
-  //TODO enum 타입으로 변경해야함
+  // TODO enum 타입으로 변경해야함
   private Boolean isOpened(String state) {
     if (state.toLowerCase(Locale.ROOT).equals("open")) {
       return true;
