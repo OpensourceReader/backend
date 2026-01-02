@@ -36,9 +36,6 @@ public class PullComment extends BaseEntity {
   @Column(nullable = false)
   private String path;
 
-  @Column(nullable = false)
-  private Boolean disabled = false;
-
   private PullComment(PullCommentCommand command) {
     super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
     this.author = command.getAuthor();
@@ -50,9 +47,5 @@ public class PullComment extends BaseEntity {
 
   public static PullComment from(PullCommentCommand command) {
     return new PullComment(command);
-  }
-
-  public void updateDisabled(Boolean newDisabled) {
-    this.disabled = newDisabled;
   }
 }

@@ -13,7 +13,6 @@ import com.opensourcereader.api.controller.board.response.BoardPreviewResponse;
 import com.opensourcereader.core.board.entity.Issue;
 import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.service.IssueRetrieveService;
-import com.opensourcereader.core.board.service.PullRetrieveService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +31,6 @@ class BoardFacadeServiceTest {
           .build();
 
   @Mock private IssueRetrieveService issueRetrieveService;
-
-  @Mock private PullRetrieveService pullRetrieveService;
 
   @InjectMocks private BoardFacadeService boardFacadeService;
 

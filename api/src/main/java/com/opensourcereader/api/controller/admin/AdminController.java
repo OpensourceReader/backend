@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.facade.github.GitHubFacadeService;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
@@ -30,6 +31,13 @@ public class AdminController {
   @PostMapping("/issues")
   public ResponseEntity<Boolean> fetchIssues(@RequestBody GithubRepoRequest request) {
     boolean success = gitHubFacadeService.createIssues(request);
+
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/reviews")
+  public ResponseEntity<Boolean> fetchReviews(@RequestBody GithubIssueCommentRequest request) {
+    boolean success = gitHubFacadeService.createReviews(request);
 
     return ResponseEntity.ok(success);
   }

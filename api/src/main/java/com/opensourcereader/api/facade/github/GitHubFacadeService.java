@@ -15,6 +15,7 @@ import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
+import com.opensourcereader.api.client.response.GithubReviewResponse;
 import com.opensourcereader.api.client.response.GithubUserResponse;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
@@ -22,10 +23,13 @@ import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.board.dto.BoardBaseCommand;
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.board.dto.PullCommand;
+import com.opensourcereader.core.board.dto.ReviewCommand;
 import com.opensourcereader.core.board.entity.Issue;
+import com.opensourcereader.core.board.entity.Pull;
 import com.opensourcereader.core.board.service.IssueCommentService;
 import com.opensourcereader.core.board.service.IssueRetrieveService;
 import com.opensourcereader.core.board.service.IssueSyncService;
+import com.opensourcereader.core.board.service.ReviewService;
 import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.exception.UserNotFoundException;
@@ -50,6 +54,7 @@ public class GitHubFacadeService {
   private final IssueRetrieveService issueRetrieveService;
 
   private final IssueCommentService issueCommentService;
+  private final ReviewService reviewService;
 
   public OpenSourceRepo createRepo(GithubRepoRequest request) {
     try {
@@ -129,6 +134,29 @@ public class GitHubFacadeService {
       }
     }
     return issueCommentService.saveIssueComments(commands);
+  }
+
+  public boolean createReviews(GithubIssueCommentRequest request) {
+    OpenSourceRepo repo =
+        openSourceRepoService.getRepoByOwnerNameAndTitle(request.owner(), request.repoName());
+
+    Pull pull =
+        issueRetrieveService.findIssueOrPullByTagId(repo.getId(), request.tagNumber(), Pull.class);
+
+    List<ReviewCommand> commands = new ArrayList<>();
+    List<GithubReviewResponse> responses = githubClient.fetchRepoReviews(request);
+
+    for (GithubReviewResponse response : responses) {
+      User author = findByUser(response.user());
+      ReviewCommand command = modelMapper.toReviewCommand(response, author, pull);
+      commands.add(command);
+    }
+
+    return reviewService.saveReviews(commands);
+  }
+
+  public boolean createPullComments(GithubIssueCommentRequest request) {
+    return true;
   }
 
   private User findByUser(GithubUserResponse response) {

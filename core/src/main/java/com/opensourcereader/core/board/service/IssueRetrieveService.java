@@ -38,6 +38,20 @@ public class IssueRetrieveService {
   }
 
   @Transactional(readOnly = true)
+  public <T extends Issue> T findIssueOrPullByTagId(
+      Long repositoryId, Integer tagId, Class<T> type) {
+    Issue entity =
+        issueRepository
+            .findByRepositoryIdAndTagId(repositoryId, tagId)
+            .orElseThrow(BoardNotFoundException::new);
+    if (type.isInstance(entity)) {
+      return type.cast(entity);
+    } else {
+      throw new BoardNotFoundException();
+    }
+  }
+
+  @Transactional(readOnly = true)
   public Issue findIssueOrPullByTagId(String owner, String repoName, Integer tagId) {
     Issue entity =
         issueRepository

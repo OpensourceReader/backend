@@ -20,6 +20,7 @@ import com.opensourcereader.api.client.response.GithubIssueCommentResponse;
 import com.opensourcereader.api.client.response.GithubIssueResponse;
 import com.opensourcereader.api.client.response.GithubPullResponse;
 import com.opensourcereader.api.client.response.GithubRepoResponse;
+import com.opensourcereader.api.client.response.GithubReviewResponse;
 import com.opensourcereader.api.controller.auth.response.GitHubApiEmailResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -192,6 +193,20 @@ public class GithubClient {
     }
 
     return response;
+  }
+
+  public List<GithubReviewResponse> fetchRepoReviews(GithubIssueCommentRequest request) {
+    return restClient
+        .get()
+        .uri(
+            "/repos/{owner}/{repoName}/pulls/{tagNumber}/reviews",
+            request.owner(),
+            request.repoName(),
+            request.tagNumber())
+        .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+        .retrieve()
+        .toEntity(new ParameterizedTypeReference<List<GithubReviewResponse>>() {})
+        .getBody();
   }
 
   public List<GitHubApiEmailResponse> fetchUserEmails(String accessToken) {
