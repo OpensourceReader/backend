@@ -11,19 +11,17 @@ import com.opensourcereader.core.user.dto.GithubUserCommand;
 import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.Role;
 import com.opensourcereader.core.user.entity.User;
-import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserSignUpService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
-  @Override
   @Transactional
   public User signup(UserSignUpCommand command) {
     User user =
@@ -39,13 +37,10 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(user);
   }
 
-  @Override
   @Transactional
   public User signup(UserInfo userInfo) {
     User user =
-        userRepository
-            .findFirstByLoginName(userInfo.loginName())
-            .orElseGet(() -> User.from(userInfo));
+        userRepository.findByProviderId(userInfo.providerId()).orElseGet(() -> User.from(userInfo));
 
     user.updateAvatar(userInfo.avatarUrl());
     user.linkSocialProvider(userInfo.providerId());
@@ -57,12 +52,11 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(user);
   }
 
-  @Override
   @Transactional
   public User guest(GithubUserCommand command) {
     User user =
         userRepository
-            .findFirstByLoginName(command.loginName())
+            .findByProviderId(command.providerId())
             .orElseGet(() -> User.newGuest(command));
     user.updateAvatar(command.avatarUrl());
     user.linkSocialProvider(command.providerId());
@@ -70,23 +64,5 @@ public class UserServiceImpl implements UserService {
       user.updatePassword(UUID.randomUUID().toString());
     }
     return userRepository.save(user);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public User findByProviderId(Long providerId) {
-    return userRepository.findByProviderId(providerId).orElseThrow(UserNotFoundException::new);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public User findByNickname(String loginName) {
-    return userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public User findByEmail(String email) {
-    return userRepository.findFirstByEmail(email).orElseThrow(UserNotFoundException::new);
   }
 }

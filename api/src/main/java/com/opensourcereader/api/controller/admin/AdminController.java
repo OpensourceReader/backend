@@ -1,17 +1,15 @@
 package com.opensourcereader.api.controller.admin;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.opensourcereader.api.client.request.GithubIssueCommentRequest;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.api.facade.github.GitHubFacadeService;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.board.entity.Issue;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +21,24 @@ public class AdminController {
 
   private final GitHubFacadeService gitHubFacadeService;
 
+  @PostMapping("/all")
+  public ResponseEntity<Boolean> fetchAll(@RequestBody GithubRepoRequest request) {
+    gitHubFacadeService.createRepo(request);
+    gitHubFacadeService.createIssues(request);
+    gitHubFacadeService.createPulls(request);
+    gitHubFacadeService.createIssueComments(request);
+
+    return ResponseEntity.ok(true);
+  }
+
+  @PostMapping("/all/comments")
+  public ResponseEntity<Boolean> fetchAllComments(@RequestBody GithubIssueCommentRequest request) {
+    gitHubFacadeService.createReviews(request);
+    gitHubFacadeService.createPullComments(request);
+
+    return ResponseEntity.ok(true);
+  }
+
   @PostMapping("/repo")
   public ResponseEntity<OpenSourceRepo> fetchRepo(@RequestBody GithubRepoRequest request) {
     OpenSourceRepo repo = gitHubFacadeService.createRepo(request);
@@ -31,9 +47,37 @@ public class AdminController {
   }
 
   @PostMapping("/issues")
-  public ResponseEntity<List<Issue>> fetchIssues(@RequestBody GithubRepoRequest request) {
-    List<Issue> issues = gitHubFacadeService.createIssues(request);
+  public ResponseEntity<Boolean> fetchIssues(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createIssues(request);
 
-    return ResponseEntity.ok(issues);
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/pulls")
+  public ResponseEntity<Boolean> fetchPulls(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createPulls(request);
+
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/reviews")
+  public ResponseEntity<Boolean> fetchReviews(@RequestBody GithubIssueCommentRequest request) {
+    boolean success = gitHubFacadeService.createReviews(request);
+
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/comments")
+  public ResponseEntity<Boolean> fetchComments(@RequestBody GithubRepoRequest request) {
+    boolean success = gitHubFacadeService.createIssueComments(request);
+
+    return ResponseEntity.ok(success);
+  }
+
+  @PostMapping("/pulls/comments")
+  public ResponseEntity<Boolean> fetchPullComments(@RequestBody GithubIssueCommentRequest request) {
+    boolean success = gitHubFacadeService.createPullComments(request);
+
+    return ResponseEntity.ok(success);
   }
 }

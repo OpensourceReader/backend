@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class Pull extends Issue {
 
   @Column(name = "review_count")
-  private Long reviewCount;
+  private Integer reviewCount;
 
   private Pull(PullCommand command) {
     super(command);
@@ -27,7 +27,7 @@ public class Pull extends Issue {
     return new Pull(command);
   }
 
-  public void updateReviewCount(Long newReviewCount) {
+  public void updateReviewCount(Integer newReviewCount) {
     this.reviewCount = updateField(this.reviewCount, newReviewCount);
   }
 }

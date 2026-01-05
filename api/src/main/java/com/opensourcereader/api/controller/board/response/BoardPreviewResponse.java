@@ -12,10 +12,10 @@ import lombok.Builder;
 public record BoardPreviewResponse(
     Long id,
     String title,
-    Long tagId,
+    Integer tagId,
     String body,
     UserDto userDto,
-    Long commentCount,
+    Integer commentCount,
     Instant createdAt,
     Instant updatedAt) {
 

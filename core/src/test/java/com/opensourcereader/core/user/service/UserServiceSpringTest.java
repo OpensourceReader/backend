@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 public class UserServiceSpringTest {
 
-  @Autowired private UserServiceImpl userService;
+  @Autowired private UserRetrieveService userRetrieveService;
 
   @Autowired private UserRepository userRepository;
 
@@ -31,7 +31,7 @@ public class UserServiceSpringTest {
     user.updatePassword(encode);
     userRepository.save(user);
     // when
-    User result = userService.findByEmail("test@github.no-email");
+    User result = userRetrieveService.findByEmail("test@github.no-email");
     // then
     assertThat(result).isNotNull();
   }

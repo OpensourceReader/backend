@@ -41,7 +41,7 @@ public class BoardFacadeService {
     return responses;
   }
 
-  public BoardBaseResponse findByTagId(Long tagId, BoardGetRequest request) {
+  public BoardBaseResponse findByTagId(Integer tagId, BoardGetRequest request) {
     Long repositoryId = request.repositoryId();
 
     Issue entity = issueRetrieveService.findIssueOrPullByTagId(repositoryId, tagId);

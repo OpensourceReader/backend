@@ -22,7 +22,7 @@ import com.opensourcereader.api.client.request.GithubRepoRequest;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.impl.LocalOpenSourceRepoService;
 import com.opensourcereader.core.board.service.IssueSyncService;
-import com.opensourcereader.core.user.service.UserServiceImpl;
+import com.opensourcereader.core.user.service.UserRetrieveService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ public class GithubFacadeServiceTest {
 
   @Autowired private LocalOpenSourceRepoService openSourceRepoService;
 
-  @Autowired private UserServiceImpl userService;
+  @Autowired private UserRetrieveService userRetrieveService;
 
   @Autowired private IssueSyncService issueSyncService;
 
@@ -54,7 +54,7 @@ public class GithubFacadeServiceTest {
   @Autowired private GitHubFacadeService gitHubFacadeService;
 
   @Test
-  @DisplayName("")
+  @DisplayName("레포지토리 JSON 데이터를 요청해서 성공적으로 받는다.")
   void createRepoTest() {
     // given
     GithubRepoRequest request = new GithubRepoRequest("OpensourceReader", "backend");

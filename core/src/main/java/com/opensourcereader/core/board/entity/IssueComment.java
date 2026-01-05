@@ -1,14 +1,17 @@
 package com.opensourcereader.core.board.entity;
 
-import com.opensourcereader.core.BaseEntity;
+import java.time.Instant;
+
 import com.opensourcereader.core.board.dto.IssueCommentCommand;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import lombok.AccessLevel;
@@ -19,9 +22,22 @@ import lombok.NoArgsConstructor;
 @Table(name = "IssueComments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IssueComment extends BaseEntity {
+public class IssueComment {
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "created_at")
+  private Instant createdAt;
+
+  @Column(name = "updated_at")
+  private Instant updatedAt;
+
+  @Column(name = "provider_id")
+  private Long providerId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
   private User author;
 
@@ -29,14 +45,13 @@ public class IssueComment extends BaseEntity {
   @JoinColumn(name = "issue_id", nullable = false)
   private Issue issue;
 
-  @Column(nullable = false)
+  @Column(columnDefinition = "LONGTEXT")
   private String body;
 
-  @Column(nullable = false)
-  private Boolean disabled = false;
-
   private IssueComment(IssueCommentCommand command) {
-    super(command.getId(), command.getCreatedAt(), command.getUpdatedAt());
+    this.providerId = command.getId();
+    this.createdAt = command.getCreatedAt();
+    this.updatedAt = command.getUpdatedAt();
     this.author = command.getAuthor();
     this.issue = command.getIssue();
     this.body = command.getBody();
@@ -44,9 +59,5 @@ public class IssueComment extends BaseEntity {
 
   public static IssueComment from(IssueCommentCommand command) {
     return new IssueComment(command);
-  }
-
-  public void updateDisabled(Boolean newDisabled) {
-    this.disabled = newDisabled;
   }
 }
