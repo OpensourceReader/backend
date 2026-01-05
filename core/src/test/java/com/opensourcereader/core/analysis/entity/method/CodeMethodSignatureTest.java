@@ -1,9 +1,9 @@
 package com.opensourcereader.core.analysis.entity.method;
 
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,15 +17,8 @@ class CodeMethodSignatureTest {
   @MethodSource("methodSignatureTestCases")
   void codeSignatureParameterizedTest(List<String> rawParamTypes, String expectedSignature) {
     // given
-    CodeMethodExtractResult methodExtractResult = new CodeMethodExtractResult(
-        "methodName",
-        null,
-        null,
-        "void",
-        rawParamTypes,
-        null,
-        null
-    );
+    CodeMethodExtractResult methodExtractResult =
+        new CodeMethodExtractResult("methodName", null, null, "void", rawParamTypes, null, null);
 
     // when
     CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodExtractResult);

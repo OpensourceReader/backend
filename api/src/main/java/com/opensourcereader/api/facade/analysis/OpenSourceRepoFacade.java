@@ -12,7 +12,7 @@ import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.infra.ClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.GitRepositoryLoader;
-import com.opensourcereader.core.analysis.service.CodeMethodGraphCommandService;
+import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
@@ -32,7 +32,7 @@ public class OpenSourceRepoFacade {
   private final GitRepositoryLoader gitRepositoryLoader;
   private final OpenSourceRepoService opensourceRepoService;
   private final ClassStructureExtractor classStructureExtractor;
-  private final CodeMethodGraphCommandService codeMethodGraphCommandService;
+  private final CodeMethodCallGraphService codeMethodCallGraphService;
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
@@ -45,7 +45,7 @@ public class OpenSourceRepoFacade {
     OpenSourceRepo openSourceRepo =
         opensourceRepoService.createRepo(
             request.openSourceUri(), gitRepoLoadResult.files(), classStructures);
-    codeMethodGraphCommandService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
+    codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
     FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
 
     return OpenSourceRepoResponse.from(openSourceRepo);

@@ -2,7 +2,6 @@ package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -18,12 +17,13 @@ import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 import com.opensourcereader.core.analysis.entity.method.CodeMethod;
 import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
 import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.repo.ContentType;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.service.CodeMethodGraphQueryService;
+import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class CodeMethodGraphQueryServiceTest {
 
-  @Autowired CodeMethodGraphQueryService codeMethodGraphQueryService;
+  @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
   @Autowired CodeMethodRepository codeMethodRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired OpenSourceContentRepository openSourceContentRepository;
@@ -83,7 +83,7 @@ class CodeMethodGraphQueryServiceTest {
     codeMethodRepository.save(target);
 
     // when
-    CodeMethod found = codeMethodGraphQueryService.getCodeMethodById(target.getId());
+    CodeMethod found = codeMethodCallGraphService.getCodeMethodById(target.getId());
 
     // then (assert 너무 많지 않게 "핵심 3개"만)
     assertThat(found.getId()).isEqualTo(target.getId());
@@ -100,7 +100,8 @@ class CodeMethodGraphQueryServiceTest {
       OpenSourceRepo repo, String classInternalName, String rawText) {
     ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "java/lang/Object", List.of());
     ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", ContentType.FILE, rawText);
+    OpenSourceFileInfo fileInfo =
+        new OpenSourceFileInfo(classInternalName + ".java", ContentType.FILE, rawText);
 
     return openSourceContentRepository.save(
         OpenSourceRepoContent.of(fileInfo, classStructure, List.of(), repo));

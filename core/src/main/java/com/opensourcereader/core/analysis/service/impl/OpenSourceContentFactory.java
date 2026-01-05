@@ -1,19 +1,21 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.ParsedSourceFile;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.infra.SourceFileParseService;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -31,30 +33,30 @@ public class OpenSourceContentFactory {
 
     return sourFileInfos.stream()
         .filter(sourFile -> sourFile.contentType().isSupported())
-        .map(sourFile -> {
-          ParsedSourceFile parsed = sourceFileParseService.parse(sourFile);
-          ClassStructure classStructure = structures.get(parsed.classInternalName());
-          List<CodeMethodExtractResult> methods = extract(classStructure, parsed);
+        .map(
+            sourFile -> {
+              ParsedSourceFile parsed = sourceFileParseService.parse(sourFile);
+              ClassStructure classStructure = structures.get(parsed.classInternalName());
+              List<CodeMethodExtractResult> methods = extract(classStructure, parsed);
 
-          return OpenSourceRepoContent.of(sourFile, classStructure, methods, opensourceRepo);
-        })
+              return OpenSourceRepoContent.of(sourFile, classStructure, methods, opensourceRepo);
+            })
         .toList();
   }
 
   private List<CodeMethodExtractResult> extract(
-      ClassStructure classStructure,
-      ParsedSourceFile parsedSourceFile
-  ) {
+      ClassStructure classStructure, ParsedSourceFile parsedSourceFile) {
     if (classStructure == null) {
       return List.of();
     }
 
     return classStructure.methods().stream()
-        .map(m -> {
-          CodeMethodSignature sig = CodeMethodSignature.of(m.declaredMethodInfo());
-          return CodeMethodExtractResult.of(m.declaredMethodInfo(),
-              parsedSourceFile.methodsBySignature().get(sig));
-        })
+        .map(
+            m -> {
+              CodeMethodSignature sig = CodeMethodSignature.of(m.declaredMethodInfo());
+              return CodeMethodExtractResult.of(
+                  m.declaredMethodInfo(), parsedSourceFile.methodsBySignature().get(sig));
+            })
         .toList();
   }
 }

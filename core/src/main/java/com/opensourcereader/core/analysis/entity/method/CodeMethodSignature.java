@@ -3,13 +3,13 @@ package com.opensourcereader.core.analysis.entity.method;
 import static com.opensourcereader.core.analysis.entity.method.NameSeparators.PACKAGE_SEPARATOR;
 import static com.opensourcereader.core.analysis.entity.method.NameSeparators.PATH_SEPARATOR;
 
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import jakarta.persistence.Embeddable;
 
 @Embeddable

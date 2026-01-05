@@ -1,30 +1,30 @@
-//package com.opensourcereader.core.analysis.service.impl;
+// package com.opensourcereader.core.analysis.service.impl;
 //
-//import static org.assertj.core.api.Assertions.assertThat;
+// import static org.assertj.core.api.Assertions.assertThat;
 //
-//import com.opensourcereader.core.analysis.entity.repo.ContentType;
-//import java.nio.file.Path;
-//import java.util.EnumSet;
-//import java.util.List;
-//import java.util.Map;
+// import com.opensourcereader.core.analysis.entity.repo.ContentType;
+// import java.nio.file.Path;
+// import java.util.EnumSet;
+// import java.util.List;
+// import java.util.Map;
 //
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
 //
-//import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-//import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
-//import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-//import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-//import com.opensourcereader.core.analysis.entity.method.AccessModifier;
-//import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
-//import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
-//import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
-//import org.assertj.core.groups.Tuple;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
+// import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
+// import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
+// import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+// import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+// import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+// import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
+// import com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor;
+// import com.opensourcereader.core.analysis.testfixture.InMemoryJavaCompilerFixture;
+// import org.assertj.core.groups.Tuple;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
 //
-//@SpringBootTest
-//class CodeMethodExtractorTest {
+// @SpringBootTest
+// class CodeMethodExtractorTest {
 //
 //  @Autowired private CodeMethodExtractor extractor;
 //  @Autowired private ClassStructureExtractor classStructureExtractor;
@@ -57,9 +57,11 @@
 //            """;
 //    Map<String, byte[]> compiled = InMemoryJavaCompilerFixture.compile(className, rawText);
 //    byte[] mainBytes = compiled.get(className);
-//    OpenSourceFileInfo file = new OpenSourceFileInfo(className + ".java", ContentType.FILE, rawText);
+//    OpenSourceFileInfo file = new OpenSourceFileInfo(className + ".java", ContentType.FILE,
+// rawText);
 //
-//    List<ClassBytecode> classBytecodes = List.of(new ClassBytecode(Path.of(className), mainBytes));
+//    List<ClassBytecode> classBytecodes = List.of(new ClassBytecode(Path.of(className),
+// mainBytes));
 //    List<ClassStructure> methodCallsOfClass = classStructureExtractor.extract(classBytecodes);
 //
 //    // when
@@ -98,4 +100,4 @@
 //                4,
 //                4));
 //  }
-//}
+// }
