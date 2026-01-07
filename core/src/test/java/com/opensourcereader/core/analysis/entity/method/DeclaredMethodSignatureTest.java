@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class CodeMethodSignatureTest {
+class DeclaredMethodSignatureTest {
 
   @DisplayName("MethodSignature 생성 테스트 - 파라미터 타입 포맷에 관계없이 short name으로 생성된다")
   @ParameterizedTest(name = "[{index}] rawParamTypes={0}")

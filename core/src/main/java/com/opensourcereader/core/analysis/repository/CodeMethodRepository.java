@@ -6,43 +6,43 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 
-public interface CodeMethodRepository extends JpaRepository<CodeMethod, Long> {
+public interface CodeMethodRepository extends JpaRepository<DeclaredMethod, Long> {
 
   @Query(
       """
           SELECT m
-          FROM CodeMethod m
-          WHERE m.openSourceRepoContent.openSourceRepo.id = :repoId
-              AND m.openSourceRepoContent.classInternalName = :classInternalName
+          FROM DeclaredMethod m
+          WHERE m.declaredType.openSourceRepoContent.openSourceRepo.id = :repoId
+              AND m.declaredType.typeInternalName = :classInternalName
               AND m.methodSignature.methodSignature = :methodSignature
 
           """)
-  Optional<CodeMethod> findByRepoIdAndClassInternalNameAndMethodSignature(
+  Optional<DeclaredMethod> findByRepoIdAndTypeInternalNameAndMethodSignature(
       @Param("repoId") Long repoId,
-      @Param("classInternalName") String classInternalName,
+      @Param("typeInternalName") String typeInternalName,
       @Param("methodSignature") String methodSignature);
 
   @Query(
       """
        SELECT DISTINCT m
-        FROM CodeMethod m
-        LEFT JOIN FETCH m.openSourceRepoContent c
+        FROM DeclaredMethod m
+        LEFT JOIN FETCH m.declaredType.openSourceRepoContent.rawText r
         LEFT JOIN FETCH m.outgoingCalls oc
         LEFT JOIN FETCH oc.callee
         WHERE m.id = :codeMethodId
        """)
-  Optional<CodeMethod> findWithOutgoingGraphById(Long codeMethodId);
+  Optional<DeclaredMethod> findWithOutgoingGraphById(Long codeMethodId);
 
   @Query(
       """
        SELECT DISTINCT m
-        FROM CodeMethod m
-        LEFT JOIN FETCH m.openSourceRepoContent c
+        FROM DeclaredMethod m
+        LEFT JOIN FETCH m.declaredType.openSourceRepoContent.rawText r
         LEFT JOIN FETCH m.ingoingCalls ic
         LEFT JOIN FETCH ic.caller
         WHERE m.id = :codeMethodId
        """)
-  Optional<CodeMethod> findWithIngoingGraphById(Long codeMethodId);
+  Optional<DeclaredMethod> findWithIngoingGraphById(Long codeMethodId);
 }

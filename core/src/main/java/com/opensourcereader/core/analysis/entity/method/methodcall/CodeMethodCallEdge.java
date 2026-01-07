@@ -1,7 +1,7 @@
-package com.opensourcereader.core.analysis.entity.methodcall;
+package com.opensourcereader.core.analysis.entity.method.methodcall;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,26 +29,27 @@ public class CodeMethodCallEdge extends BaseEntity {
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "caller_id")
-  private CodeMethod caller;
+  private DeclaredMethod caller;
 
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "callee_id")
-  private CodeMethod callee;
+  private DeclaredMethod callee;
 
   private CodeMethodCallEdge(
-      CodeMethod caller, CodeMethod callee, MethodCallOrigin methodCallOrigin) {
+      DeclaredMethod caller, DeclaredMethod callee, MethodCallOrigin methodCallOrigin) {
     this.caller = caller;
     this.callee = callee;
     this.methodCallOrigin = methodCallOrigin;
   }
 
-  public static CodeMethodCallEdge of(CodeMethod caller, CodeMethod callee) {
+  public static CodeMethodCallEdge of(DeclaredMethod caller, DeclaredMethod callee) {
     return new CodeMethodCallEdge(caller, callee, getCodeMethodCallEdge(caller, callee));
   }
 
-  private static MethodCallOrigin getCodeMethodCallEdge(CodeMethod caller, CodeMethod callee) {
+  private static MethodCallOrigin getCodeMethodCallEdge(
+      DeclaredMethod caller, DeclaredMethod callee) {
     if (caller.getOrigin().equals(MethodOrigin.EXTERNAL)
         || callee.getOrigin().equals(MethodOrigin.EXTERNAL)) {
       return MethodCallOrigin.EXTERNAL;

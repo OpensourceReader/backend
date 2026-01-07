@@ -8,8 +8,8 @@ import com.opensourcereader.api.dto.CodeMethodRequest;
 import com.opensourcereader.api.dto.CodeMethodResponse;
 import com.opensourcereader.api.dto.CodeMethodSummary;
 import com.opensourcereader.api.viewpolicy.CodeMethodViewPolicy;
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
-import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,11 +22,11 @@ public class OpenSourceCodeMethodFacade {
   private final CodeMethodViewPolicy codeMethodViewPolicy;
 
   public CodeMethodResponse getCodeMethodById(CodeMethodRequest request) {
-    CodeMethod method = codeMethodCallGraphService.getCodeMethodById(request.codeMethodId());
+    DeclaredMethod method = codeMethodCallGraphService.getCodeMethodById(request.codeMethodId());
 
     return new CodeMethodResponse(
         method.getId(),
-        method.getClassInternalName(),
+        method.getTypeInternalName(),
         method.getMethodName(),
         extractRawText(method),
         method.getStartLine(),
@@ -35,7 +35,7 @@ public class OpenSourceCodeMethodFacade {
         filterOutgoing(method, request));
   }
 
-  private List<CodeMethodSummary> filterIngoing(CodeMethod method, CodeMethodRequest request) {
+  private List<CodeMethodSummary> filterIngoing(DeclaredMethod method, CodeMethodRequest request) {
     return method.getIngoingCalls().stream()
         .map(CodeMethodCallEdge::getCaller)
         .filter(caller -> codeMethodViewPolicy.isVisible(caller, request))
@@ -43,7 +43,7 @@ public class OpenSourceCodeMethodFacade {
         .toList();
   }
 
-  private List<CodeMethodSummary> filterOutgoing(CodeMethod method, CodeMethodRequest request) {
+  private List<CodeMethodSummary> filterOutgoing(DeclaredMethod method, CodeMethodRequest request) {
     return method.getOutgoingCalls().stream()
         .map(CodeMethodCallEdge::getCallee)
         .filter(callee -> codeMethodViewPolicy.isVisible(callee, request))
@@ -51,10 +51,10 @@ public class OpenSourceCodeMethodFacade {
         .toList();
   }
 
-  private String extractRawText(CodeMethod method) {
-    if (method.getOpenSourceRepoContent() == null) {
+  private String extractRawText(DeclaredMethod method) {
+    if (method.getDeclaredType().getOpenSourceRepoContent() == null) {
       return null;
     }
-    return method.getOpenSourceRepoContent().getRawText();
+    return method.getDeclaredType().getOpenSourceRepoContent().getRawText();
   }
 }

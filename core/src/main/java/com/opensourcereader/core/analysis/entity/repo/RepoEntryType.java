@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.entity.repo;
 import lombok.Getter;
 
 @Getter
-public enum ContentType {
+public enum RepoEntryType {
   TREE("tree", "040000"),
   FILE("blob", "100644"),
   EXECUTABLE_FILE("blob", "100755"),
@@ -12,15 +12,15 @@ public enum ContentType {
   private final String value;
   private final String typeNumber;
 
-  ContentType(String value, String typeNumber) {
+  RepoEntryType(String value, String typeNumber) {
     this.value = value;
     this.typeNumber = typeNumber;
   }
 
-  public static ContentType from(String typeNumber) {
-    for (ContentType contentType : ContentType.values()) {
-      if (typeNumber.equals(contentType.typeNumber)) {
-        return contentType;
+  public static RepoEntryType from(String typeNumber) {
+    for (RepoEntryType repoEntryType : RepoEntryType.values()) {
+      if (typeNumber.equals(repoEntryType.typeNumber)) {
+        return repoEntryType;
       }
     }
     return OTHERS;

@@ -7,8 +7,8 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -29,10 +29,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CodeMethod extends BaseEntity {
+public class DeclaredMethod extends BaseEntity {
 
   @Column(name = "class_internal_name")
-  private String classInternalName;
+  private String typeInternalName;
 
   @Column(name = "method_name")
   private String methodName;
@@ -75,13 +75,13 @@ public class CodeMethod extends BaseEntity {
   private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "open_source_repo_content_id")
-  private OpenSourceRepoContent openSourceRepoContent;
+  @JoinColumn(name = "declared_type_id")
+  private DeclaredType declaredType;
 
-  public static CodeMethod internal(
-      CodeMethodExtractResult methodExtractResult, OpenSourceRepoContent openSourceRepoContent) {
-    return new CodeMethod(
-        openSourceRepoContent.getClassInternalName(),
+  public static DeclaredMethod internal(
+      CodeMethodExtractResult methodExtractResult, DeclaredType declaredType) {
+    return new DeclaredMethod(
+        declaredType.getTypeInternalName(),
         methodExtractResult.methodName(),
         methodExtractResult.returnType(),
         methodExtractResult.paramTypes(),
@@ -90,11 +90,12 @@ public class CodeMethod extends BaseEntity {
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
         MethodOrigin.INTERNAL,
-        openSourceRepoContent);
+        declaredType);
   }
 
-  public static CodeMethod external(MethodCallInfo callee, CodeMethodSignature methodSignature) {
-    return new CodeMethod(
+  public static DeclaredMethod external(
+      MethodCallInfo callee, CodeMethodSignature methodSignature) {
+    return new DeclaredMethod(
         callee.className(),
         callee.methodName(),
         callee.descriptor().methodReturnType(),
@@ -107,8 +108,8 @@ public class CodeMethod extends BaseEntity {
         null);
   }
 
-  public static CodeMethod external(String interfaceName, CodeMethod caller) {
-    return new CodeMethod(
+  public static DeclaredMethod external(String interfaceName, DeclaredMethod caller) {
+    return new DeclaredMethod(
         interfaceName,
         caller.methodName,
         caller.returnType,
@@ -121,8 +122,8 @@ public class CodeMethod extends BaseEntity {
         null);
   }
 
-  private CodeMethod(
-      String classInternalName,
+  private DeclaredMethod(
+      String typeInternalName,
       String methodName,
       String returnType,
       List<String> paramTypes,
@@ -131,8 +132,8 @@ public class CodeMethod extends BaseEntity {
       Integer startLine,
       Integer endLine,
       MethodOrigin methodOrigin,
-      OpenSourceRepoContent openSourceRepoContent) {
-    this.classInternalName = classInternalName;
+      DeclaredType declaredType) {
+    this.typeInternalName = typeInternalName;
     this.methodName = methodName;
     this.returnType = returnType;
     this.paramTypes = paramTypes;
@@ -141,7 +142,7 @@ public class CodeMethod extends BaseEntity {
     this.startLine = startLine;
     this.endLine = endLine;
     this.origin = methodOrigin;
-    this.openSourceRepoContent = openSourceRepoContent;
+    this.declaredType = declaredType;
   }
 
   public void updateAllCalls(
@@ -163,15 +164,15 @@ public class CodeMethod extends BaseEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CodeMethod that)) {
+    if (!(o instanceof DeclaredMethod that)) {
       return false;
     }
     return Objects.equals(methodSignature, that.methodSignature)
-        && Objects.equals(openSourceRepoContent, that.openSourceRepoContent);
+        && Objects.equals(declaredType, that.declaredType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(methodSignature, openSourceRepoContent);
+    return Objects.hash(methodSignature, declaredType);
   }
 }

@@ -7,8 +7,6 @@ import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -18,7 +16,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,16 +30,13 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "path", nullable = false)
   private String path;
 
-  @Column(name = "class_internal_name")
-  private String classInternalName;
-
   @Embedded
   @Column(name = "name", nullable = false)
   private OpenSourceRepoContentName name;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "content_type", nullable = false)
-  private ContentType contentType;
+  private RepoEntryType repoEntryType;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "extension")
@@ -51,11 +46,9 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
-  @OneToMany(
-      mappedBy = "openSourceRepoContent",
-      fetch = FetchType.LAZY,
-      cascade = CascadeType.PERSIST)
-  private List<CodeMethod> codeMethods;
+  @OneToOne
+  @JoinColumn(name = "declared_type_id")
+  private DeclaredType declaredType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
@@ -68,7 +61,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
-        fileInfo.contentType(),
+        fileInfo.repoEntryType(),
         fileInfo.rawText(),
         classStructure,
         methodExtractResults,
@@ -77,7 +70,7 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   private OpenSourceRepoContent(
       String path,
-      ContentType contentType,
+      RepoEntryType repoEntryType,
       String rawText,
       ClassStructure classStructure,
       List<CodeMethodExtractResult> methodExtractResults,
@@ -85,24 +78,10 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
-    this.contentType = contentType;
+    this.repoEntryType = repoEntryType;
     this.rawText = rawText;
-    this.classInternalName = extractedClassName(classStructure);
-    this.codeMethods = getCodeMethods(methodExtractResults);
+    this.declaredType = DeclaredType.internal(classStructure, methodExtractResults);
     this.openSourceRepo = openSourceRepo;
-  }
-
-  private String extractedClassName(ClassStructure classStructure) {
-    if (classStructure == null) {
-      return null;
-    }
-    return classStructure.classInfo().className();
-  }
-
-  private List<CodeMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
-    return methodExtractResults.stream()
-        .map(extractResult -> CodeMethod.internal(extractResult, this))
-        .toList();
   }
 
   @Override

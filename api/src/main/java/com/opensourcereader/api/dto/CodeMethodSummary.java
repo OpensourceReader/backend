@@ -2,8 +2,8 @@ package com.opensourcereader.api.dto;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
-import com.opensourcereader.core.analysis.entity.methodcall.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
 
 public record CodeMethodSummary(Long id, String classInternalName, String methodName) {
 
@@ -21,8 +21,10 @@ public record CodeMethodSummary(Long id, String classInternalName, String method
         .toList();
   }
 
-  public static CodeMethodSummary from(CodeMethod codeMethod) {
+  public static CodeMethodSummary from(DeclaredMethod declaredMethod) {
     return new CodeMethodSummary(
-        codeMethod.getId(), codeMethod.getClassInternalName(), codeMethod.getMethodName());
+        declaredMethod.getId(),
+        declaredMethod.getTypeInternalName(),
+        declaredMethod.getMethodName());
   }
 }

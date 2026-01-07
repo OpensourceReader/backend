@@ -3,13 +3,13 @@ package com.opensourcereader.api.viewpolicy;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.dto.CodeMethodRequest;
-import com.opensourcereader.core.analysis.entity.method.CodeMethod;
+import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 
 @Component
 public class CodeMethodViewPolicy {
 
-  public boolean isVisible(CodeMethod method, CodeMethodRequest request) {
+  public boolean isVisible(DeclaredMethod method, CodeMethodRequest request) {
     if (method == null) {
       return false;
     }
@@ -23,8 +23,8 @@ public class CodeMethodViewPolicy {
     }
 
     if (!request.includeJdk()
-        && method.getClassInternalName() != null
-        && method.getClassInternalName().startsWith("java/")) {
+        && method.getTypeInternalName() != null
+        && method.getTypeInternalName().startsWith("java/")) {
       return false;
     }
 

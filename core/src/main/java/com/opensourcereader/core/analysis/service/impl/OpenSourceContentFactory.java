@@ -32,7 +32,7 @@ public class OpenSourceContentFactory {
             .collect(Collectors.toMap(cs -> cs.classInfo().className(), cs -> cs));
 
     return sourFileInfos.stream()
-        .filter(sourFile -> sourFile.contentType().isSupported())
+        .filter(sourFile -> sourFile.repoEntryType().isSupported())
         .map(
             sourFile -> {
               ParsedSourceFile parsed = sourceFileParseService.parse(sourFile);
