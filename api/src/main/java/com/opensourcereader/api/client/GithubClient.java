@@ -235,4 +235,12 @@ public class GithubClient {
 
     return response.getBody();
   }
+
+  public String fetchDiff(GithubIssueCommentRequest request) {
+    return restClient
+        .get()
+        .uri("https://github.com/{owner}/{repoName}/pull/{tagNumber}.diff", request.owner(),request.repoName(),request.tagNumber())
+        .retrieve()
+        .body(String.class);
+  }
 }
