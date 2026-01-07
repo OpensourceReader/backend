@@ -2,19 +2,13 @@ package com.opensourcereader.core.analysis.service.impl.callgraph;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.repository.CodeMethodCallEdgeRepository;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 
@@ -24,29 +18,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphService {
 
-  private final CodeMethodCallEdgeRepository codeMethodCallEdgeRepository;
+  private final MethodPolymorphicDispatchService methodPolymorphicDispatchService;
+  private final MethodCallEdgeService methodCallEdgeService;
   private final CodeMethodRepository codeMethodRepository;
-  private final DeclaredMethodEdgeResolver declaredMethodEdgeResolver;
 
   @Transactional
   @Override
   public List<CodeMethodCallEdge> createMethodCallGraph(
       Long repoId, List<ClassStructure> classStructures) {
-    List<CodeMethodCallEdge> result = new ArrayList<>();
-    for (ClassStructure classStructure : classStructures) {
-      //      declaredMethodEdgeResolver.resolve();
+    List<CodeMethodCallEdge> dispatch = methodPolymorphicDispatchService.dispatch(repoId);
+    List<CodeMethodCallEdge> codeMethodCallEdges =
+        methodCallEdgeService.create(repoId, classStructures);
 
-    }
-    return codeMethodCallEdgeRepository.saveAll(result);
-  }
-
-  private Map<CodeMethodSignature, MethodStructure> getMethodStructures(
-      ClassStructure classStructure) {
-    return classStructure.methods().stream()
-        .collect(
-            Collectors.toMap(
-                methodStructure -> CodeMethodSignature.of(methodStructure.declaredMethodInfo()),
-                methodStructure -> methodStructure));
+    List<CodeMethodCallEdge> result = new ArrayList<>(dispatch);
+    result.addAll(codeMethodCallEdges);
+    return result;
   }
 
   @Transactional
@@ -61,20 +47,5 @@ public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphServic
         .orElseThrow(IllegalArgumentException::new);
 
     return declaredMethod;
-  }
-
-  private List<DeclaredMethod> getDeclaredMethods(Long repoId, ClassStructure classStructure) {
-    return classStructure.methods().stream()
-        .map(
-            methodStructure -> {
-              CodeMethodSignature codeMethodSignature =
-                  CodeMethodSignature.of(methodStructure.declaredMethodInfo());
-              return codeMethodRepository.findByRepoIdAndTypeInternalNameAndMethodSignature(
-                  repoId,
-                  methodStructure.declaredMethodInfo().className(),
-                  codeMethodSignature.methodSignature());
-            })
-        .flatMap(Optional::stream)
-        .toList();
   }
 }
