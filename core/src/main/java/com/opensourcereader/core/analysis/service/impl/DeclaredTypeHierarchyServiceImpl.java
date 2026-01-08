@@ -21,6 +21,10 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
   private final DeclaredTypeRepository declaredTypeRepository;
 
   public List<DeclaredType> resolveTypeHierarchy(List<ClassStructure> classStructures) {
+    if (classStructures == null || classStructures.isEmpty()) {
+      return List.of();
+    }
+
     List<DeclaredType> declaredTypes = new ArrayList<>();
     for (ClassInfo classInfo : getClassInfos(classStructures)) {
       DeclaredType declaredType =
@@ -33,6 +37,8 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
       declaredType.update(superType, implementEdges);
       declaredTypes.add(declaredType);
     }
+    // 반환은 하는데, 이게 영속상태가 아닌 객체여서 문제가 되는 것 같은데,
+    // ㄱㄷㄱ
 
     return declaredTypeRepository.saveAll(declaredTypes);
   }
@@ -45,10 +51,13 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
         .toList();
   }
 
-  private DeclaredType findTypeOrExternal(String classInfo) {
+  private DeclaredType findTypeOrExternal(String superName) {
+    if (superName == null) {
+      return null;
+    }
     return declaredTypeRepository
-        .findByTypeInternalName(classInfo)
-        .orElse(DeclaredType.external(classInfo));
+        .findByTypeInternalName(superName)
+        .orElse(DeclaredType.external(superName)); // 여기 문제
   }
 
   private List<ClassInfo> getClassInfos(List<ClassStructure> classStructures) {

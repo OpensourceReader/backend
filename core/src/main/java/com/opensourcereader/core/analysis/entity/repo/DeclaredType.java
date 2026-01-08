@@ -33,14 +33,20 @@ public class DeclaredType extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private TypeKind typeKind;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "super_type_id")
   private DeclaredType superType;
 
-  @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OneToMany(
+      mappedBy = "type",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private final List<DeclaredTypeImplementEdge> implementedInterfaces = new ArrayList<>();
 
-  @OneToMany(mappedBy = "interfaceType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OneToMany(
+      mappedBy = "interfaceType",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private final List<DeclaredTypeImplementEdge> implementations = new ArrayList<>();
 
   @OneToMany(mappedBy = "declaredType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
