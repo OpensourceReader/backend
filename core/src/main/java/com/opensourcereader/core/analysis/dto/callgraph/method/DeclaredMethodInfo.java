@@ -5,12 +5,12 @@ import java.util.EnumSet;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.entity.method.AccessModifier;
-import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public record DeclaredMethodInfo(
     String className,
     AccessModifier accessModifier,
-    EnumSet<NonAccessModifier> nonAccessModifiers,
+    EnumSet<MethodModifier> methodModifiers,
     String methodName,
     MethodDescriptor methodDescriptor,
     String genericSignature,
@@ -26,7 +26,7 @@ public record DeclaredMethodInfo(
     return new DeclaredMethodInfo(
         className,
         AccessModifier.from(access),
-        NonAccessModifier.from(access),
+        MethodModifier.from(access),
         methodName,
         MethodDescriptor.from(descriptor),
         genericSignature,

@@ -45,8 +45,12 @@ public class DeclaredMethod extends BaseEntity {
   private List<String> paramTypes;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "method_modifier")
+  @Column(name = "acess_modifier")
   private AccessModifier accessModifier;
+
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "method_modifier")
+  private List<MethodModifier> methodModifiers;
 
   @Column(name = "method_signature")
   @Embedded
@@ -77,6 +81,11 @@ public class DeclaredMethod extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "declared_type_id")
   private DeclaredType declaredType;
+
+  public static DeclaredMethod internalInheritance(
+      DeclaredMethod declaredMethod, DeclaredType nextDeclaredType) {
+    return new DeclaredMethod();
+  }
 
   public static DeclaredMethod internal(
       CodeMethodExtractResult methodExtractResult, DeclaredType declaredType) {
@@ -167,12 +176,13 @@ public class DeclaredMethod extends BaseEntity {
     if (!(o instanceof DeclaredMethod that)) {
       return false;
     }
-    return Objects.equals(methodSignature, that.methodSignature)
+    return Objects.equals(typeInternalName, that.typeInternalName)
+        && Objects.equals(methodSignature, that.methodSignature)
         && Objects.equals(declaredType, that.declaredType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(methodSignature, declaredType);
+    return Objects.hash(typeInternalName, methodSignature, declaredType);
   }
 }

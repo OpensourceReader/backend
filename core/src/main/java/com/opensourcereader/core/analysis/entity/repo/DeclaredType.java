@@ -1,6 +1,8 @@
 package com.opensourcereader.core.analysis.entity.repo;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
@@ -36,10 +38,10 @@ public class DeclaredType extends BaseEntity {
   private DeclaredType superType;
 
   @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  private List<DeclaredTypeImplementEdge> implementedInterfaces;
+  private final List<DeclaredTypeImplementEdge> implementedInterfaces = new ArrayList<>();
 
   @OneToMany(mappedBy = "interfaceType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  private List<DeclaredTypeImplementEdge> implementations;
+  private final List<DeclaredTypeImplementEdge> implementations = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "openSourceRepoContent",
@@ -128,5 +130,20 @@ public class DeclaredType extends BaseEntity {
     return methodExtractResults.stream()
         .map(extractResult -> DeclaredMethod.internal(extractResult, this))
         .toList();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof DeclaredType that)) {
+      return false;
+    }
+    return Objects.equals(typeInternalName, that.typeInternalName)
+        && typeOrigin == that.typeOrigin
+        && Objects.equals(openSourceRepoContent, that.openSourceRepoContent);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(typeInternalName, typeOrigin, openSourceRepoContent);
   }
 }

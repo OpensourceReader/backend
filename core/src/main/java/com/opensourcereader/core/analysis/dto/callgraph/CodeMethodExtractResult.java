@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.entity.method.AccessModifier;
-import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public record CodeMethodExtractResult(
     String methodName,
     AccessModifier modifier,
-    EnumSet<NonAccessModifier> nonAccessModifiers,
+    EnumSet<MethodModifier> methodModifiers,
     String returnType,
     List<String> paramTypes,
     Integer startLine,
@@ -21,7 +21,7 @@ public record CodeMethodExtractResult(
     return new CodeMethodExtractResult(
         declaredMethodInfo.methodName(),
         declaredMethodInfo.accessModifier(),
-        declaredMethodInfo.nonAccessModifiers(),
+        declaredMethodInfo.methodModifiers(),
         declaredMethodInfo.methodDescriptor().methodReturnType(),
         declaredMethodInfo.methodDescriptor().argumentTypes(),
         getStartLine(codeParseResult),
