@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class MethodCallLinkService {
+public class MethodCallResolver {
 
   private final DeclaredTypeRepository declaredTypeRepository;
   private final CodeMethodCallEdgeRepository codeMethodCallEdgeRepository;

@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class MethodPolymorphicDispatchService {
+public class MethodPolymorphicDispatcher {
 
   private final CodeMethodCallEdgeRepository codeMethodCallEdgeRepository;
   private final DeclaredTypeRepository declaredTypeRepository;
