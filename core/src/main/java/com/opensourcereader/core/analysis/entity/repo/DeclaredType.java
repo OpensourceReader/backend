@@ -43,10 +43,7 @@ public class DeclaredType extends BaseEntity {
   @OneToMany(mappedBy = "interfaceType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private final List<DeclaredTypeImplementEdge> implementations = new ArrayList<>();
 
-  @OneToMany(
-      mappedBy = "openSourceRepoContent",
-      fetch = FetchType.LAZY,
-      cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "declaredType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<DeclaredMethod> declaredMethods;
 
   @Enumerated(EnumType.STRING)
@@ -58,6 +55,9 @@ public class DeclaredType extends BaseEntity {
 
   public static DeclaredType internal(
       ClassStructure classStructure, List<CodeMethodExtractResult> methodExtractResults) {
+    if (classStructure == null) {
+      return null;
+    }
     return new DeclaredType(classStructure, methodExtractResults, TypeOrigin.INTERNAL);
   }
 

@@ -33,20 +33,25 @@ public class OpenSourceContentFactory {
 
     return sourFileInfos.stream()
         .filter(sourFile -> sourFile.repoEntryType().isSupported())
-        .map(
-            sourFile -> {
-              ParsedSourceFile parsed = sourceFileParseService.parse(sourFile);
-              ClassStructure classStructure = structures.get(parsed.classInternalName());
-              List<CodeMethodExtractResult> methods = extract(classStructure, parsed);
-
-              return OpenSourceRepoContent.of(sourFile, classStructure, methods, opensourceRepo);
-            })
+        .map(sourFile -> toRepoContent(opensourceRepo, sourFile, structures))
         .toList();
   }
 
-  private List<CodeMethodExtractResult> extract(
+  // extractMethod할떄 마지막 리턴타입에서, String 말고, com.ex. 같은 커스텀 타입도 검증 필요 -> 클래스 분리 필요
+  private OpenSourceRepoContent toRepoContent(
+      OpenSourceRepo opensourceRepo,
+      OpenSourceFileInfo sourFile,
+      Map<String, ClassStructure> structures) {
+    ParsedSourceFile parsedFile = sourceFileParseService.parse(sourFile);
+    ClassStructure structure = structures.get(parsedFile.classInternalName());
+    List<CodeMethodExtractResult> methods = extractMethod(structure, parsedFile);
+
+    return OpenSourceRepoContent.of(sourFile, structure, methods, opensourceRepo);
+  }
+
+  private List<CodeMethodExtractResult> extractMethod(
       ClassStructure classStructure, ParsedSourceFile parsedSourceFile) {
-    if (classStructure == null) {
+    if (classStructure == null || parsedSourceFile == null) {
       return List.of();
     }
 

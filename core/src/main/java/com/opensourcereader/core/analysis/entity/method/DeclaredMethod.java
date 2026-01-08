@@ -50,7 +50,7 @@ public class DeclaredMethod extends BaseEntity {
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "method_modifier")
-  private List<MethodModifier> methodModifiers;
+  private List<MethodModifier> methodModifiers; // 수정필요
 
   @Column(name = "method_signature")
   @Embedded
@@ -70,13 +70,13 @@ public class DeclaredMethod extends BaseEntity {
       mappedBy = "caller",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-  private List<CodeMethodCallEdge> outgoingCalls = new ArrayList<>();
+  private final List<CodeMethodCallEdge> outgoingCalls = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "callee",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-  private List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
+  private final List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "declared_type_id")
@@ -97,6 +97,7 @@ public class DeclaredMethod extends BaseEntity {
         null);
   }
 
+  // 수정필요
   public static DeclaredMethod internalInheritance(
       DeclaredMethod declaredMethod, DeclaredType nextDeclaredType) {
     return new DeclaredMethod();
@@ -153,23 +154,6 @@ public class DeclaredMethod extends BaseEntity {
     this.endLine = endLine;
     this.origin = methodOrigin;
     this.declaredType = declaredType;
-  }
-
-  public void updateAllCalls(
-      List<CodeMethodCallEdge> newOutgoingCalls, List<CodeMethodCallEdge> newIngoingCalls) {
-    syncEdges(this.outgoingCalls, newOutgoingCalls);
-    syncEdges(this.ingoingCalls, newIngoingCalls);
-  }
-
-  private static void syncEdges(
-      List<CodeMethodCallEdge> current, List<CodeMethodCallEdge> incoming) {
-    current.removeIf(edge -> !incoming.contains(edge));
-
-    for (CodeMethodCallEdge edge : incoming) {
-      if (!current.contains(edge)) {
-        current.add(edge);
-      }
-    }
   }
 
   @Override

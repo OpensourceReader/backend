@@ -26,23 +26,25 @@ public interface CodeMethodRepository extends JpaRepository<DeclaredMethod, Long
 
   @Query(
       """
-       SELECT DISTINCT m
+        SELECT DISTINCT m
         FROM DeclaredMethod m
-        LEFT JOIN FETCH m.declaredType.openSourceRepoContent.rawText r
+        LEFT JOIN FETCH m.declaredType dt
+        LEFT JOIN FETCH dt.openSourceRepoContent orc
         LEFT JOIN FETCH m.outgoingCalls oc
         LEFT JOIN FETCH oc.callee
         WHERE m.id = :codeMethodId
-       """)
+      """)
   Optional<DeclaredMethod> findWithOutgoingGraphById(Long codeMethodId);
 
   @Query(
       """
-       SELECT DISTINCT m
-        FROM DeclaredMethod m
-        LEFT JOIN FETCH m.declaredType.openSourceRepoContent.rawText r
-        LEFT JOIN FETCH m.ingoingCalls ic
-        LEFT JOIN FETCH ic.caller
-        WHERE m.id = :codeMethodId
-       """)
+      SELECT DISTINCT m
+      FROM DeclaredMethod m
+      LEFT JOIN FETCH m.declaredType dt
+      LEFT JOIN FETCH dt.openSourceRepoContent orc
+      LEFT JOIN FETCH m.ingoingCalls ic
+      LEFT JOIN FETCH ic.caller
+      WHERE m.id = :codeMethodId
+      """)
   Optional<DeclaredMethod> findWithIngoingGraphById(Long codeMethodId);
 }
