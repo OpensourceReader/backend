@@ -18,7 +18,7 @@ public class CodeMethodViewPolicy {
       return false;
     }
 
-    if (!request.includeExternal() && method.getOrigin() == MethodOrigin.EXTERNAL) {
+    if (!request.includeExternal() && method.getOrigin() == MethodOrigin.EXTERNAL_RESOLVED) {
       return false;
     }
 

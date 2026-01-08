@@ -50,8 +50,8 @@ public class CodeMethodCallEdge extends BaseEntity {
 
   private static MethodCallOrigin getCodeMethodCallEdge(
       DeclaredMethod caller, DeclaredMethod callee) {
-    if (caller.getOrigin().equals(MethodOrigin.EXTERNAL)
-        || callee.getOrigin().equals(MethodOrigin.EXTERNAL)) {
+    if (caller.getOrigin().equals(MethodOrigin.EXTERNAL_RESOLVED)
+        || callee.getOrigin().equals(MethodOrigin.EXTERNAL_RESOLVED)) {
       return MethodCallOrigin.EXTERNAL;
     }
     return MethodCallOrigin.INTERNAL;

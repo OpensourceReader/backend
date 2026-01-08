@@ -19,7 +19,7 @@ public interface CodeMethodRepository extends JpaRepository<DeclaredMethod, Long
               AND m.methodSignature.methodSignature = :methodSignature
 
           """)
-  Optional<DeclaredMethod> findByRepoIdAndTypeInternalNameAndMethodSignature(
+  Optional<DeclaredMethod> findCodeMethod(
       @Param("repoId") Long repoId,
       @Param("typeInternalName") String typeInternalName,
       @Param("methodSignature") String methodSignature);

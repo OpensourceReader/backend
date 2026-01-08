@@ -82,6 +82,21 @@ public class DeclaredMethod extends BaseEntity {
   @JoinColumn(name = "declared_type_id")
   private DeclaredType declaredType;
 
+  public static DeclaredMethod internalInheritanceDeclared(
+      MethodCallInfo callee, CodeMethodSignature methodSignature) {
+    return new DeclaredMethod(
+        callee.className(),
+        callee.methodName(),
+        callee.descriptor().methodReturnType(),
+        callee.descriptor().argumentTypes(),
+        null,
+        methodSignature,
+        null,
+        null,
+        MethodOrigin.INTERNAL_INHERITED_RESOLVED,
+        null);
+  }
+
   public static DeclaredMethod internalInheritance(
       DeclaredMethod declaredMethod, DeclaredType nextDeclaredType) {
     return new DeclaredMethod();
@@ -98,7 +113,7 @@ public class DeclaredMethod extends BaseEntity {
         CodeMethodSignature.of(methodExtractResult),
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
-        MethodOrigin.INTERNAL,
+        MethodOrigin.INTERNAL_DECLARED,
         declaredType);
   }
 
@@ -113,21 +128,7 @@ public class DeclaredMethod extends BaseEntity {
         methodSignature,
         null,
         null,
-        MethodOrigin.EXTERNAL,
-        null);
-  }
-
-  public static DeclaredMethod external(String interfaceName, DeclaredMethod caller) {
-    return new DeclaredMethod(
-        interfaceName,
-        caller.methodName,
-        caller.returnType,
-        caller.paramTypes,
-        caller.accessModifier,
-        caller.methodSignature,
-        caller.startLine,
-        caller.endLine,
-        MethodOrigin.EXTERNAL,
+        MethodOrigin.EXTERNAL_RESOLVED,
         null);
   }
 

@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphService {
 
   private final MethodPolymorphicDispatchService methodPolymorphicDispatchService;
-  private final MethodCallEdgeService methodCallEdgeService;
+  private final MethodCallLinkService methodCallLinkService;
   private final CodeMethodRepository codeMethodRepository;
 
   @Transactional
@@ -28,7 +28,7 @@ public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphServic
       Long repoId, List<ClassStructure> classStructures) {
     List<CodeMethodCallEdge> dispatch = methodPolymorphicDispatchService.dispatch(repoId);
     List<CodeMethodCallEdge> codeMethodCallEdges =
-        methodCallEdgeService.create(repoId, classStructures);
+        methodCallLinkService.create(repoId, classStructures);
 
     List<CodeMethodCallEdge> result = new ArrayList<>(dispatch);
     result.addAll(codeMethodCallEdges);

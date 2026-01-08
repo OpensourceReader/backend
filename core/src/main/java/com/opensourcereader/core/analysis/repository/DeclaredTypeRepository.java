@@ -25,4 +25,16 @@ public interface DeclaredTypeRepository extends JpaRepository<DeclaredType, Long
   """)
   List<DeclaredType> findByRepoAndTypesByKind(
       @Param("repoId") Long repoId, @Param("typeKind") TypeKind typeKind);
+
+  @Query(
+      """
+    select dt
+    from DeclaredType dt
+    left join dt.openSourceRepoContent orc
+    left join orc.openSourceRepo osr
+    where osr.id = :repoId
+      and dt.typeInternalName = :internalName
+  """)
+  Optional<DeclaredType> findByRepoAndTypeInternalName(
+      @Param("repoId") Long repoId, @Param("internalName") String internalName);
 }
