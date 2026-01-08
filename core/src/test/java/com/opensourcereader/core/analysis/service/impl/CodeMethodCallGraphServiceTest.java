@@ -29,7 +29,7 @@
 // import org.junit.jupiter.api.Test;
 //
 // @SpringBootTest
-// class DeclaredMethodGraphQueryServiceTest {
+// class CodeMethodCallGraphServiceTest {
 //
 //  @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
 //  @Autowired CodeMethodRepository codeMethodRepository;

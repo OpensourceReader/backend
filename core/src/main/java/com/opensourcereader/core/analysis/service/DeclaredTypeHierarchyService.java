@@ -5,7 +5,7 @@ import java.util.List;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 
-public interface DeclaredTypeRelationService {
+public interface DeclaredTypeHierarchyService {
 
-  List<DeclaredType> create(List<ClassStructure> classStructures);
+  List<DeclaredType> resolveTypeHierarchy(List<ClassStructure> classStructures);
 }

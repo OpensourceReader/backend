@@ -10,17 +10,17 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
-import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
+import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationService {
+public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchyService {
 
   private final DeclaredTypeRepository declaredTypeRepository;
 
-  public List<DeclaredType> create(List<ClassStructure> classStructures) {
+  public List<DeclaredType> resolveTypeHierarchy(List<ClassStructure> classStructures) {
     List<DeclaredType> declaredTypes = new ArrayList<>();
     for (ClassInfo classInfo : getClassInfos(classStructures)) {
       DeclaredType declaredType =
