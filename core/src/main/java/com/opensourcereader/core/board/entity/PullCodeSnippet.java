@@ -7,34 +7,34 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pull_code_line")
+@Table(name = "pull_code_snippet")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PullCodeLine extends BaseEntity {
+public class PullCodeSnippet extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "pull_code_id")
-  private PullCode pullCode;
+  @JoinColumn(name = "pull_request_file_id")
+  private PullRequestFile pullRequestFile;
 
-  @Column
-  private Integer startLine;
+  @Column private Integer startLine;
 
-  @Column
-  private Integer endLine;
+  @Column private Integer endLine;
 
-  private PullCodeLine(PullCode pullCode, Integer startLine, Integer endLine) {
+  private PullCodeSnippet(PullRequestFile pullRequestFile, Integer startLine, Integer endLine) {
     super();
-    this.pullCode = pullCode;
+    this.pullRequestFile = pullRequestFile;
     this.startLine = startLine;
     this.endLine = endLine;
   }
 
-  public static PullCodeLine of(PullCode pullCode, Integer startLine, Integer endLine) {
-    return new PullCodeLine(pullCode, startLine, endLine);
+  public static PullCodeSnippet of(
+      PullRequestFile pullRequestFile, Integer startLine, Integer endLine) {
+    return new PullCodeSnippet(pullRequestFile, startLine, endLine);
   }
 }

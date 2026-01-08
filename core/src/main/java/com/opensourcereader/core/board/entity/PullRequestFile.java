@@ -4,34 +4,32 @@ import com.opensourcereader.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pull_codes")
+@Table(name = "pull_request_file")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PullCode extends BaseEntity {
+public class PullRequestFile extends BaseEntity {
 
-  @Column
-  private Integer tagNumber;   //TODO 나중에 Pull로 대체해야함
+  @Column private Integer tagNumber; // TODO 나중에 Pull로 대체해야함
 
-  @Column
-  private String classPath;
+  @Column private String classPath;
 
-  @Column
-  private String className;
+  @Column private String className;
 
-  private PullCode(Integer tagNumber, String classPath, String className) {
+  private PullRequestFile(Integer tagNumber, String classPath, String className) {
     super();
     this.tagNumber = tagNumber;
     this.classPath = classPath;
     this.className = className;
   }
 
-  public static PullCode of(Integer tagNumber, String classPath) {
-    return new PullCode(tagNumber, classPath, extractClassName(classPath));
+  public static PullRequestFile of(Integer tagNumber, String classPath) {
+    return new PullRequestFile(tagNumber, classPath, extractClassName(classPath));
   }
 
   private static String extractClassName(String classPath) {
