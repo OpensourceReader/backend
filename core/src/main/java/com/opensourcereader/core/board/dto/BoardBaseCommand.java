@@ -3,6 +3,7 @@ package com.opensourcereader.core.board.dto;
 import java.time.Instant;
 
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.board.entity.State;
 import com.opensourcereader.core.user.entity.User;
 
 import lombok.AccessLevel;
@@ -26,6 +27,6 @@ public class BoardBaseCommand {
   private Instant updatedAt;
   private String title;
   private String body;
-  private Boolean isOpened;
+  private State state;
   private Integer commentCount;
 }

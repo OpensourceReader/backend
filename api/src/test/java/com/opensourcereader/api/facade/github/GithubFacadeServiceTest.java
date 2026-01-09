@@ -69,6 +69,7 @@ public class GithubFacadeServiceTest {
                 "login" : "%s",
                 "avatar_url" : "https://avatars.githubusercontent.com/u/245825325?v=4"
               },
+            "state": "open",
             "created_at" : "2025-11-24T08:23:45Z",
             "updated_at" : "2025-12-11T08:43:04Z"
           }

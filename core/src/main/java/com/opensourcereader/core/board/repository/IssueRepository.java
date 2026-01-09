@@ -13,8 +13,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
   Optional<Issue> findByRepositoryIdAndTagId(Long repositoryId, Integer tagId);
 
-  List<Issue> findAllByRepositoryIdAndIsOpenedOrderByCreatedAtDesc(
-      Long repositoryId, Boolean isOpened);
+  List<Issue> findAllByRepositoryIdOrderByCreatedAtDesc(Long repositoryId);
 
   Optional<Issue> findByRepositoryOwnerLoginNameAndRepositoryTitleAndTagId(
       String repositoryOwnerLoginName, String repositoryTitle, Integer tagId);

@@ -1,7 +1,6 @@
 package com.opensourcereader.core.board.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.board.dto.PullCommand;
 import com.opensourcereader.core.board.entity.Pull;
+import com.opensourcereader.core.board.entity.State;
 import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class PullRepositoryTest {
             .updatedAt(now)
             .title("testPull")
             .body("testBody")
-            .isOpened(true)
+            .state(State.OPEN)
             .commentCount(1)
             .reviewCount(2)
             .build();

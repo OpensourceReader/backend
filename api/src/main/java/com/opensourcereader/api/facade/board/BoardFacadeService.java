@@ -25,7 +25,7 @@ public class BoardFacadeService {
     List<BoardPreviewResponse> responses = new ArrayList<>();
     Long repositoryId = request.repositoryId();
 
-    List<Issue> issueEntities = issueRetrieveService.findIssuesByRepositoryId(repositoryId, true);
+    List<Issue> issueEntities = issueRetrieveService.findIssuesByRepositoryId(repositoryId);
 
     for (Issue entity : issueEntities) {
       UserDto userDto = UserDto.from(entity.getAuthor());

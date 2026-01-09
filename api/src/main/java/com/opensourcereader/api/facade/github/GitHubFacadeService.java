@@ -3,7 +3,6 @@ package com.opensourcereader.api.facade.github;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Queue;
 
 import org.springframework.stereotype.Service;
@@ -76,12 +75,11 @@ public class GitHubFacadeService {
 
     for (GithubIssueResponse fetched : fetchedRepoIssues) {
       User author = findByUser(fetched.user());
-      Boolean isOpened = isOpened(fetched.state());
       BoardBaseCommand command = null;
       if (fetched.isPullRequest()) {
-        command = modelMapper.toPullCommand(fetched, author, repo, isOpened);
+        command = modelMapper.toPullCommand(fetched, author, repo);
       } else {
-        command = modelMapper.toIssueCommand(fetched, author, repo, isOpened);
+        command = modelMapper.toIssueCommand(fetched, author, repo);
       }
       issueCommands.add(command);
     }
@@ -100,8 +98,7 @@ public class GitHubFacadeService {
 
     for (GithubPullResponse pullResponse : pullResponses) {
       User author = findByUser(pullResponse.user());
-      Boolean isOpened = isOpened(pullResponse.state());
-      PullCommand command = modelMapper.toPullCommand(pullResponse, author, repo, isOpened);
+      PullCommand command = modelMapper.toPullCommand(pullResponse, author, repo);
       pullCommands.add(command);
     }
 
@@ -164,16 +161,5 @@ public class GitHubFacadeService {
     GithubUserCommand command =
         new GithubUserCommand(response.id(), response.login(), response.avatarUrl());
     return userSignUpService.guest(command);
-  }
-
-  // TODO enum 타입으로 변경해야함
-  private Boolean isOpened(String state) {
-    if (state.toLowerCase(Locale.ROOT).equals("open")) {
-      return true;
-    }
-    if (state.toLowerCase(Locale.ROOT).equals("closed")) {
-      return false;
-    }
-    return null;
   }
 }

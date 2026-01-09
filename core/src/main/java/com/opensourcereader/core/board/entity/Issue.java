@@ -11,6 +11,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -64,8 +66,8 @@ public class Issue {
   @Column(columnDefinition = "LONGTEXT")
   private String body;
 
-  @Column(name = "is_opened", nullable = false)
-  private Boolean isOpened;
+  @Enumerated(EnumType.STRING)
+  private State state;
 
   @Column(name = "comment_count", nullable = false)
   private Integer commentCount;
@@ -82,7 +84,7 @@ public class Issue {
     this.repository = command.getRepo();
     this.title = command.getTitle();
     this.body = command.getBody();
-    this.isOpened = command.getIsOpened();
+    this.state = command.getState();
     this.commentCount = command.getCommentCount();
   }
 
@@ -100,8 +102,8 @@ public class Issue {
     this.disabled = newDisabled;
   }
 
-  public void updateStatus(Boolean newStatus) {
-    this.isOpened = updateField(this.isOpened, newStatus);
+  public void updateStatus(State newState) {
+    this.state = updateField(this.state, newState);
   }
 
   public void updateCommentCount(Integer newCommentCount) {

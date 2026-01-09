@@ -3,6 +3,7 @@ package com.opensourcereader.api.client.response;
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.opensourcereader.core.board.entity.State;
 
 public record GithubIssueResponse(
     Long id,
@@ -10,7 +11,7 @@ public record GithubIssueResponse(
     String title,
     @JsonProperty("user") GithubUserResponse user,
     String body,
-    String state,
+    State state,
     @JsonProperty("comments") Integer commentCount,
     @JsonProperty("created_at") Instant createdAt,
     @JsonProperty("updated_at") Instant updatedAt,

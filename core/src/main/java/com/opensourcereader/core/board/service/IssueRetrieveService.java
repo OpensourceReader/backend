@@ -31,9 +31,8 @@ public class IssueRetrieveService {
   }
 
   @Transactional(readOnly = true)
-  public List<Issue> findIssuesByRepositoryId(Long repositoryId, Boolean isOpened) {
-    return issueRepository.findAllByRepositoryIdAndIsOpenedOrderByCreatedAtDesc(
-        repositoryId, isOpened);
+  public List<Issue> findIssuesByRepositoryId(Long repositoryId) {
+    return issueRepository.findAllByRepositoryIdOrderByCreatedAtDesc(repositoryId);
   }
 
   @Transactional(readOnly = true)

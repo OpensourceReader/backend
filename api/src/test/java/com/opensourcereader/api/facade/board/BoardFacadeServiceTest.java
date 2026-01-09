@@ -43,7 +43,7 @@ class BoardFacadeServiceTest {
     Issue issue = FIXTURE_MONKEY.giveMeOne(Issue.class);
     Pull pull = FIXTURE_MONKEY.giveMeOne(Pull.class);
 
-    given(issueRetrieveService.findIssuesByRepositoryId(request.repositoryId(), true))
+    given(issueRetrieveService.findIssuesByRepositoryId(request.repositoryId()))
         .willReturn(List.of(issue, pull));
 
     // when

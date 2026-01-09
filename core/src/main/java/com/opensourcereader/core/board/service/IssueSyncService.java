@@ -133,7 +133,7 @@ public class IssueSyncService {
 
   private void updateIssue(Issue issue, BoardBaseCommand command) {
     issue.updateBody(command.getBody());
-    issue.updateStatus(command.getIsOpened());
+    issue.updateStatus(command.getState());
     issue.updateCommentCount(command.getCommentCount());
     if (issue instanceof Pull pull && command instanceof PullCommand pullCommand) {
       pull.updateReviewCount(pullCommand.getReviewCount());

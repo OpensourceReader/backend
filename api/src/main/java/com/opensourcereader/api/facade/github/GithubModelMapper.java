@@ -21,7 +21,7 @@ import com.opensourcereader.core.user.entity.User;
 @Component
 public class GithubModelMapper {
   public BoardBaseCommand toIssueCommand(
-      GithubIssueResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
+      GithubIssueResponse response, User author, OpenSourceRepo repo) {
     return BoardBaseCommand.builder()
         .id(response.id())
         .createdAt(response.createdAt())
@@ -31,13 +31,12 @@ public class GithubModelMapper {
         .repo(repo)
         .title(response.title())
         .body(response.body())
-        .isOpened(isOpened)
+        .state(response.state())
         .commentCount(response.commentCount())
         .build();
   }
 
-  public PullCommand toPullCommand(
-      GithubPullResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
+  public PullCommand toPullCommand(GithubPullResponse response, User author, OpenSourceRepo repo) {
     return PullCommand.builder()
         .id(response.id())
         .createdAt(response.createdAt())
@@ -47,14 +46,13 @@ public class GithubModelMapper {
         .repo(repo)
         .title(response.title())
         .body(response.body())
-        .isOpened(isOpened)
+        .state(response.state())
         .commentCount(response.commentCount())
         .reviewCount(response.reviewCount())
         .build();
   }
 
-  public PullCommand toPullCommand(
-      GithubIssueResponse response, User author, OpenSourceRepo repo, Boolean isOpened) {
+  public PullCommand toPullCommand(GithubIssueResponse response, User author, OpenSourceRepo repo) {
     return PullCommand.builder()
         .id(response.id())
         .createdAt(response.createdAt())
@@ -64,7 +62,7 @@ public class GithubModelMapper {
         .repo(repo)
         .title(response.title())
         .body(response.body())
-        .isOpened(isOpened)
+        .state(response.state())
         .commentCount(response.commentCount())
         .build();
   }
@@ -79,7 +77,7 @@ public class GithubModelMapper {
         .repo(command.getRepo())
         .title(command.getTitle())
         .body(command.getBody())
-        .isOpened(command.getIsOpened())
+        .state(command.getState())
         .commentCount(command.getCommentCount())
         .reviewCount(reviewCommentCounts)
         .build();
