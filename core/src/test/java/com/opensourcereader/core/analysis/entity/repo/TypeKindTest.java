@@ -13,7 +13,7 @@ class TypeKindTest {
   void class_type() {
     int classAccess = Opcodes.ACC_PUBLIC;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.CLASS);
   }
@@ -23,7 +23,7 @@ class TypeKindTest {
   void interface_type() {
     int classAccess = Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.INTERFACE);
   }
@@ -33,7 +33,7 @@ class TypeKindTest {
   void annotation_type() {
     int classAccess = Opcodes.ACC_PUBLIC | Opcodes.ACC_INTERFACE | Opcodes.ACC_ANNOTATION;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.ANNOTATION);
   }
@@ -43,7 +43,7 @@ class TypeKindTest {
   void enum_type() {
     int classAccess = Opcodes.ACC_PUBLIC | Opcodes.ACC_ENUM;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.ENUM);
   }
@@ -53,7 +53,7 @@ class TypeKindTest {
   void record_type() {
     int classAccess = Opcodes.ACC_PUBLIC | Opcodes.ACC_RECORD;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.RECORD);
   }
@@ -63,7 +63,7 @@ class TypeKindTest {
   void annotation_has_higher_priority_than_interface() {
     int classAccess = Opcodes.ACC_INTERFACE | Opcodes.ACC_ANNOTATION;
 
-    TypeKind kind = TypeKind.fromClassAccess(classAccess);
+    TypeKind kind = TypeKind.from(classAccess);
 
     assertThat(kind).isEqualTo(TypeKind.ANNOTATION);
   }

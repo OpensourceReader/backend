@@ -4,12 +4,10 @@ import java.util.EnumSet;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public record CodeMethodExtractResult(
     String methodName,
-    AccessModifier modifier,
     EnumSet<MethodModifier> methodModifiers,
     String returnType,
     List<String> paramTypes,
@@ -20,7 +18,6 @@ public record CodeMethodExtractResult(
       DeclaredMethodInfo declaredMethodInfo, SourceCodeParseResult codeParseResult) {
     return new CodeMethodExtractResult(
         declaredMethodInfo.methodName(),
-        declaredMethodInfo.accessModifier(),
         declaredMethodInfo.methodModifiers(),
         declaredMethodInfo.methodDescriptor().methodReturnType(),
         declaredMethodInfo.methodDescriptor().argumentTypes(),

@@ -9,7 +9,7 @@ public enum TypeKind {
   RECORD,
   ANNOTATION;
 
-  public static TypeKind fromClassAccess(int classAccess) {
+  public static TypeKind from(int classAccess) {
     // 1) Annotation: annotation은 interface 플래그도 같이 켜지므로 먼저 체크
     if ((classAccess & Opcodes.ACC_ANNOTATION) != 0) {
       return TypeKind.ANNOTATION;

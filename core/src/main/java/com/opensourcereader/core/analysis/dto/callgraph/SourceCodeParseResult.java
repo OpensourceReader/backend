@@ -1,12 +1,13 @@
 package com.opensourcereader.core.analysis.dto.callgraph;
 
+import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public record SourceCodeParseResult(
     String methodName,
-    AccessModifier modifier,
+    EnumSet<MethodModifier> modifier,
     String returnType,
     List<String> argumentTypes,
     Integer startLine,

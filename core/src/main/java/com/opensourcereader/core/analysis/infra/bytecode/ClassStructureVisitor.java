@@ -1,9 +1,5 @@
 package com.opensourcereader.core.analysis.infra.bytecode;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
@@ -11,12 +7,14 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class ClassStructureVisitor extends ClassVisitor {
 
+  private int classAccess;
   private ClassInfo classInfo;
   private final List<MethodStructure> methodStructures = new ArrayList<>();
 
@@ -27,19 +25,19 @@ public class ClassStructureVisitor extends ClassVisitor {
   @Override
   public void visit(
       int version,
-      int access,
+      int classAccess,
       String className,
       String signature,
       String superName,
       String[] interfaces) {
+    this.classAccess = classAccess;
     this.classInfo =
-        new ClassInfo(
-            version, access, className, signature, superName, Arrays.stream(interfaces).toList());
+        ClassInfo.of(version, classAccess, className, signature, superName, interfaces);
   }
 
   @Override
   public MethodVisitor visitMethod(
-      int access,
+      int methodAccess,
       String callerMethodName,
       String callerDescriptor,
       String genericSignature,
@@ -65,7 +63,8 @@ public class ClassStructureVisitor extends ClassVisitor {
         DeclaredMethodInfo declaredMethodInfo =
             DeclaredMethodInfo.of(
                 classInfo.className(),
-                access,
+                classAccess,
+                methodAccess,
                 callerMethodName,
                 callerDescriptor,
                 genericSignature,

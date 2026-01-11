@@ -1,11 +1,12 @@
 package com.opensourcereader.core.analysis.dto.callgraph;
 
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import java.util.Arrays;
 import java.util.List;
 
 public record ClassInfo(
     int version,
-    int access,
+    TypeKind typeKind,
     String className,
     String signature,
     String superName,
@@ -19,7 +20,7 @@ public record ClassInfo(
       String superName,
       String[] interfaces) {
     return new ClassInfo(
-        version, access, className, signature, superName, getInterfaces(interfaces));
+        version, TypeKind.from(access), className, signature, superName, getInterfaces(interfaces));
   }
 
   private static List<String> getInterfaces(String[] interfaces) {

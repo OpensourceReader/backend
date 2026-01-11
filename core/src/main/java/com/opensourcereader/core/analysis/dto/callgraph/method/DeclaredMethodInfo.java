@@ -4,12 +4,10 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public record DeclaredMethodInfo(
     String className,
-    AccessModifier accessModifier,
     EnumSet<MethodModifier> methodModifiers,
     String methodName,
     MethodDescriptor methodDescriptor,
@@ -18,15 +16,15 @@ public record DeclaredMethodInfo(
 
   public static DeclaredMethodInfo of(
       String className,
-      int access,
+      int classAccess,
+      int methodAccess,
       String methodName,
       String descriptor,
       String genericSignature,
       String[] exceptions) {
     return new DeclaredMethodInfo(
         className,
-        AccessModifier.from(access),
-        MethodModifier.from(access),
+        MethodModifier.from(classAccess, methodAccess),
         methodName,
         MethodDescriptor.from(descriptor),
         genericSignature,
