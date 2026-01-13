@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
@@ -110,14 +109,13 @@ class OpenSourceContentFactoryTest {
     assertThat(contents.get(0).getDeclaredType().getDeclaredMethods())
         .extracting(
             DeclaredMethod::getMethodName,
-            DeclaredMethod::getAccessModifier,
             DeclaredMethod::getMethodModifiers,
             DeclaredMethod::getParamTypes,
             DeclaredMethod::getStartLine,
             DeclaredMethod::getEndLine)
         .containsExactlyInAnyOrder(
-            tuple("<init>", AccessModifier.PUBLIC, null, List.of(), null, null),
-            tuple("m", AccessModifier.PUBLIC, null, List.of("java.lang.String"), 3, 3),
-            tuple("n", AccessModifier.PUBLIC, null, List.of(), 4, 4));
+            tuple("<init>", null, List.of(), null, null),
+            tuple("m", null, List.of("java.lang.String"), 3, 3),
+            tuple("n", null, List.of(), 4, 4));
   }
 }

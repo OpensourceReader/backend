@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.infra.parser.SourceCodeParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -93,11 +93,11 @@ class SourceCodeParserTest {
 
       assertMethods(
           results,
-          expected("m1", AccessModifier.PUBLIC, List.of()),
-          expected("m2", AccessModifier.PRIVATE, List.of("int")),
-          expected("m2", AccessModifier.PROTECTED, List.of("String")),
-          expected("m3", AccessModifier.PACKAGE_PRIVATE, List.of("String...")),
-          expected("m4", AccessModifier.PACKAGE_PRIVATE, List.of("int[]", "String[][]")));
+          expected("m1", MethodModifier.PUBLIC, List.of()),
+          expected("m2", MethodModifier.PRIVATE, List.of("int")),
+          expected("m2", MethodModifier.PROTECTED, List.of("String")),
+          expected("m3", MethodModifier.PACKAGE_PRIVATE, List.of("String...")),
+          expected("m4", MethodModifier.PACKAGE_PRIVATE, List.of("int[]", "String[][]")));
     }
 
     @Test
@@ -118,9 +118,9 @@ class SourceCodeParserTest {
 
       assertMethods(
           results,
-          expected("m1", AccessModifier.PUBLIC, List.of("R")),
-          expected("m2", AccessModifier.PUBLIC, List.of("List")),
-          expected("m3", AccessModifier.PUBLIC, List.of()));
+          expected("m1", MethodModifier.PUBLIC, List.of("R")),
+          expected("m2", MethodModifier.PUBLIC, List.of("List")),
+          expected("m3", MethodModifier.PUBLIC, List.of()));
     }
   }
 
@@ -145,10 +145,10 @@ class SourceCodeParserTest {
 
       assertMethods(
           results,
-          expected("a", AccessModifier.PUBLIC, List.of()),
-          expected("b", AccessModifier.PUBLIC, List.of()),
-          expected("c", AccessModifier.PUBLIC, List.of()),
-          expected("d", AccessModifier.PRIVATE, List.of()));
+          expected("a", MethodModifier.PUBLIC, List.of()),
+          expected("b", MethodModifier.PUBLIC, List.of()),
+          expected("c", MethodModifier.PUBLIC, List.of()),
+          expected("d", MethodModifier.PRIVATE, List.of()));
     }
 
     @Test
@@ -163,12 +163,12 @@ class SourceCodeParserTest {
 
       var results = sourceCodeParser.extractCodeMethods(rawText);
 
-      assertMethods(results, expected("sum", AccessModifier.PUBLIC, List.of()));
+      assertMethods(results, expected("sum", MethodModifier.PUBLIC, List.of()));
     }
   }
 
   private static ExpectedMethod expected(
-      String name, AccessModifier modifier, List<String> paramTypes) {
+      String name, MethodModifier modifier, List<String> paramTypes) {
     return new ExpectedMethod(name, modifier, paramTypes);
   }
 
@@ -186,5 +186,5 @@ class SourceCodeParserTest {
                 .toArray(org.assertj.core.groups.Tuple[]::new));
   }
 
-  private record ExpectedMethod(String name, AccessModifier modifier, List<String> paramTypes) {}
+  private record ExpectedMethod(String name, MethodModifier modifier, List<String> paramTypes) {}
 }

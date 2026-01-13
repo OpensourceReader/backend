@@ -1,5 +1,7 @@
 package com.opensourcereader.core.analysis.entity.method.methodcall;
 
+import java.util.Objects;
+
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
@@ -55,5 +57,20 @@ public class CodeMethodCallEdge extends BaseEntity {
       return MethodCallOrigin.EXTERNAL;
     }
     return MethodCallOrigin.INTERNAL;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof CodeMethodCallEdge that)) {
+      return false;
+    }
+    return methodCallOrigin == that.methodCallOrigin
+        && Objects.equals(caller, that.caller)
+        && Objects.equals(callee, that.callee);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(methodCallOrigin, caller, callee);
   }
 }

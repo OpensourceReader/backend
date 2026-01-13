@@ -44,10 +44,6 @@ public class DeclaredMethod extends BaseEntity {
   @Column(name = "param_types", columnDefinition = "json", nullable = false)
   private List<String> paramTypes;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "acess_modifier")
-  private AccessModifier accessModifier;
-
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "method_modifier")
   private List<MethodModifier> methodModifiers; // 수정필요
@@ -97,10 +93,19 @@ public class DeclaredMethod extends BaseEntity {
         null);
   }
 
-  // 수정필요
-  public static DeclaredMethod internalInheritance(
-      DeclaredMethod declaredMethod, DeclaredType nextDeclaredType) {
-    return new DeclaredMethod();
+  public static DeclaredMethod internalInheritanceDeclared(
+      DeclaredMethod superDeclaredMethod, DeclaredType childDeclaredType) {
+    return new DeclaredMethod(
+        childDeclaredType.getTypeInternalName(),
+        superDeclaredMethod.methodName,
+        superDeclaredMethod.returnType,
+        superDeclaredMethod.paramTypes,
+        superDeclaredMethod.methodModifiers,
+        superDeclaredMethod.getMethodSignature(),
+        null,
+        null,
+        MethodOrigin.INTERNAL_INHERITED_DECLARATION,
+        childDeclaredType);
   }
 
   public static DeclaredMethod internal(
@@ -110,7 +115,7 @@ public class DeclaredMethod extends BaseEntity {
         methodExtractResult.methodName(),
         methodExtractResult.returnType(),
         methodExtractResult.paramTypes(),
-        methodExtractResult.modifier(),
+        methodExtractResult.methodModifiers().stream().toList(),
         CodeMethodSignature.of(methodExtractResult),
         methodExtractResult.startLine(),
         methodExtractResult.endLine(),
@@ -138,7 +143,7 @@ public class DeclaredMethod extends BaseEntity {
       String methodName,
       String returnType,
       List<String> paramTypes,
-      AccessModifier accessModifier,
+      List<MethodModifier> methodModifiers,
       CodeMethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
@@ -148,7 +153,7 @@ public class DeclaredMethod extends BaseEntity {
     this.methodName = methodName;
     this.returnType = returnType;
     this.paramTypes = paramTypes;
-    this.accessModifier = accessModifier;
+    this.methodModifiers = methodModifiers;
     this.methodSignature = methodSignature;
     this.startLine = startLine;
     this.endLine = endLine;

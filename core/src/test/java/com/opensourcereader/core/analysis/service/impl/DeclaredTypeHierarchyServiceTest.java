@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.entity.repo.TypeOrigin;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
@@ -27,7 +28,8 @@ class DeclaredTypeHierarchyServiceTest {
 
   private ClassStructure toClassStructure(
       String className, String superName, List<String> interfaceNames) {
-    ClassInfo classInfo = new ClassInfo(0, 0, className, null, superName, interfaceNames);
+    ClassInfo classInfo =
+        new ClassInfo(0, TypeKind.CLASS, className, null, superName, interfaceNames);
     return new ClassStructure(classInfo, List.of());
   }
 

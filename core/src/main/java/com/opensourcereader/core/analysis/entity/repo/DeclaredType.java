@@ -3,6 +3,7 @@ package com.opensourcereader.core.analysis.entity.repo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
@@ -41,15 +42,18 @@ public class DeclaredType extends BaseEntity {
       mappedBy = "type",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private final List<DeclaredTypeImplementEdge> implementedInterfaces = new ArrayList<>();
+  private List<DeclaredTypeImplementEdge> implementedInterfaces;
 
   @OneToMany(
       mappedBy = "interfaceType",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private final List<DeclaredTypeImplementEdge> implementations = new ArrayList<>();
+  private List<DeclaredTypeImplementEdge> implementations;
 
-  @OneToMany(mappedBy = "declaredType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OneToMany(
+      mappedBy = "declaredType",
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<DeclaredMethod> declaredMethods;
 
   @Enumerated(EnumType.STRING)
@@ -71,14 +75,24 @@ public class DeclaredType extends BaseEntity {
     return new DeclaredType(typeInternalName, null, TypeOrigin.EXTERNAL, null, null);
   }
 
+  public void updateMethod(DeclaredMethod newMethod) {
+    if (newMethod == null) {
+      return;
+    }
+    if (declaredMethods.contains(newMethod)) {
+      return;
+    }
+    declaredMethods.add(newMethod);
+  }
+
   public void update(DeclaredType newSuperType, List<DeclaredTypeImplementEdge> newImplementEdges) {
     if (newSuperType != null) {
       this.superType = newSuperType;
     }
-    syncInterfaceEdges(newImplementEdges);
+    syncImplementedInterfaceEdges(newImplementEdges);
   }
 
-  private void syncInterfaceEdges(List<DeclaredTypeImplementEdge> newEdges) {
+  private void syncImplementedInterfaceEdges(List<DeclaredTypeImplementEdge> newEdges) {
     if (newEdges == null) {
       return;
     }
@@ -93,8 +107,20 @@ public class DeclaredType extends BaseEntity {
 
       if (!exists) {
         this.implementedInterfaces.add(newEdge);
+        newEdge.getInterfaceType().updateImplementation(newEdge);
       }
     }
+  }
+
+  private void updateImplementation(DeclaredTypeImplementEdge newEdge) {
+    if (newEdge == null) {
+      return;
+    }
+    if (this.implementations.contains(newEdge)) {
+      return;
+    }
+
+    this.implementations.add(newEdge);
   }
 
   private boolean sameInterface(DeclaredTypeImplementEdge a, DeclaredTypeImplementEdge b) {
@@ -114,6 +140,8 @@ public class DeclaredType extends BaseEntity {
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
     this.declaredMethods = declaredMethods;
+    this.implementedInterfaces = new ArrayList<>();
+    this.implementations = new ArrayList<>();
   }
 
   private DeclaredType(
@@ -121,8 +149,12 @@ public class DeclaredType extends BaseEntity {
       List<CodeMethodExtractResult> methodExtractResults,
       TypeOrigin typeOrigin) {
     this.typeInternalName = extractedTypeName(classStructure);
+    this.typeKind = classStructure.classInfo().typeKind();
     this.declaredMethods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
+    this.openSourceRepoContent = null; // 수정 필요
+    this.implementedInterfaces = new ArrayList<>();
+    this.implementations = new ArrayList<>();
   }
 
   private String extractedTypeName(ClassStructure classStructure) {
@@ -135,7 +167,7 @@ public class DeclaredType extends BaseEntity {
   private List<DeclaredMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
     return methodExtractResults.stream()
         .map(extractResult -> DeclaredMethod.internal(extractResult, this))
-        .toList();
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   @Override

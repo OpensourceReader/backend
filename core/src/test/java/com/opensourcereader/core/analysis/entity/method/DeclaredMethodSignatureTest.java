@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity.method;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,7 +19,8 @@ class DeclaredMethodSignatureTest {
   void codeSignatureParameterizedTest(List<String> rawParamTypes, String expectedSignature) {
     // given
     CodeMethodExtractResult methodExtractResult =
-        new CodeMethodExtractResult("methodName", null, null, "void", rawParamTypes, null, null);
+        new CodeMethodExtractResult(
+            "methodName", EnumSet.noneOf(MethodModifier.class), "void", rawParamTypes, null, null);
 
     // when
     CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodExtractResult);

@@ -25,7 +25,7 @@ public class DeclaredTypeImplementEdge extends BaseEntity {
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "interfaceType_id")
+  @JoinColumn(name = "interface_type_id")
   private DeclaredType interfaceType;
 
   public static DeclaredTypeImplementEdge of(DeclaredType type, DeclaredType interfaceType) {

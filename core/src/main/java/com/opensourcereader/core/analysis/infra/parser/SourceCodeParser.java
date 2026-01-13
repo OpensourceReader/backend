@@ -15,7 +15,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.type.Type;
 import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.entity.method.AccessModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,7 +59,7 @@ public class SourceCodeParser {
             methodDeclaration ->
                 new SourceCodeParseResult(
                     methodDeclaration.getNameAsString(),
-                    AccessModifier.from(methodDeclaration),
+                    MethodModifier.from(methodDeclaration),
                     methodDeclaration.getType().asString(),
                     getParameterTypes(methodDeclaration),
                     getStartLine(methodDeclaration),

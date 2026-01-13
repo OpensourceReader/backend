@@ -1,5 +1,8 @@
 package com.opensourcereader.core.analysis.infra.bytecode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
@@ -7,8 +10,7 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.Getter;
 
 @Getter

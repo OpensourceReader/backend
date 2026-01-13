@@ -1,8 +1,9 @@
 package com.opensourcereader.core.analysis.dto.callgraph;
 
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import java.util.Arrays;
 import java.util.List;
+
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 
 public record ClassInfo(
     int version,

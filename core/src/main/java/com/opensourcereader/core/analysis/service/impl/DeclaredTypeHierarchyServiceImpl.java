@@ -37,8 +37,6 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
       declaredType.update(superType, implementEdges);
       declaredTypes.add(declaredType);
     }
-    // 반환은 하는데, 이게 영속상태가 아닌 객체여서 문제가 되는 것 같은데,
-    // ㄱㄷㄱ
 
     return declaredTypeRepository.saveAll(declaredTypes);
   }
@@ -57,7 +55,7 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
     }
     return declaredTypeRepository
         .findByTypeInternalName(superName)
-        .orElse(DeclaredType.external(superName)); // 여기 문제
+        .orElse(DeclaredType.external(superName));
   }
 
   private List<ClassInfo> getClassInfos(List<ClassStructure> classStructures) {

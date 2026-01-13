@@ -1,6 +1,5 @@
 package com.opensourcereader.core.analysis.service.impl.callgraph;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 
@@ -24,15 +22,9 @@ public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphServic
 
   @Transactional
   @Override
-  public List<CodeMethodCallEdge> createMethodCallGraph(
-      Long repoId, List<ClassStructure> classStructures) {
-    List<CodeMethodCallEdge> dispatch = methodPolymorphicDispatcher.dispatch(repoId);
-    List<CodeMethodCallEdge> codeMethodCallEdges =
-        methodCallResolver.create(repoId, classStructures);
-
-    List<CodeMethodCallEdge> result = new ArrayList<>(dispatch);
-    result.addAll(codeMethodCallEdges);
-    return result;
+  public void createMethodCallGraph(Long repoId, List<ClassStructure> classStructures) {
+    methodPolymorphicDispatcher.dispatch(repoId);
+    methodCallResolver.create(repoId, classStructures);
   }
 
   @Transactional
