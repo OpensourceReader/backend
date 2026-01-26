@@ -3,6 +3,7 @@ package com.opensourcereader.core.analysis.infra;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +24,15 @@ class SourceCodeParserTest {
   @Test
   @DisplayName("패키지명+클래스명칭을 클래스이름으로 반환합니다.")
   void extract_mapsSourceBySignature() {
-    // given
     String rawText =
         """
-        package com.example.ossr;
-        public class A {
-          public void m(String s) {}
-          public void n() {}
-        }
-        """;
+            package com.example.ossr;
+            public class A {
+              public void m(String s) {}
+              public void n() {}
+            }
+            """;
+
     String fqcn = sourceCodeParser.extractClassName(rawText);
 
     assertThat(fqcn).isEqualTo("com.example.ossr.A");
@@ -91,13 +92,20 @@ class SourceCodeParserTest {
 
       var results = sourceCodeParser.extractCodeMethods(rawText);
 
-      assertMethods(
-          results,
-          expected("m1", MethodModifier.PUBLIC, List.of()),
-          expected("m2", MethodModifier.PRIVATE, List.of("int")),
-          expected("m2", MethodModifier.PROTECTED, List.of("String")),
-          expected("m3", MethodModifier.PACKAGE_PRIVATE, List.of("String...")),
-          expected("m4", MethodModifier.PACKAGE_PRIVATE, List.of("int[]", "String[][]")));
+      assertThat(results)
+          .extracting(
+              SourceCodeParseResult::methodName,
+              SourceCodeParseResult::modifier,
+              SourceCodeParseResult::argumentTypes)
+          .containsExactlyInAnyOrder(
+              tuple("m1", EnumSet.of(MethodModifier.PUBLIC), List.of()),
+              tuple("m2", EnumSet.of(MethodModifier.PRIVATE), List.of("int")),
+              tuple("m2", EnumSet.of(MethodModifier.PROTECTED), List.of("String")),
+              tuple("m3", EnumSet.of(MethodModifier.PACKAGE_PRIVATE), List.of("String...")),
+              tuple(
+                  "m4",
+                  EnumSet.of(MethodModifier.PACKAGE_PRIVATE),
+                  List.of("int[]", "String[][]")));
     }
 
     @Test
@@ -116,16 +124,20 @@ class SourceCodeParserTest {
 
       var results = sourceCodeParser.extractCodeMethods(rawText);
 
-      assertMethods(
-          results,
-          expected("m1", MethodModifier.PUBLIC, List.of("R")),
-          expected("m2", MethodModifier.PUBLIC, List.of("List")),
-          expected("m3", MethodModifier.PUBLIC, List.of()));
+      assertThat(results)
+          .extracting(
+              SourceCodeParseResult::methodName,
+              SourceCodeParseResult::modifier,
+              SourceCodeParseResult::argumentTypes)
+          .containsExactlyInAnyOrder(
+              tuple("m1", EnumSet.of(MethodModifier.PUBLIC), List.of("R")),
+              tuple("m2", EnumSet.of(MethodModifier.PUBLIC), List.of("List")),
+              tuple("m3", EnumSet.of(MethodModifier.PUBLIC), List.of()));
     }
   }
 
   @Nested
-  @DisplayName("인터페이스/애노테이션 타입/레코드/열거형")
+  @DisplayName("인터페이스/레코드")
   class NonClassTypeDeclarations {
 
     @Test
@@ -143,12 +155,16 @@ class SourceCodeParserTest {
 
       var results = sourceCodeParser.extractCodeMethods(rawText);
 
-      assertMethods(
-          results,
-          expected("a", MethodModifier.PUBLIC, List.of()),
-          expected("b", MethodModifier.PUBLIC, List.of()),
-          expected("c", MethodModifier.PUBLIC, List.of()),
-          expected("d", MethodModifier.PRIVATE, List.of()));
+      assertThat(results)
+          .extracting(
+              SourceCodeParseResult::methodName,
+              SourceCodeParseResult::modifier,
+              SourceCodeParseResult::argumentTypes)
+          .containsExactlyInAnyOrder(
+              tuple("a", EnumSet.of(MethodModifier.PUBLIC, MethodModifier.ABSTRACT), List.of()),
+              tuple("b", EnumSet.of(MethodModifier.PUBLIC), List.of()),
+              tuple("c", EnumSet.of(MethodModifier.PUBLIC, MethodModifier.STATIC), List.of()),
+              tuple("d", EnumSet.of(MethodModifier.PRIVATE), List.of()));
     }
 
     @Test
@@ -163,28 +179,12 @@ class SourceCodeParserTest {
 
       var results = sourceCodeParser.extractCodeMethods(rawText);
 
-      assertMethods(results, expected("sum", MethodModifier.PUBLIC, List.of()));
+      assertThat(results)
+          .extracting(
+              SourceCodeParseResult::methodName,
+              SourceCodeParseResult::modifier,
+              SourceCodeParseResult::argumentTypes)
+          .containsExactlyInAnyOrder(tuple("sum", EnumSet.of(MethodModifier.PUBLIC), List.of()));
     }
   }
-
-  private static ExpectedMethod expected(
-      String name, MethodModifier modifier, List<String> paramTypes) {
-    return new ExpectedMethod(name, modifier, paramTypes);
-  }
-
-  private static void assertMethods(
-      List<SourceCodeParseResult> results, ExpectedMethod... expected) {
-
-    assertThat(results)
-        .extracting(
-            SourceCodeParseResult::methodName,
-            SourceCodeParseResult::modifier,
-            SourceCodeParseResult::argumentTypes)
-        .containsExactlyInAnyOrder(
-            List.of(expected).stream()
-                .map(e -> tuple(e.name, e.modifier, e.paramTypes))
-                .toArray(org.assertj.core.groups.Tuple[]::new));
-  }
-
-  private record ExpectedMethod(String name, MethodModifier modifier, List<String> paramTypes) {}
 }

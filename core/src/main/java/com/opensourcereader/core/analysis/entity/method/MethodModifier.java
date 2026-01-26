@@ -29,33 +29,60 @@ public enum MethodModifier {
   public static EnumSet<MethodModifier> from(MethodDeclaration md) {
     EnumSet<MethodModifier> mods = EnumSet.noneOf(MethodModifier.class);
 
-    if (md.hasModifier(Modifier.Keyword.PUBLIC)) {
-      mods.add(MethodModifier.PUBLIC);
-    } else if (md.hasModifier(Modifier.Keyword.PROTECTED)) {
-      mods.add(MethodModifier.PROTECTED);
-    } else if (md.hasModifier(Modifier.Keyword.PRIVATE)) {
-      mods.add(MethodModifier.PRIVATE);
-    } else {
-      mods.add(MethodModifier.PACKAGE_PRIVATE);
+    // 1) explicit access modifier
+    if (md.hasModifier(Modifier.Keyword.PUBLIC)) mods.add(MethodModifier.PUBLIC);
+    if (md.hasModifier(Modifier.Keyword.PROTECTED)) mods.add(MethodModifier.PROTECTED);
+    if (md.hasModifier(Modifier.Keyword.PRIVATE)) mods.add(MethodModifier.PRIVATE);
+
+    // 2) other explicit modifiers
+    if (md.hasModifier(Modifier.Keyword.STATIC)) mods.add(MethodModifier.STATIC);
+    if (md.hasModifier(Modifier.Keyword.FINAL)) mods.add(MethodModifier.FINAL);
+    if (md.hasModifier(Modifier.Keyword.ABSTRACT)) mods.add(MethodModifier.ABSTRACT);
+    if (md.hasModifier(Modifier.Keyword.SYNCHRONIZED)) mods.add(MethodModifier.SYNCHRONIZED);
+    if (md.hasModifier(Modifier.Keyword.NATIVE)) mods.add(MethodModifier.NATIVE);
+    if (md.hasModifier(Modifier.Keyword.STRICTFP)) mods.add(MethodModifier.STRICTFP);
+
+    // 3) implicit modifiers for interface/annotation members
+    boolean inInterface =
+        md.findAncestor(com.github.javaparser.ast.body.ClassOrInterfaceDeclaration.class)
+            .map(com.github.javaparser.ast.body.ClassOrInterfaceDeclaration::isInterface)
+            .orElse(false);
+
+    boolean inAnnotation =
+        md.findAncestor(com.github.javaparser.ast.body.AnnotationDeclaration.class).isPresent();
+
+    if (inInterface || inAnnotation) {
+      // access: if not explicitly private/public/protected, it's implicitly public
+      boolean hasAnyAccess =
+          mods.contains(MethodModifier.PUBLIC)
+              || mods.contains(MethodModifier.PROTECTED)
+              || mods.contains(MethodModifier.PRIVATE);
+
+      if (!hasAnyAccess) {
+        // 인터페이스는 package-private/protected가 아예 불가이므로 기본 public로 보정
+        mods.add(MethodModifier.PUBLIC);
+        mods.remove(MethodModifier.PACKAGE_PRIVATE);
+      }
+
+      // abstract: if it's not private/static and not a default method and has no body -> abstract
+      boolean isPrivate = md.hasModifier(Modifier.Keyword.PRIVATE);
+      boolean isStatic = md.hasModifier(Modifier.Keyword.STATIC);
+      boolean isDefault = md.hasModifier(Modifier.Keyword.DEFAULT);
+      boolean hasBody = md.getBody().isPresent();
+
+      if (!isPrivate && !isStatic && !isDefault && !hasBody) {
+        mods.add(MethodModifier.ABSTRACT);
+      }
     }
 
-    if (md.hasModifier(Modifier.Keyword.STATIC)) {
-      mods.add(MethodModifier.STATIC);
-    }
-    if (md.hasModifier(Modifier.Keyword.FINAL)) {
-      mods.add(MethodModifier.FINAL);
-    }
-    if (md.hasModifier(Modifier.Keyword.ABSTRACT)) {
-      mods.add(MethodModifier.ABSTRACT);
-    }
-    if (md.hasModifier(Modifier.Keyword.SYNCHRONIZED)) {
-      mods.add(MethodModifier.SYNCHRONIZED);
-    }
-    if (md.hasModifier(Modifier.Keyword.NATIVE)) {
-      mods.add(MethodModifier.NATIVE);
-    }
-    if (md.hasModifier(Modifier.Keyword.STRICTFP)) {
-      mods.add(MethodModifier.STRICTFP);
+    // 4) if still no access modifier at all -> package-private (class case)
+    boolean hasAnyAccess =
+        mods.contains(MethodModifier.PUBLIC)
+            || mods.contains(MethodModifier.PROTECTED)
+            || mods.contains(MethodModifier.PRIVATE);
+
+    if (!hasAnyAccess) {
+      mods.add(MethodModifier.PACKAGE_PRIVATE);
     }
 
     return mods;
