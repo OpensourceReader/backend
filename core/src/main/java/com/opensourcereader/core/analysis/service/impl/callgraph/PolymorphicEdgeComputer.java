@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,7 +59,6 @@ public class PolymorphicEdgeComputer {
     return result;
   }
 
-  // 처음에 부모 연결을 해준다고 해봐,
   private List<CodeMethodCallEdge> dispatchImplementationByBfs(DeclaredType type) {
     List<CodeMethodCallEdge> result = new ArrayList<>();
     Queue<DeclaredType> queue = new LinkedList<>();

@@ -1,10 +1,8 @@
-package com.opensourcereader.core.analysis.entity.method.methodcall;
+package com.opensourcereader.core.analysis.entity.method;
 
 import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

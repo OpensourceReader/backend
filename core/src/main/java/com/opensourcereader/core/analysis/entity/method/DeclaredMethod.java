@@ -7,8 +7,7 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -159,6 +158,52 @@ public class DeclaredMethod extends BaseEntity {
     this.endLine = endLine;
     this.origin = methodOrigin;
     this.declaredType = declaredType;
+  }
+
+  public void addIngoingCall(DeclaredMethod caller) {
+    if (caller == null) {
+      return;
+    }
+    CodeMethodCallEdge ingoingCall = CodeMethodCallEdge.of(caller, this);
+    if (this.ingoingCalls.contains(ingoingCall)) {
+      return;
+    }
+    this.ingoingCalls.add(ingoingCall);
+
+    caller.syncOutgoingCall(ingoingCall);
+  }
+
+  public void addOutgoingCall(DeclaredMethod callee) {
+    if (callee == null) {
+      return;
+    }
+    CodeMethodCallEdge outgoingCall = CodeMethodCallEdge.of(this, callee);
+    if (this.outgoingCalls.contains(outgoingCall)) {
+      return;
+    }
+    this.outgoingCalls.add(outgoingCall);
+
+    callee.syncIngoingCall(outgoingCall);
+  }
+
+  private void syncIngoingCall(CodeMethodCallEdge targetOutgoingCall) {
+    if (targetOutgoingCall == null) {
+      return;
+    }
+    if (this.ingoingCalls.contains(targetOutgoingCall)) {
+      return;
+    }
+    this.ingoingCalls.add(targetOutgoingCall);
+  }
+
+  private void syncOutgoingCall(CodeMethodCallEdge targetIngoingCall) {
+    if (targetIngoingCall == null) {
+      return;
+    }
+    if (this.outgoingCalls.contains(targetIngoingCall)) {
+      return;
+    }
+    this.outgoingCalls.add(targetIngoingCall);
   }
 
   @Override

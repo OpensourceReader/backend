@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.dto.callgraph;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
 public record ClassInfo(
     int version,

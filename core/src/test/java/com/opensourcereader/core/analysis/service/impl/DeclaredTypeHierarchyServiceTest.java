@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
-import com.opensourcereader.core.analysis.entity.repo.TypeOrigin;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
 import org.junit.jupiter.api.DisplayName;

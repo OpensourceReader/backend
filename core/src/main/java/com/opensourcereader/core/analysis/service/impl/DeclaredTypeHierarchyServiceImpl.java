@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
 

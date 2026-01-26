@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
 public interface DeclaredTypeRepository extends JpaRepository<DeclaredType, Long> {
 

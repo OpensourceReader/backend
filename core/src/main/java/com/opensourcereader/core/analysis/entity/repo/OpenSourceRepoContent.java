@@ -7,6 +7,7 @@ import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

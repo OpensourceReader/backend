@@ -30,14 +30,12 @@ public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphServic
   @Transactional
   @Override
   public DeclaredMethod getCodeMethodById(Long codeMethodId) {
-    DeclaredMethod declaredMethod =
-        codeMethodRepository
-            .findWithOutgoingGraphById(codeMethodId)
-            .orElseThrow(IllegalArgumentException::new);
     codeMethodRepository
-        .findWithIngoingGraphById(declaredMethod.getId())
+        .findWithOutgoingGraphById(codeMethodId)
         .orElseThrow(IllegalArgumentException::new);
 
-    return declaredMethod;
+    return codeMethodRepository
+        .findWithIngoingGraphById(codeMethodId)
+        .orElseThrow(IllegalArgumentException::new);
   }
 }

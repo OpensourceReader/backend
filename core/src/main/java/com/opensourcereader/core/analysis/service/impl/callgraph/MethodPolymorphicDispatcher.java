@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.methodcall.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
+import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.CodeMethodCallEdgeRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 

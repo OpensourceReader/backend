@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity.type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -68,7 +70,7 @@ public class DeclaredType extends BaseEntity {
     if (classStructure == null) {
       return null;
     }
-    return new DeclaredType(classStructure, methodExtractResults, TypeOrigin.INTERNAL);
+    return new DeclaredType(classStructure.classInfo(), methodExtractResults, TypeOrigin.INTERNAL);
   }
 
   public static DeclaredType external(String typeInternalName) {
@@ -145,11 +147,11 @@ public class DeclaredType extends BaseEntity {
   }
 
   private DeclaredType(
-      ClassStructure classStructure,
+      ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
       TypeOrigin typeOrigin) {
-    this.typeInternalName = extractedTypeName(classStructure);
-    this.typeKind = classStructure.classInfo().typeKind();
+    this.typeInternalName = extractedTypeName(classInfo);
+    this.typeKind = classInfo.typeKind();
     this.declaredMethods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = null; // 수정 필요
@@ -157,11 +159,11 @@ public class DeclaredType extends BaseEntity {
     this.implementations = new ArrayList<>();
   }
 
-  private String extractedTypeName(ClassStructure classStructure) {
-    if (classStructure == null) {
+  private String extractedTypeName(ClassInfo classInfo) {
+    if (classInfo == null) {
       return null;
     }
-    return classStructure.classInfo().className();
+    return classInfo.className();
   }
 
   private List<DeclaredMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
