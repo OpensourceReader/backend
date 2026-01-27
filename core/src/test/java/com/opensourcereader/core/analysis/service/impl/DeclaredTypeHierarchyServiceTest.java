@@ -55,8 +55,9 @@ class DeclaredTypeHierarchyServiceTest {
     ClassStructure interfaceStructure = toClassStructure(interfaceName, null, List.of());
     ClassStructure classStructure =
         toClassStructure(implementClassName, null, List.of(interfaceName));
-    DeclaredType interfaceI = DeclaredType.internal(interfaceStructure, List.of());
-    DeclaredType classA = DeclaredType.internal(classStructure, List.of());
+    DeclaredType interfaceI =
+        DeclaredType.internal(interfaceStructure.classInfo(), List.of(), null);
+    DeclaredType classA = DeclaredType.internal(classStructure.classInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(interfaceI, classA));
 
@@ -85,8 +86,10 @@ class DeclaredTypeHierarchyServiceTest {
     ClassStructure childInterfaceStructure =
         toClassStructure(childInterfaceName, null, List.of(parentInterfaceName));
 
-    DeclaredType parentInterface = DeclaredType.internal(parentInterfaceStructure, List.of());
-    DeclaredType childInterface = DeclaredType.internal(childInterfaceStructure, List.of());
+    DeclaredType parentInterface =
+        DeclaredType.internal(parentInterfaceStructure.classInfo(), List.of(), null);
+    DeclaredType childInterface =
+        DeclaredType.internal(childInterfaceStructure.classInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(parentInterface, childInterface));
 
@@ -114,8 +117,8 @@ class DeclaredTypeHierarchyServiceTest {
 
     ClassStructure superStructure = toClassStructure(superClassName, null, List.of());
     ClassStructure subStructure = toClassStructure(subClassName, superClassName, List.of());
-    DeclaredType superType = DeclaredType.internal(superStructure, List.of());
-    DeclaredType subType = DeclaredType.internal(subStructure, List.of());
+    DeclaredType superType = DeclaredType.internal(superStructure.classInfo(), List.of(), null);
+    DeclaredType subType = DeclaredType.internal(subStructure.classInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(superType, subType));
 
@@ -143,7 +146,7 @@ class DeclaredTypeHierarchyServiceTest {
 
     ClassStructure classStructure =
         toClassStructure(className, externalSuper, List.of(externalInterface1, externalInterface2));
-    DeclaredType internalA = DeclaredType.internal(classStructure, List.of());
+    DeclaredType internalA = DeclaredType.internal(classStructure.classInfo(), List.of(), null);
     declaredTypeRepository.save(internalA);
 
     // when

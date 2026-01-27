@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
@@ -66,11 +65,14 @@ public class DeclaredType extends BaseEntity {
   private OpenSourceRepoContent openSourceRepoContent;
 
   public static DeclaredType internal(
-      ClassStructure classStructure, List<CodeMethodExtractResult> methodExtractResults) {
-    if (classStructure == null) {
+      ClassInfo classInfo,
+      List<CodeMethodExtractResult> methodExtractResults,
+      OpenSourceRepoContent openSourceRepoContent) {
+    if (classInfo == null) {
       return null;
     }
-    return new DeclaredType(classStructure.classInfo(), methodExtractResults, TypeOrigin.INTERNAL);
+    return new DeclaredType(
+        classInfo, methodExtractResults, TypeOrigin.INTERNAL, openSourceRepoContent);
   }
 
   public static DeclaredType external(String typeInternalName) {
@@ -149,12 +151,13 @@ public class DeclaredType extends BaseEntity {
   private DeclaredType(
       ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
-      TypeOrigin typeOrigin) {
+      TypeOrigin typeOrigin,
+      OpenSourceRepoContent openSourceRepoContent) {
     this.typeInternalName = extractedTypeName(classInfo);
     this.typeKind = classInfo.typeKind();
     this.declaredMethods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
-    this.openSourceRepoContent = null; // 수정 필요
+    this.openSourceRepoContent = openSourceRepoContent;
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
   }

@@ -5,9 +5,10 @@ import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -47,7 +48,7 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "declared_type_id")
   private DeclaredType declaredType;
 
@@ -57,14 +58,14 @@ public class OpenSourceRepoContent extends BaseEntity {
 
   public static OpenSourceRepoContent of(
       OpenSourceFileInfo fileInfo,
-      ClassStructure classStructure,
+      ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         fileInfo.path(),
         fileInfo.repoEntryType(),
         fileInfo.rawText(),
-        classStructure,
+        classInfo,
         methodExtractResults,
         openSourceRepo);
   }
@@ -73,7 +74,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       String path,
       RepoEntryType repoEntryType,
       String rawText,
-      ClassStructure classStructure,
+      ClassInfo classInfo,
       List<CodeMethodExtractResult> methodExtractResults,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
@@ -81,7 +82,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.name = OpenSourceRepoContentName.from(path);
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;
-    this.declaredType = DeclaredType.internal(classStructure, methodExtractResults);
+    this.declaredType = DeclaredType.internal(classInfo, methodExtractResults, this);
     this.openSourceRepo = openSourceRepo;
   }
 

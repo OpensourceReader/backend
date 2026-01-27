@@ -59,14 +59,15 @@ class ClassSuperDispatcherTest {
       ClassStructure parentStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredType parentType = DeclaredType.internal(parentStructure, List.of(declaredFoo));
+      DeclaredType parentType =
+          DeclaredType.internal(parentStructure.classInfo(), List.of(declaredFoo), null);
 
       // 2) Child (CLASS, extends Parent): foo() 선언 없음
       String childName = "Child";
       ClassStructure childStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredType childType = DeclaredType.internal(childStructure, List.of()); // foo 없음
+      DeclaredType childType = DeclaredType.internal(childStructure.classInfo(), List.of(), null);
 
       declaredTypeRepository.saveAll(List.of(parentType, childType));
 
@@ -118,7 +119,8 @@ class ClassSuperDispatcherTest {
       ClassStructure parentStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredType parentType = DeclaredType.internal(parentStructure, List.of(parentFoo));
+      DeclaredType parentType =
+          DeclaredType.internal(parentStructure.classInfo(), List.of(parentFoo), null);
 
       // 2) Child (CLASS, extends Parent): foo() override (직접 선언)
       String childName = "Child";
@@ -136,7 +138,8 @@ class ClassSuperDispatcherTest {
               1);
 
       DeclaredType childType =
-          DeclaredType.internal(childStructure, List.of(childOverrideFoo)); // ✅ override 선언
+          DeclaredType.internal(
+              childStructure.classInfo(), List.of(childOverrideFoo), null); // ✅ override 선언
 
       declaredTypeRepository.saveAll(List.of(parentType, childType));
 
@@ -188,14 +191,15 @@ class ClassSuperDispatcherTest {
       ClassStructure parentStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredType parentType = DeclaredType.internal(parentStructure, List.of(parentFoo));
+      DeclaredType parentType =
+          DeclaredType.internal(parentStructure.classInfo(), List.of(parentFoo), null);
 
       // Child extends Parent: foo() 없음
       String childName = "Child";
       ClassStructure childStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredType childType = DeclaredType.internal(childStructure, List.of());
+      DeclaredType childType = DeclaredType.internal(childStructure.classInfo(), List.of(), null);
 
       // GrandChild extends Child: foo() 없음
       String grandChildName = "GrandChild";
@@ -203,7 +207,8 @@ class ClassSuperDispatcherTest {
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, grandChildName, childName, null, List.of()),
               List.of());
-      DeclaredType grandChildType = DeclaredType.internal(grandChildStructure, List.of());
+      DeclaredType grandChildType =
+          DeclaredType.internal(grandChildStructure.classInfo(), List.of(), null);
 
       declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
 
@@ -264,7 +269,8 @@ class ClassSuperDispatcherTest {
       ClassStructure parentStructure =
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredType parentType = DeclaredType.internal(parentStructure, List.of(parentFoo));
+      DeclaredType parentType =
+          DeclaredType.internal(parentStructure.classInfo(), List.of(parentFoo), null);
 
       // Child extends Parent: foo() override (직접 선언)
       String childName = "Child";
@@ -281,7 +287,8 @@ class ClassSuperDispatcherTest {
               1,
               1);
 
-      DeclaredType childType = DeclaredType.internal(childStructure, List.of(childOverrideFoo));
+      DeclaredType childType =
+          DeclaredType.internal(childStructure.classInfo(), List.of(childOverrideFoo), null);
 
       // GrandChild extends Child: foo() 없음
       String grandChildName = "GrandChild";
@@ -289,7 +296,8 @@ class ClassSuperDispatcherTest {
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, grandChildName, childName, null, List.of()),
               List.of());
-      DeclaredType grandChildType = DeclaredType.internal(grandChildStructure, List.of());
+      DeclaredType grandChildType =
+          DeclaredType.internal(grandChildStructure.classInfo(), List.of(), null);
 
       declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
 

@@ -64,7 +64,7 @@ class InterfacePolymorphicDispatcherTest {
               1,
               1);
       DeclaredType interfaceType =
-          DeclaredType.internal(interfaceStructure, List.of(methodExtractResult));
+          DeclaredType.internal(interfaceStructure.classInfo(), List.of(methodExtractResult), null);
 
       // 2) 구현체 A (I를 implements 하는 CLASS)
       String className = "A";
@@ -72,7 +72,7 @@ class InterfacePolymorphicDispatcherTest {
           new ClassStructure(
               new ClassInfo(33, TypeKind.CLASS, className, null, null, List.of("I")), List.of());
       DeclaredType implClassType =
-          DeclaredType.internal(implStructure, List.of(methodExtractResult));
+          DeclaredType.internal(implStructure.classInfo(), List.of(methodExtractResult), null);
       declaredTypeRepository.saveAll(List.of(interfaceType, implClassType));
       implClassType.update(
           null, List.of(DeclaredTypeImplementEdge.of(implClassType, interfaceType)));
@@ -118,14 +118,14 @@ class InterfacePolymorphicDispatcherTest {
                 md.argumentTypes(),
                 1,
                 1);
-        DeclaredType i1Type = DeclaredType.internal(i1Structure, List.of(foo));
+        DeclaredType i1Type = DeclaredType.internal(i1Structure.classInfo(), List.of(foo), null);
 
         // I2: extends I1, + foo()를 "명시적으로" 선언(테스트 편의상)
         String i2Name = "I2";
         ClassStructure i2Structure =
             new ClassStructure(
                 new ClassInfo(183, TypeKind.INTERFACE, i2Name, i1Name, null, List.of()), List.of());
-        DeclaredType i2Type = DeclaredType.internal(i2Structure, List.of(foo));
+        DeclaredType i2Type = DeclaredType.internal(i2Structure.classInfo(), List.of(foo), null);
 
         declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
@@ -169,7 +169,7 @@ class InterfacePolymorphicDispatcherTest {
         ClassStructure i1Structure =
             new ClassStructure(
                 new ClassInfo(183, TypeKind.INTERFACE, i1Name, null, null, List.of()), List.of());
-        DeclaredType i1Type = DeclaredType.internal(i1Structure, List.of(foo));
+        DeclaredType i1Type = DeclaredType.internal(i1Structure.classInfo(), List.of(foo), null);
 
         // I2: extends I1 (테스트 단순화를 위해 foo()도 "명시적으로" 넣음)
         String i2Name = "I2";
@@ -178,14 +178,14 @@ class InterfacePolymorphicDispatcherTest {
                 new ClassInfo(183, TypeKind.INTERFACE, i2Name, i1Name, null, List.of()),
                 // superName=I1 가정
                 List.of());
-        DeclaredType i2Type = DeclaredType.internal(i2Structure, List.of(foo));
+        DeclaredType i2Type = DeclaredType.internal(i2Structure.classInfo(), List.of(foo), null);
 
         // A: implements I2
         String aName = "A";
         ClassStructure aStructure =
             new ClassStructure(
                 new ClassInfo(33, TypeKind.CLASS, aName, null, null, List.of(i2Name)), List.of());
-        DeclaredType aType = DeclaredType.internal(aStructure, List.of(foo));
+        DeclaredType aType = DeclaredType.internal(aStructure.classInfo(), List.of(foo), null);
         declaredTypeRepository.saveAll(List.of(i1Type, i2Type, aType));
 
         // I2 extends I1 (프로젝트에 맞게 edge 이름 수정)
@@ -244,7 +244,8 @@ class InterfacePolymorphicDispatcherTest {
                 1,
                 1);
 
-        DeclaredType interfaceType = DeclaredType.internal(interfaceStructure, List.of(defaultFoo));
+        DeclaredType interfaceType =
+            DeclaredType.internal(interfaceStructure.classInfo(), List.of(defaultFoo), null);
 
         // 2) 구현체 A: implements I, foo() 선언 없음 (즉, methodExtractResult 비움)
         String className = "A";
@@ -252,7 +253,8 @@ class InterfacePolymorphicDispatcherTest {
             new ClassStructure(
                 new ClassInfo(33, TypeKind.CLASS, className, null, null, List.of(interfaceName)),
                 List.of());
-        DeclaredType implType = DeclaredType.internal(implStructure, List.of()); // foo를 일부러 넣지 않음
+        DeclaredType implType =
+            DeclaredType.internal(implStructure.classInfo(), List.of(), null); // foo를 일부러 넣지 않음
 
         declaredTypeRepository.saveAll(List.of(interfaceType, implType));
 
@@ -306,7 +308,8 @@ class InterfacePolymorphicDispatcherTest {
                 1,
                 1);
 
-        DeclaredType interfaceType = DeclaredType.internal(interfaceStructure, List.of(defaultFoo));
+        DeclaredType interfaceType =
+            DeclaredType.internal(interfaceStructure.classInfo(), List.of(defaultFoo), null);
 
         // 2) 구현체 A: implements I, foo() override(직접 선언)
         String className = "A";
@@ -325,7 +328,8 @@ class InterfacePolymorphicDispatcherTest {
                 1,
                 1);
 
-        DeclaredType implType = DeclaredType.internal(implStructure, List.of(overrideFoo));
+        DeclaredType implType =
+            DeclaredType.internal(implStructure.classInfo(), List.of(overrideFoo), null);
 
         declaredTypeRepository.saveAll(List.of(interfaceType, implType));
 
@@ -382,14 +386,14 @@ class InterfacePolymorphicDispatcherTest {
       ClassStructure i1Structure =
           new ClassStructure(
               new ClassInfo(183, TypeKind.INTERFACE, i1Name, null, null, List.of()), List.of());
-      DeclaredType i1Type = DeclaredType.internal(i1Structure, List.of(foo));
+      DeclaredType i1Type = DeclaredType.internal(i1Structure.classInfo(), List.of(foo), null);
 
       // I2
       String i2Name = "I2";
       ClassStructure i2Structure =
           new ClassStructure(
               new ClassInfo(183, TypeKind.INTERFACE, i2Name, null, null, List.of()), List.of());
-      DeclaredType i2Type = DeclaredType.internal(i2Structure, List.of(foo));
+      DeclaredType i2Type = DeclaredType.internal(i2Structure.classInfo(), List.of(foo), null);
 
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 

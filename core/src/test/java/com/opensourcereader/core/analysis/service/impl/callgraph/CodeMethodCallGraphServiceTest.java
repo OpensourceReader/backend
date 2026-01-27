@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
@@ -38,8 +37,7 @@ class CodeMethodCallGraphServiceTest {
     DeclaredType callerType =
         declaredTypeRepository.save(
             DeclaredType.internal(
-                new ClassStructure(
-                    new ClassInfo(9, TypeKind.CLASS, "t/Other", null, null, null), List.of()),
+                new ClassInfo(9, TypeKind.CLASS, "t/Other", null, null, null),
                 List.of(
                     new CodeMethodExtractResult(
                         "run",
@@ -47,12 +45,12 @@ class CodeMethodCallGraphServiceTest {
                         "void",
                         List.of("t.Main"),
                         3,
-                        3))));
+                        3)),
+                null));
     DeclaredType targetType =
         declaredTypeRepository.save(
             DeclaredType.internal(
-                new ClassStructure(
-                    new ClassInfo(9, TypeKind.CLASS, "t/Main", null, null, null), List.of()),
+                new ClassInfo(9, TypeKind.CLASS, "t/Main", null, null, null),
                 List.of(
                     new CodeMethodExtractResult(
                         "target",
@@ -60,12 +58,12 @@ class CodeMethodCallGraphServiceTest {
                         "void",
                         List.of(),
                         3,
-                        3))));
+                        3)),
+                null));
     DeclaredType calleeType =
         declaredTypeRepository.save(
             DeclaredType.internal(
-                new ClassStructure(
-                    new ClassInfo(9, TypeKind.CLASS, "t/Util", null, null, null), List.of()),
+                new ClassInfo(9, TypeKind.CLASS, "t/Util", null, null, null),
                 List.of(
                     new CodeMethodExtractResult(
                         "help",
@@ -73,7 +71,8 @@ class CodeMethodCallGraphServiceTest {
                         "void",
                         List.of(),
                         3,
-                        3))));
+                        3)),
+                null));
     declaredTypeRepository.saveAll(List.of(callerType, targetType, calleeType));
     // given
     DeclaredMethod callerMethod = callerType.getDeclaredMethods().get(0);

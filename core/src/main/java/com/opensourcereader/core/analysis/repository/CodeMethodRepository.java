@@ -15,7 +15,7 @@ public interface CodeMethodRepository extends JpaRepository<DeclaredMethod, Long
           SELECT m
           FROM DeclaredMethod m
           WHERE m.declaredType.openSourceRepoContent.openSourceRepo.id = :repoId
-              AND m.declaredType.typeInternalName = :classInternalName
+              AND m.declaredType.typeInternalName = :typeInternalName
               AND m.methodSignature.methodSignature = :methodSignature
 
           """)
