@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.callgraph;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.util.List;
 
@@ -9,6 +9,8 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.impl.callgraph.MethodCallResolver;
+import com.opensourcereader.core.analysis.service.impl.callgraph.MethodPolymorphicDispatcher;
 
 import lombok.RequiredArgsConstructor;
 

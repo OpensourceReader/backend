@@ -44,7 +44,7 @@ public class CodeMethodCallEdge extends BaseEntity {
     this.methodCallOrigin = methodCallOrigin;
   }
 
-  public static CodeMethodCallEdge of(DeclaredMethod caller, DeclaredMethod callee) {
+  static CodeMethodCallEdge of(DeclaredMethod caller, DeclaredMethod callee) {
     return new CodeMethodCallEdge(caller, callee, getCodeMethodCallEdge(caller, callee));
   }
 

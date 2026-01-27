@@ -10,11 +10,9 @@ import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
 import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.repository.CodeMethodCallEdgeRepository;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 
@@ -25,11 +23,10 @@ import lombok.RequiredArgsConstructor;
 public class MethodCallResolver {
 
   private final DeclaredTypeRepository declaredTypeRepository;
-  private final CodeMethodCallEdgeRepository codeMethodCallEdgeRepository;
   private final CodeMethodRepository codeMethodRepository;
 
-  public List<CodeMethodCallEdge> create(Long repoId, List<ClassStructure> classStructures) {
-    List<CodeMethodCallEdge> result = new ArrayList<>();
+  public List<DeclaredMethod> create(Long repoId, List<ClassStructure> classStructures) {
+    List<DeclaredMethod> result = new ArrayList<>();
     for (ClassStructure classStructure : classStructures) {
       for (MethodStructure method : classStructure.methods()) {
         DeclaredMethodInfo declaredMethodInfo = method.declaredMethodInfo();
@@ -51,20 +48,24 @@ public class MethodCallResolver {
             if (calleeDeclaredType.isPresent()) {
               DeclaredMethod internalInheritanceDeclared =
                   DeclaredMethod.internalInheritanceDeclared(methodCallInfo, calleeMethodSignature);
-              result.add(CodeMethodCallEdge.of(declaredMethod, internalInheritanceDeclared));
+              declaredMethod.addOutgoingCall(internalInheritanceDeclared);
+              result.add(declaredMethod);
             }
             if (calleeDeclaredType.isEmpty()) {
               DeclaredMethod external =
                   DeclaredMethod.external(methodCallInfo, calleeMethodSignature);
-              result.add(CodeMethodCallEdge.of(declaredMethod, external));
+              declaredMethod.addOutgoingCall(external);
+              result.add(declaredMethod);
             }
           }
-          calleeMethod.ifPresent(
-              callee -> result.add(CodeMethodCallEdge.of(declaredMethod, callee)));
+          if (calleeMethod.isPresent()) {
+            declaredMethod.addOutgoingCall(calleeMethod.get());
+            result.add(declaredMethod);
+          }
         }
       }
     }
 
-    return codeMethodCallEdgeRepository.saveAll(result);
+    return codeMethodRepository.saveAll(result);
   }
 }

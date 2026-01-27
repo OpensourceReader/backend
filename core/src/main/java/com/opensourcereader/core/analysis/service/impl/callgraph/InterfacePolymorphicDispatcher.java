@@ -11,56 +11,32 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class PolymorphicEdgeComputer {
+public class InterfacePolymorphicDispatcher {
 
-  public List<CodeMethodCallEdge> compute(
-      List<DeclaredType> interfaceTypes, List<DeclaredType> classTypes) {
-    Set<CodeMethodCallEdge> result = new HashSet<>();
-    for (DeclaredType interfaceType : interfaceTypes) {
+  private final CodeMethodRepository codeMethodRepository;
+
+  public List<DeclaredMethod> dispatchImplementations(List<DeclaredType> interfaces) {
+    Set<DeclaredMethod> result = new HashSet<>();
+    for (DeclaredType interfaceType : interfaces) {
       result.addAll(dispatchImplementationByBfs(interfaceType));
     }
-    for (DeclaredType classType : classTypes) {
-      result.addAll(dispatchSuperMethod(classType));
-    }
-    return result.stream().toList();
+
+    return codeMethodRepository.saveAll(result);
   }
 
-  private List<CodeMethodCallEdge> dispatchSuperMethod(DeclaredType childType) {
-    List<CodeMethodCallEdge> result = new ArrayList<>();
-    DeclaredType superType = childType.getSuperType();
-    if (superType == null) {
-      return new ArrayList<>();
-    }
-    Map<CodeMethodSignature, DeclaredMethod> childMethods =
-        childType.getDeclaredMethods().stream()
-            .collect(Collectors.toMap(DeclaredMethod::getMethodSignature, it -> it));
-    for (DeclaredMethod superMethod : superType.getDeclaredMethods()) {
-      DeclaredMethod childMethodSameWithSuper = childMethods.get(superMethod.getMethodSignature());
-      if (childMethodSameWithSuper == null) {
-        childMethodSameWithSuper =
-            DeclaredMethod.internalInheritanceDeclared(superMethod, childType);
-        childType.updateMethod(childMethodSameWithSuper);
-      }
-
-      result.add(CodeMethodCallEdge.of(superMethod, childMethodSameWithSuper));
-    }
-
-    return result;
-  }
-
-  private List<CodeMethodCallEdge> dispatchImplementationByBfs(DeclaredType type) {
-    List<CodeMethodCallEdge> result = new ArrayList<>();
+  private List<DeclaredMethod> dispatchImplementationByBfs(DeclaredType type) {
+    List<DeclaredMethod> result = new ArrayList<>();
     Queue<DeclaredType> queue = new LinkedList<>();
     queue.add(type);
 
@@ -79,7 +55,8 @@ public class PolymorphicEdgeComputer {
                 collect.getOrDefault(
                     declaredMethod.getMethodSignature(),
                     DeclaredMethod.internalInheritanceDeclared(declaredMethod, newDeclaredType));
-            result.add(CodeMethodCallEdge.of(declaredMethod, nextDeclaredMethod));
+            declaredMethod.addOutgoingCall(nextDeclaredMethod);
+            result.add(declaredMethod);
           }
           if (newDeclaredType.getTypeKind().equals(TypeKind.INTERFACE)) {
             queue.add(newDeclaredType);
