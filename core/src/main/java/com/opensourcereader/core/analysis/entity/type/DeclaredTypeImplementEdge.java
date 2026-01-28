@@ -28,7 +28,7 @@ public class DeclaredTypeImplementEdge extends BaseEntity {
   @JoinColumn(name = "interface_type_id")
   private DeclaredType interfaceType;
 
-  public static DeclaredTypeImplementEdge of(DeclaredType type, DeclaredType interfaceType) {
+  static DeclaredTypeImplementEdge of(DeclaredType type, DeclaredType interfaceType) {
     return new DeclaredTypeImplementEdge(type, interfaceType);
   }
 

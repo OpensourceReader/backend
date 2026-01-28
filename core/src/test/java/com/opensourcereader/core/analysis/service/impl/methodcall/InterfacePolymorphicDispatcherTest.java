@@ -21,7 +21,6 @@ import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
@@ -64,8 +63,7 @@ class InterfacePolymorphicDispatcherTest {
       DeclaredType implClassType =
           DeclaredType.internal(implStructure.typeInfo(), List.of(declaredMethodInfo), null);
       declaredTypeRepository.saveAll(List.of(interfaceType, implClassType));
-      implClassType.update(
-          null, List.of(DeclaredTypeImplementEdge.of(implClassType, interfaceType)));
+      implClassType.updateRelations(null, List.of(interfaceType));
       declaredTypeRepository.save(implClassType);
 
       // when
@@ -113,7 +111,7 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
         // (선택) extends edge를 별도 엔티티로 관리한다면 여기서 업데이트/저장
-        i2Type.update(null, List.of(DeclaredTypeImplementEdge.of(i2Type, i1Type)));
+        i2Type.updateRelations(null, List.of(i1Type));
         declaredTypeRepository.save(i2Type);
 
         // when
@@ -164,11 +162,11 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.saveAll(List.of(i1Type, i2Type, aType));
 
         // I2 extends I1 (프로젝트에 맞게 edge 이름 수정)
-        i2Type.update(null, List.of(DeclaredTypeImplementEdge.of(i2Type, i1Type)));
+        i2Type.updateRelations(null, List.of(i1Type));
         declaredTypeRepository.save(i2Type);
 
         // A implements I2
-        aType.update(null, List.of(DeclaredTypeImplementEdge.of(aType, i2Type)));
+        aType.updateRelations(null, List.of(i2Type));
         declaredTypeRepository.save(aType);
 
         // when
@@ -227,7 +225,7 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.saveAll(List.of(interfaceType, implType));
 
         // A implements I
-        implType.update(null, List.of(DeclaredTypeImplementEdge.of(implType, interfaceType)));
+        implType.updateRelations(null, List.of(interfaceType));
         declaredTypeRepository.save(implType);
 
         // when
@@ -288,7 +286,7 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.saveAll(List.of(interfaceType, implType));
 
         // A implements I
-        implType.update(null, List.of(DeclaredTypeImplementEdge.of(implType, interfaceType)));
+        implType.updateRelations(null, List.of(interfaceType));
         declaredTypeRepository.save(implType);
 
         // when
@@ -345,8 +343,8 @@ class InterfacePolymorphicDispatcherTest {
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
       // 순환 extends 구성: I1 extends I2, I2 extends I1
-      i1Type.update(null, List.of(DeclaredTypeImplementEdge.of(i1Type, i2Type)));
-      i2Type.update(null, List.of(DeclaredTypeImplementEdge.of(i2Type, i1Type)));
+      i1Type.updateRelations(null, List.of(i2Type));
+      i2Type.updateRelations(null, List.of(i1Type));
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then

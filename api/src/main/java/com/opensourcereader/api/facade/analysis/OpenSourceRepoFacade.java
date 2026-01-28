@@ -11,7 +11,7 @@ import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
+import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
 import com.opensourcereader.core.analysis.util.FileUtil;
@@ -31,7 +31,7 @@ public class OpenSourceRepoFacade {
 
   private final RepositoryArtifactService repositoryArtifactService;
   private final OpenSourceRepoService opensourceRepoService;
-  private final DeclaredTypeHierarchyService declaredTypeHierarchyService;
+  private final DeclaredTypeRelationService declaredTypeRelationService;
   private final CodeMethodCallGraphService codeMethodCallGraphService;
 
   @Transactional
@@ -43,7 +43,7 @@ public class OpenSourceRepoFacade {
         opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
 
     List<TypeStructureMeta> typeStructureMetas = TypeStructureMeta.from(artifact.typeStructures());
-    declaredTypeHierarchyService.resolveTypeHierarchy(typeStructureMetas);
+    declaredTypeRelationService.resolveTypeHierarchy(typeStructureMetas);
     codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), typeStructureMetas);
 
     FileUtil.removeDirectory(artifact.savedLocalRepoPath());

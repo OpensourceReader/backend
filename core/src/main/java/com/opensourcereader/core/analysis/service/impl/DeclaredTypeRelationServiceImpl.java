@@ -8,18 +8,19 @@ import org.springframework.stereotype.Service;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
-import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
+import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchyService {
+public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationService {
 
   private final DeclaredTypeRepository declaredTypeRepository;
 
+  // 이 부분, DeclaredTypeImplementEdge 엣지 따로 넣어야함
+  // 레포 id 받아야함
   public List<DeclaredType> resolveTypeHierarchy(List<TypeStructureMeta> typeStructureMetas) {
     if (typeStructureMetas == null || typeStructureMetas.isEmpty()) {
       return List.of();
@@ -32,21 +33,13 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
               .findByTypeInternalName(typeInfo.internalName())
               .orElseThrow(IllegalArgumentException::new);
       DeclaredType superType = findTypeOrExternal(typeInfo.superName());
-      List<DeclaredTypeImplementEdge> implementEdges = getImplementEdges(typeInfo, declaredType);
-
-      declaredType.update(superType, implementEdges);
+      List<DeclaredType> interfaceTypes =
+          typeInfo.interfaceNames().stream().map(this::findTypeOrExternal).toList();
+      declaredType.updateRelations(superType, interfaceTypes);
       declaredTypes.add(declaredType);
     }
 
     return declaredTypeRepository.saveAll(declaredTypes);
-  }
-
-  private List<DeclaredTypeImplementEdge> getImplementEdges(
-      TypeInfo typeInfo, DeclaredType declaredType) {
-    return typeInfo.interfaceNames().stream()
-        .map(this::findTypeOrExternal)
-        .map(interfaceType -> DeclaredTypeImplementEdge.of(declaredType, interfaceType))
-        .toList();
   }
 
   private DeclaredType findTypeOrExternal(String superName) {

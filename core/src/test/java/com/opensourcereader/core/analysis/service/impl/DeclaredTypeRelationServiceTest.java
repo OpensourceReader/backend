@@ -14,17 +14,17 @@ import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
-import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
+import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class DeclaredTypeHierarchyServiceTest {
+class DeclaredTypeRelationServiceTest {
 
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
 
-  @Autowired private DeclaredTypeHierarchyService service;
+  @Autowired private DeclaredTypeRelationService service;
 
   private TypeStructureMeta toClassStructure(
       String className, String superName, List<String> interfaceNames) {

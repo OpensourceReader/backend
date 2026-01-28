@@ -89,11 +89,15 @@ public class DeclaredType extends BaseEntity {
     declaredMethods.add(newMethod);
   }
 
-  public void update(DeclaredType newSuperType, List<DeclaredTypeImplementEdge> newImplementEdges) {
+  public void updateRelations(DeclaredType newSuperType, List<DeclaredType> interfaceTypes) {
     if (newSuperType != null) {
       this.superType = newSuperType;
     }
-    syncImplementedInterfaceEdges(newImplementEdges);
+    List<DeclaredTypeImplementEdge> newInterfaceEdges =
+        interfaceTypes.stream()
+            .map(interfaceType -> DeclaredTypeImplementEdge.of(this, interfaceType))
+            .toList();
+    syncImplementedInterfaceEdges(newInterfaceEdges);
   }
 
   private void syncImplementedInterfaceEdges(List<DeclaredTypeImplementEdge> newEdges) {
@@ -108,11 +112,11 @@ public class DeclaredType extends BaseEntity {
       boolean exists =
           this.implementedInterfaces.stream()
               .anyMatch(existing -> sameInterface(existing, newEdge));
-
-      if (!exists) {
-        this.implementedInterfaces.add(newEdge);
-        newEdge.getInterfaceType().updateImplementation(newEdge);
+      if (exists) {
+        continue;
       }
+      this.implementedInterfaces.add(newEdge);
+      newEdge.getInterfaceType().updateImplementation(newEdge);
     }
   }
 

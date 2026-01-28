@@ -63,7 +63,7 @@ class ClassSuperDispatcherTest {
       declaredTypeRepository.saveAll(List.of(parentType, childType));
 
       // Child extends Parent (너희 프로젝트 extends-edge로 교체)
-      childType.update(parentType, List.of());
+      childType.updateRelations(parentType, List.of());
       declaredTypeRepository.save(childType);
 
       // when
@@ -119,7 +119,7 @@ class ClassSuperDispatcherTest {
       declaredTypeRepository.saveAll(List.of(parentType, childType));
 
       // Child extends Parent (너희 update 시그니처 기준: parentType을 바로 넣는 형태)
-      childType.update(parentType, List.of());
+      childType.updateRelations(parentType, List.of());
       declaredTypeRepository.save(childType);
 
       // when
@@ -181,10 +181,10 @@ class ClassSuperDispatcherTest {
       declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
 
       // 타입 그래프 세팅: Child -> Parent, GrandChild -> Child
-      childType.update(parentType, List.of());
+      childType.updateRelations(parentType, List.of());
       declaredTypeRepository.save(childType);
 
-      grandChildType.update(childType, List.of());
+      grandChildType.updateRelations(childType, List.of());
       declaredTypeRepository.save(grandChildType);
 
       // when
@@ -254,10 +254,10 @@ class ClassSuperDispatcherTest {
       declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
 
       // Type Graph: Parent -> Child, Child -> GrandChild
-      childType.update(parentType, List.of());
+      childType.updateRelations(parentType, List.of());
       declaredTypeRepository.save(childType);
 
-      grandChildType.update(childType, List.of());
+      grandChildType.updateRelations(childType, List.of());
       declaredTypeRepository.save(grandChildType);
 
       // when
