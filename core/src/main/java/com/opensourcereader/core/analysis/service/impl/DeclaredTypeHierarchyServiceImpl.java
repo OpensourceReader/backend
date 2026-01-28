@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
@@ -20,19 +20,19 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
 
   private final DeclaredTypeRepository declaredTypeRepository;
 
-  public List<DeclaredType> resolveTypeHierarchy(List<ClassStructure> classStructures) {
-    if (classStructures == null || classStructures.isEmpty()) {
+  public List<DeclaredType> resolveTypeHierarchy(List<TypeStructureMeta> typeStructureMetas) {
+    if (typeStructureMetas == null || typeStructureMetas.isEmpty()) {
       return List.of();
     }
 
     List<DeclaredType> declaredTypes = new ArrayList<>();
-    for (ClassInfo classInfo : getClassInfos(classStructures)) {
+    for (TypeInfo typeInfo : getClassInfos(typeStructureMetas)) {
       DeclaredType declaredType =
           declaredTypeRepository
-              .findByTypeInternalName(classInfo.className())
+              .findByTypeInternalName(typeInfo.internalName())
               .orElseThrow(IllegalArgumentException::new);
-      DeclaredType superType = findTypeOrExternal(classInfo.superName());
-      List<DeclaredTypeImplementEdge> implementEdges = getImplementEdges(classInfo, declaredType);
+      DeclaredType superType = findTypeOrExternal(typeInfo.superName());
+      List<DeclaredTypeImplementEdge> implementEdges = getImplementEdges(typeInfo, declaredType);
 
       declaredType.update(superType, implementEdges);
       declaredTypes.add(declaredType);
@@ -42,8 +42,8 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
   }
 
   private List<DeclaredTypeImplementEdge> getImplementEdges(
-      ClassInfo classInfo, DeclaredType declaredType) {
-    return classInfo.interfaceNames().stream()
+      TypeInfo typeInfo, DeclaredType declaredType) {
+    return typeInfo.interfaceNames().stream()
         .map(this::findTypeOrExternal)
         .map(interfaceType -> DeclaredTypeImplementEdge.of(declaredType, interfaceType))
         .toList();
@@ -58,7 +58,7 @@ public class DeclaredTypeHierarchyServiceImpl implements DeclaredTypeHierarchySe
         .orElse(DeclaredType.external(superName));
   }
 
-  private List<ClassInfo> getClassInfos(List<ClassStructure> classStructures) {
-    return classStructures.stream().map(ClassStructure::classInfo).toList();
+  private List<TypeInfo> getClassInfos(List<TypeStructureMeta> typeStructureMetas) {
+    return typeStructureMetas.stream().map(TypeStructureMeta::typeInfo).toList();
   }
 }

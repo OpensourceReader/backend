@@ -7,14 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.dto.gitrepo.GitRepositoryLoadResult;
+import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
-import com.opensourcereader.core.analysis.infra.ClassStructureExtractor;
-import com.opensourcereader.core.analysis.infra.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.DeclaredTypeHierarchyService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
 
@@ -30,28 +29,24 @@ public class OpenSourceRepoFacade {
   @Value("${opensource-reader.work-tree-name}")
   private String workingTreeDirName;
 
-  private final GitRepositoryLoader gitRepositoryLoader;
+  private final RepositoryArtifactService repositoryArtifactService;
   private final OpenSourceRepoService opensourceRepoService;
-  private final ClassStructureExtractor classStructureExtractor;
-  private final CodeMethodCallGraphService codeMethodCallGraphService;
   private final DeclaredTypeHierarchyService declaredTypeHierarchyService;
+  private final CodeMethodCallGraphService codeMethodCallGraphService;
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
-    GitRepositoryLoadResult gitRepoLoadResult =
-        gitRepositoryLoader.downloadGitRepo(
-            request.openSourceUri(), request.reference(), localClonePath);
-    List<ClassStructure> classStructures =
-        classStructureExtractor.createClassStructures(
-            gitRepoLoadResult.savedLocalRepoPath(), request.reference(), workingTreeDirName);
+    RepositoryArtifact artifact =
+        repositoryArtifactService.create(
+            request.openSourceUri(), request.reference(), localClonePath, workingTreeDirName);
     OpenSourceRepo openSourceRepo =
-        opensourceRepoService.createRepo(
-            request.openSourceUri(), gitRepoLoadResult.files(), classStructures);
+        opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
 
-    declaredTypeHierarchyService.resolveTypeHierarchy(classStructures);
-    codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), classStructures);
-    FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
+    List<TypeStructureMeta> typeStructureMetas = TypeStructureMeta.from(artifact.typeStructures());
+    declaredTypeHierarchyService.resolveTypeHierarchy(typeStructureMetas);
+    codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), typeStructureMetas);
 
+    FileUtil.removeDirectory(artifact.savedLocalRepoPath());
     return OpenSourceRepoResponse.from(openSourceRepo);
   }
 

@@ -5,16 +5,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-import com.opensourcereader.core.analysis.infra.ClassStructureExtractor;
+import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
+import com.opensourcereader.core.analysis.infra.dto.ClassBytecode;
 import com.opensourcereader.core.analysis.infra.git.GitWorktreeManagerCli;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class BytecodeClassStructureExtractor implements ClassStructureExtractor {
+public class BytecodeClassStructureExtractor {
 
   private final GitWorktreeManagerCli gitWorktreeManagerCli;
   private final BuildExecutor buildExecutor;
@@ -22,8 +21,7 @@ public class BytecodeClassStructureExtractor implements ClassStructureExtractor 
   private final com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor
       classStructureExtractor;
 
-  @Override
-  public List<ClassStructure> createClassStructures(
+  public List<ByteCodeClassStructure> extract(
       Path savedLocalPath, String reference, String workingTreeDirName) {
     Path worktree =
         gitWorktreeManagerCli.createWorktree(savedLocalPath, reference, workingTreeDirName);

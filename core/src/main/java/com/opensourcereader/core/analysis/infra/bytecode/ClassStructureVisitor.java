@@ -6,10 +6,10 @@ import java.util.List;
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodStructure;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
+import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
+import com.opensourcereader.core.analysis.infra.dto.ByteCodeMethodStructure;
 
 import lombok.Getter;
 
@@ -17,8 +17,8 @@ import lombok.Getter;
 public class ClassStructureVisitor extends ClassVisitor {
 
   private int classAccess;
-  private ClassInfo classInfo;
-  private final List<MethodStructure> methodStructures = new ArrayList<>();
+  private TypeInfo typeInfo;
+  private final List<ByteCodeMethodStructure> byteCodeMethodStructures = new ArrayList<>();
 
   public ClassStructureVisitor() {
     super(Opcodes.ASM9);
@@ -33,8 +33,7 @@ public class ClassStructureVisitor extends ClassVisitor {
       String superName,
       String[] interfaces) {
     this.classAccess = classAccess;
-    this.classInfo =
-        ClassInfo.of(version, classAccess, className, signature, superName, interfaces);
+    this.typeInfo = TypeInfo.of(version, classAccess, className, signature, superName, interfaces);
   }
 
   @Override
@@ -62,16 +61,17 @@ public class ClassStructureVisitor extends ClassVisitor {
 
       @Override
       public void visitEnd() {
-        DeclaredMethodInfo declaredMethodInfo =
-            DeclaredMethodInfo.of(
-                classInfo.className(),
+        ByteCodeDeclaredMethodInfo byteCodeDeclaredMethodInfo =
+            ByteCodeDeclaredMethodInfo.of(
+                typeInfo.internalName(),
                 classAccess,
                 methodAccess,
                 callerMethodName,
                 callerDescriptor,
                 genericSignature,
                 exceptions);
-        methodStructures.add(new MethodStructure(declaredMethodInfo, methodCalls));
+        byteCodeMethodStructures.add(
+            new ByteCodeMethodStructure(byteCodeDeclaredMethodInfo, methodCalls));
       }
     };
   }

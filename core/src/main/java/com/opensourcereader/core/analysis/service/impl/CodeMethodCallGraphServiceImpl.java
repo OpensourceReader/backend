@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.impl.callgraph.MethodCallResolver;
-import com.opensourcereader.core.analysis.service.impl.callgraph.MethodPolymorphicDispatcher;
+import com.opensourcereader.core.analysis.service.impl.methodcall.MethodCallResolver;
+import com.opensourcereader.core.analysis.service.impl.methodcall.MethodPolymorphicDispatcher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +24,9 @@ public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphServic
 
   @Transactional
   @Override
-  public void createMethodCallGraph(Long repoId, List<ClassStructure> classStructures) {
+  public void createMethodCallGraph(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
     methodPolymorphicDispatcher.dispatch(repoId);
-    methodCallResolver.create(repoId, classStructures);
+    methodCallResolver.create(repoId, typeStructureMetas);
   }
 
   @Transactional

@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
@@ -20,21 +18,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OpenSourceRepoServiceImpl implements OpenSourceRepoService {
 
-  private final OpenSourceContentFactory openSourceContentFactory;
   private final OpenSourceRepoRepository opensourceRepoRepository;
 
   @Transactional
   @Override
-  public OpenSourceRepo createRepo(
-      String cloneUri,
-      List<OpenSourceFileInfo> sourFileInfos,
-      List<ClassStructure> classStructures) {
+  public OpenSourceRepo createRepo(String cloneUri, List<TypeStructure> typeStructures) {
     validateAlreadyExist(cloneUri);
-    OpenSourceRepo opensourceRepo = new OpenSourceRepo(cloneUri);
-    List<OpenSourceRepoContent> openSourceRepoContents =
-        openSourceContentFactory.create(sourFileInfos, classStructures, opensourceRepo);
-    opensourceRepo.addAllContents(openSourceRepoContents);
-
+    OpenSourceRepo opensourceRepo = OpenSourceRepo.of(cloneUri, typeStructures);
     return opensourceRepoRepository.save(opensourceRepo);
   }
 

@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
@@ -26,21 +26,20 @@ class DeclaredTypeHierarchyServiceTest {
 
   @Autowired private DeclaredTypeHierarchyService service;
 
-  private ClassStructure toClassStructure(
+  private TypeStructureMeta toClassStructure(
       String className, String superName, List<String> interfaceNames) {
-    ClassInfo classInfo =
-        new ClassInfo(0, TypeKind.CLASS, className, null, superName, interfaceNames);
-    return new ClassStructure(classInfo, List.of());
+    TypeInfo typeInfo = new TypeInfo(0, TypeKind.CLASS, className, null, superName, interfaceNames);
+    return new TypeStructureMeta(typeInfo, List.of());
   }
 
   @Test
   @DisplayName("타입 구조 입력이 비어있으면 아무 타입도 갱신하지 않는다")
   void resolveTypeHierarchy_emptyInput() {
     // given
-    List<ClassStructure> classStructures = List.of();
+    List<TypeStructureMeta> typeStructureMetas = List.of();
 
     // when
-    List<DeclaredType> result = service.resolveTypeHierarchy(classStructures);
+    List<DeclaredType> result = service.resolveTypeHierarchy(typeStructureMetas);
 
     // then
     assertThat(result).isEmpty();
@@ -52,18 +51,19 @@ class DeclaredTypeHierarchyServiceTest {
     // given
     String implementClassName = "ImplementClass";
     String interfaceName = "Interface";
-    ClassStructure interfaceStructure = toClassStructure(interfaceName, null, List.of());
-    ClassStructure classStructure =
+    TypeStructureMeta interfaceStructure = toClassStructure(interfaceName, null, List.of());
+    TypeStructureMeta implementClassStructure =
         toClassStructure(implementClassName, null, List.of(interfaceName));
-    DeclaredType interfaceI =
-        DeclaredType.internal(interfaceStructure.classInfo(), List.of(), null);
-    DeclaredType classA = DeclaredType.internal(classStructure.classInfo(), List.of(), null);
+    DeclaredType interfaceI = DeclaredType.internal(interfaceStructure.typeInfo(), List.of(), null);
+    DeclaredType classA =
+        DeclaredType.internal(implementClassStructure.typeInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(interfaceI, classA));
 
     // when
-    List<ClassStructure> classStructures = List.of(interfaceStructure, classStructure);
-    List<DeclaredType> result = service.resolveTypeHierarchy(classStructures);
+    List<TypeStructureMeta> byteCodeClassStructures =
+        List.of(interfaceStructure, implementClassStructure);
+    List<DeclaredType> result = service.resolveTypeHierarchy(byteCodeClassStructures);
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
@@ -81,22 +81,22 @@ class DeclaredTypeHierarchyServiceTest {
     String parentInterfaceName = "I";
     String childInterfaceName = "J";
 
-    ClassStructure parentInterfaceStructure =
+    TypeStructureMeta parentInterfaceStructure =
         toClassStructure(parentInterfaceName, null, List.of());
-    ClassStructure childInterfaceStructure =
+    TypeStructureMeta childInterfaceStructure =
         toClassStructure(childInterfaceName, null, List.of(parentInterfaceName));
 
     DeclaredType parentInterface =
-        DeclaredType.internal(parentInterfaceStructure.classInfo(), List.of(), null);
+        DeclaredType.internal(parentInterfaceStructure.typeInfo(), List.of(), null);
     DeclaredType childInterface =
-        DeclaredType.internal(childInterfaceStructure.classInfo(), List.of(), null);
+        DeclaredType.internal(childInterfaceStructure.typeInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(parentInterface, childInterface));
 
     // when
-    List<ClassStructure> classStructures =
+    List<TypeStructureMeta> structureMetas =
         List.of(parentInterfaceStructure, childInterfaceStructure);
-    service.resolveTypeHierarchy(classStructures);
+    service.resolveTypeHierarchy(structureMetas);
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
@@ -115,16 +115,16 @@ class DeclaredTypeHierarchyServiceTest {
     String superClassName = "A";
     String subClassName = "B";
 
-    ClassStructure superStructure = toClassStructure(superClassName, null, List.of());
-    ClassStructure subStructure = toClassStructure(subClassName, superClassName, List.of());
-    DeclaredType superType = DeclaredType.internal(superStructure.classInfo(), List.of(), null);
-    DeclaredType subType = DeclaredType.internal(subStructure.classInfo(), List.of(), null);
+    TypeStructureMeta superStructure = toClassStructure(superClassName, null, List.of());
+    TypeStructureMeta subStructure = toClassStructure(subClassName, superClassName, List.of());
+    DeclaredType superType = DeclaredType.internal(superStructure.typeInfo(), List.of(), null);
+    DeclaredType subType = DeclaredType.internal(subStructure.typeInfo(), List.of(), null);
 
     declaredTypeRepository.saveAll(List.of(superType, subType));
 
     // when
-    List<ClassStructure> classStructures = List.of(superStructure, subStructure);
-    service.resolveTypeHierarchy(classStructures);
+    List<TypeStructureMeta> structureMetas = List.of(superStructure, subStructure);
+    service.resolveTypeHierarchy(structureMetas);
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
@@ -144,13 +144,14 @@ class DeclaredTypeHierarchyServiceTest {
     String externalInterface1 = "externalInterface/Interface1";
     String externalInterface2 = "externalInterface/Interface2";
 
-    ClassStructure classStructure =
+    TypeStructureMeta byteCodeClassStructure =
         toClassStructure(className, externalSuper, List.of(externalInterface1, externalInterface2));
-    DeclaredType internalA = DeclaredType.internal(classStructure.classInfo(), List.of(), null);
+    DeclaredType internalA =
+        DeclaredType.internal(byteCodeClassStructure.typeInfo(), List.of(), null);
     declaredTypeRepository.save(internalA);
 
     // when
-    service.resolveTypeHierarchy(List.of(classStructure));
+    service.resolveTypeHierarchy(List.of(byteCodeClassStructure));
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(4);

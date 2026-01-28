@@ -6,8 +6,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
@@ -65,14 +65,14 @@ public class DeclaredType extends BaseEntity {
   private OpenSourceRepoContent openSourceRepoContent;
 
   public static DeclaredType internal(
-      ClassInfo classInfo,
-      List<CodeMethodExtractResult> methodExtractResults,
+      TypeInfo typeInfo,
+      List<DeclaredMethodInfo> methodExtractResults,
       OpenSourceRepoContent openSourceRepoContent) {
-    if (classInfo == null) {
+    if (typeInfo == null) {
       return null;
     }
     return new DeclaredType(
-        classInfo, methodExtractResults, TypeOrigin.INTERNAL, openSourceRepoContent);
+        typeInfo, methodExtractResults, TypeOrigin.INTERNAL, openSourceRepoContent);
   }
 
   public static DeclaredType external(String typeInternalName) {
@@ -149,12 +149,12 @@ public class DeclaredType extends BaseEntity {
   }
 
   private DeclaredType(
-      ClassInfo classInfo,
-      List<CodeMethodExtractResult> methodExtractResults,
+      TypeInfo typeInfo,
+      List<DeclaredMethodInfo> methodExtractResults,
       TypeOrigin typeOrigin,
       OpenSourceRepoContent openSourceRepoContent) {
-    this.typeInternalName = extractedTypeName(classInfo);
-    this.typeKind = classInfo.typeKind();
+    this.typeInternalName = extractedTypeName(typeInfo);
+    this.typeKind = typeInfo.typeKind();
     this.declaredMethods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
@@ -162,14 +162,14 @@ public class DeclaredType extends BaseEntity {
     this.implementations = new ArrayList<>();
   }
 
-  private String extractedTypeName(ClassInfo classInfo) {
-    if (classInfo == null) {
+  private String extractedTypeName(TypeInfo typeInfo) {
+    if (typeInfo == null) {
       return null;
     }
-    return classInfo.className();
+    return typeInfo.internalName();
   }
 
-  private List<DeclaredMethod> getCodeMethods(List<CodeMethodExtractResult> methodExtractResults) {
+  private List<DeclaredMethod> getCodeMethods(List<DeclaredMethodInfo> methodExtractResults) {
     return methodExtractResults.stream()
         .map(extractResult -> DeclaredMethod.internal(extractResult, this))
         .collect(Collectors.toCollection(ArrayList::new));

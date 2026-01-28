@@ -6,10 +6,10 @@ import static com.opensourcereader.core.analysis.entity.method.NameSeparators.PA
 import java.util.ArrayList;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.dto.callgraph.SourceCodeParseResult;
-import com.opensourcereader.core.analysis.dto.callgraph.method.DeclaredMethodInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
+import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
+import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
@@ -22,18 +22,18 @@ public record CodeMethodSignature(String methodSignature) {
         callee.descriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(DeclaredMethodInfo method) {
+  public static CodeMethodSignature of(ByteCodeDeclaredMethodInfo method) {
     return of(
         method.methodName(),
         method.methodDescriptor().argumentTypes(),
         method.methodDescriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(CodeMethodExtractResult methodExtractResult) {
+  public static CodeMethodSignature of(DeclaredMethodInfo declaredMethodInfo) {
     return of(
-        methodExtractResult.methodName(),
-        methodExtractResult.paramTypes(),
-        methodExtractResult.returnType());
+        declaredMethodInfo.methodName(),
+        declaredMethodInfo.methodDescriptor().argumentTypes(),
+        declaredMethodInfo.methodDescriptor().methodReturnType());
   }
 
   public static CodeMethodSignature of(SourceCodeParseResult codeParseResult) {

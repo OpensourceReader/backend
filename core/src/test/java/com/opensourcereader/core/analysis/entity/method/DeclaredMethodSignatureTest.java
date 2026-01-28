@@ -4,7 +4,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,14 +14,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class DeclaredMethodSignatureTest {
 
-  @DisplayName("MethodSignature 생성 테스트 - 파라미터 타입 포맷에 관계없이 short name으로 생성된다")
-  @ParameterizedTest(name = "[{index}] rawParamTypes={0}")
+  @DisplayName("CodeMethodSignature는 JVM descriptor 기준으로 short name 시그니처를 생성한다")
+  @ParameterizedTest(name = "[{index}] descriptor={0}")
   @MethodSource("methodSignatureTestCases")
-  void codeSignatureParameterizedTest(List<String> rawParamTypes, String expectedSignature) {
+  void codeSignatureParameterizedTest(String descriptor, String expectedSignature) {
+
     // given
-    CodeMethodExtractResult methodExtractResult =
-        new CodeMethodExtractResult(
-            "methodName", EnumSet.noneOf(MethodModifier.class), "void", rawParamTypes, null, null);
+    DeclaredMethodInfo methodExtractResult =
+        new DeclaredMethodInfo(
+            "internalName",
+            "methodName",
+            EnumSet.noneOf(MethodModifier.class),
+            MethodDescriptor.from(descriptor),
+            null,
+            List.of(),
+            null,
+            null);
 
     // when
     CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodExtractResult);
@@ -30,23 +39,20 @@ class DeclaredMethodSignatureTest {
   }
 
   static Stream<Arguments> methodSignatureTestCases() {
-    String methodName = "methodName";
-    String expected = methodName + "(String,OpenSourceRepo)void";
+    String expected = "methodName(String,OpenSourceRepo)void";
 
     return Stream.of(
-        // 1) 단순 클래스명
-        Arguments.of(List.of("String", "OpenSourceRepo"), expected),
-
-        // 2) JVM internal name ( / )
+        // 기본 객체 타입
         Arguments.of(
-            List.of("java/lang/String", "com/opensourcereader/core/analysis/entity/OpenSourceRepo"),
+            "(Ljava/lang/String;Lcom/opensourcereader/core/analysis/entity/OpenSourceRepo;)V",
             expected),
 
-        // 3) FQN ( . )
+        // 배열 케이스도 추가해보자 (현실성 있음)
         Arguments.of(
-            List.of(
-                "java.lang.String",
-                "com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo"),
-            expected));
+            "([Ljava/lang/String;Lcom/opensourcereader/core/analysis/entity/OpenSourceRepo;)V",
+            "methodName(String[],OpenSourceRepo)void"),
+
+        // primitive 포함
+        Arguments.of("(ILjava/lang/String;)V", "methodName(int,String)void"));
   }
 }

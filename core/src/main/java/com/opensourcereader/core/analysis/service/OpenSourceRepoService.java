@@ -2,16 +2,12 @@ package com.opensourcereader.core.analysis.service;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 
 public interface OpenSourceRepoService {
 
-  OpenSourceRepo createRepo(
-      String cloneUri,
-      List<OpenSourceFileInfo> sourFileInfos,
-      List<ClassStructure> classStructures);
+  OpenSourceRepo createRepo(String cloneUri, List<TypeStructure> typeStructures);
 
   OpenSourceRepo getRepoById(Long repositoryId);
 

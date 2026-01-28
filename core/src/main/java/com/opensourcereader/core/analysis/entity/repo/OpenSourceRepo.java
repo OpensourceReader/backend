@@ -3,8 +3,10 @@ package com.opensourcereader.core.analysis.entity.repo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,8 +27,16 @@ public class OpenSourceRepo extends BaseEntity {
   @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
   private List<OpenSourceRepoContent> contents = new ArrayList<>();
 
-  public OpenSourceRepo(String cloneUrl) {
+  public static OpenSourceRepo of(String cloneUrl, List<TypeStructure> typeStructures) {
+    return new OpenSourceRepo(cloneUrl, typeStructures);
+  }
+
+  private OpenSourceRepo(String cloneUrl, List<TypeStructure> typeStructures) {
     this.cloneUrl = cloneUrl;
+    this.contents =
+        typeStructures.stream()
+            .map(structure -> OpenSourceRepoContent.of(structure, this))
+            .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public void addAllContents(List<OpenSourceRepoContent> contents) {

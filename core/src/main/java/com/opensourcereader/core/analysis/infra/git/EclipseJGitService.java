@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.dto.gitrepo.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitBlobLoadException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitCloneFailedException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitReferenceNotFoundException;
@@ -17,6 +16,7 @@ import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitRepositoryOp
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeAccessException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeParseException;
 import com.opensourcereader.core.analysis.exception.gitrepo.LocalGitTreeWalkAccessException;
+import com.opensourcereader.core.analysis.infra.dto.gitrepo.GitTreeFileInfo;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;

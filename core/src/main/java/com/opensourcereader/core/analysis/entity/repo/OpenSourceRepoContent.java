@@ -1,12 +1,15 @@
 package com.opensourcereader.core.analysis.entity.repo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
+import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodStructure;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -56,17 +59,15 @@ public class OpenSourceRepoContent extends BaseEntity {
   @JoinColumn(name = "opensource_repository_id", nullable = false)
   private OpenSourceRepo openSourceRepo;
 
-  public static OpenSourceRepoContent of(
-      OpenSourceFileInfo fileInfo,
-      ClassInfo classInfo,
-      List<CodeMethodExtractResult> methodExtractResults,
-      OpenSourceRepo openSourceRepo) {
+  static OpenSourceRepoContent of(TypeStructure typeStructure, OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
-        fileInfo.path(),
-        fileInfo.repoEntryType(),
-        fileInfo.rawText(),
-        classInfo,
-        methodExtractResults,
+        typeStructure.path(),
+        typeStructure.repoEntryType(),
+        typeStructure.rawText(),
+        typeStructure.typeInfo(),
+        typeStructure.methods().stream()
+            .map(MethodStructure::methodInfo)
+            .collect(Collectors.toCollection(ArrayList::new)),
         openSourceRepo);
   }
 
@@ -74,15 +75,15 @@ public class OpenSourceRepoContent extends BaseEntity {
       String path,
       RepoEntryType repoEntryType,
       String rawText,
-      ClassInfo classInfo,
-      List<CodeMethodExtractResult> methodExtractResults,
+      TypeInfo typeInfo,
+      List<DeclaredMethodInfo> methodInfoWithSources,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;
-    this.declaredType = DeclaredType.internal(classInfo, methodExtractResults, this);
+    this.declaredType = DeclaredType.internal(typeInfo, methodInfoWithSources, this);
     this.openSourceRepo = openSourceRepo;
   }
 

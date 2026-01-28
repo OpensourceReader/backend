@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.dto.callgraph.ClassBytecode;
+import com.opensourcereader.core.analysis.infra.dto.ClassBytecode;
 import com.opensourcereader.core.analysis.util.FileUtil;
 
 @Component

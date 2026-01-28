@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.opensourcereader.core.BaseEntity;
-import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -108,12 +108,12 @@ public class DeclaredMethod extends BaseEntity {
   }
 
   public static DeclaredMethod internal(
-      CodeMethodExtractResult methodExtractResult, DeclaredType declaredType) {
+      DeclaredMethodInfo methodExtractResult, DeclaredType declaredType) {
     return new DeclaredMethod(
         declaredType.getTypeInternalName(),
         methodExtractResult.methodName(),
-        methodExtractResult.returnType(),
-        methodExtractResult.paramTypes(),
+        methodExtractResult.methodDescriptor().methodReturnType(),
+        methodExtractResult.methodDescriptor().argumentTypes(),
         methodExtractResult.methodModifiers().stream().toList(),
         CodeMethodSignature.of(methodExtractResult),
         methodExtractResult.startLine(),

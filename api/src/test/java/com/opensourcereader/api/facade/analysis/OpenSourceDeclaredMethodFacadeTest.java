@@ -13,12 +13,12 @@
 // import com.opensourcereader.api.dto.CodeMethodRequest;
 // import com.opensourcereader.api.dto.CodeMethodResponse;
 // import com.opensourcereader.api.dto.CodeMethodSummary;
-// import com.opensourcereader.core.analysis.dto.OpenSourceFileInfo;
-// import com.opensourcereader.core.analysis.dto.callgraph.ClassInfo;
+// import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
+// import com.opensourcereader.core.analysis.dto.ClassInfo;
 // import com.opensourcereader.core.analysis.dto.callgraph.ClassStructure;
-// import com.opensourcereader.core.analysis.dto.callgraph.CodeMethodExtractResult;
-// import com.opensourcereader.core.analysis.dto.callgraph.method.MethodCallInfo;
-// import com.opensourcereader.core.analysis.dto.callgraph.method.MethodDescriptor;
+// import com.opensourcereader.core.analysis.infra.dto.CodeMethodExtractResult;
+// import com.opensourcereader.core.analysis.dto.ClassStructure.MethodCallInfo;
+// import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 // import com.opensourcereader.core.analysis.entity.method.AccessModifier;
 // import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 // import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
@@ -105,11 +105,11 @@
 //  }
 //
 //  private OpenSourceRepoContent saveContent(
-//      OpenSourceRepo repo, String classInternalName, String rawText) {
-//    ClassInfo classInfo = new ClassInfo(1, 1, classInternalName, "", "java/lang/Object",
+//      OpenSourceRepo repo, String typeInternalName, String rawText) {
+//    ClassInfo classInfo = new ClassInfo(1, 1, typeInternalName, "", "java/lang/Object",
 // List.of());
 //    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-//    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(classInternalName + ".java", "1",
+//    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(typeInternalName + ".java", "1",
 // rawText);
 //
 //    return openSourceContentRepository.save(
@@ -136,10 +136,11 @@
 //    return codeMethodRepository.save(DeclaredMethod.internal(extract, content));
 //  }
 //
-//  private DeclaredMethod saveExternalMethod(String className, String methodName, String
+//  private DeclaredMethod saveExternalMethod(String internalName, String methodName, String
 // descriptor) {
 //    MethodCallInfo callInfo =
-//        new MethodCallInfo(184, className, methodName, MethodDescriptor.from(descriptor), false);
+//        new MethodCallInfo(184, internalName, methodName, MethodDescriptor.from(descriptor),
+// false);
 //    CodeMethodSignature sig =
 //        CodeMethodSignature.of(
 //            methodName,
