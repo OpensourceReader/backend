@@ -28,9 +28,11 @@ public class ClassSuperDispatcher {
   public void dispatchSupers(Long repoId) {
     List<DeclaredType> classes =
         declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
+
     Set<Method> result = new HashSet<>();
+    Set<Long> visited = new HashSet<>();
     for (DeclaredType classType : classes) {
-      result.addAll(dispatchSuperRecursively(classType, new HashSet<>()));
+      result.addAll(dispatchSuperRecursively(classType, visited));
     }
     methodRepository.saveAll(result);
   }
