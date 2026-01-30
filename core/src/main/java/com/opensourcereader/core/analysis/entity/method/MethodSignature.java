@@ -13,41 +13,40 @@ import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public record CodeMethodSignature(String methodSignature) {
+public record MethodSignature(String methodSignature) {
 
-  public static CodeMethodSignature of(MethodCallInfo callee) {
+  public static MethodSignature of(MethodCallInfo callee) {
     return of(
         callee.methodName(),
         callee.descriptor().argumentTypes(),
         callee.descriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(ByteCodeDeclaredMethodInfo method) {
+  public static MethodSignature of(ByteCodeDeclaredMethodInfo method) {
     return of(
         method.methodName(),
         method.methodDescriptor().argumentTypes(),
         method.methodDescriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(DeclaredMethodInfo declaredMethodInfo) {
+  public static MethodSignature of(DeclaredMethodInfo declaredMethodInfo) {
     return of(
         declaredMethodInfo.methodName(),
         declaredMethodInfo.methodDescriptor().argumentTypes(),
         declaredMethodInfo.methodDescriptor().methodReturnType());
   }
 
-  public static CodeMethodSignature of(SourceCodeParseResult codeParseResult) {
+  public static MethodSignature of(SourceCodeParseResult codeParseResult) {
     return of(
         codeParseResult.methodName(),
         codeParseResult.argumentTypes(),
         codeParseResult.returnType());
   }
 
-  private static CodeMethodSignature of(
+  private static MethodSignature of(
       String methodName, List<String> rawArgumentTypes, String returnType) {
     List<String> paramTypes = extractParamTypes(rawArgumentTypes);
-    return new CodeMethodSignature(
-        methodName + "(" + String.join(",", paramTypes) + ")" + returnType);
+    return new MethodSignature(methodName + "(" + String.join(",", paramTypes) + ")" + returnType);
   }
 
   private static List<String> extractParamTypes(List<String> rawArgumentTypes) {

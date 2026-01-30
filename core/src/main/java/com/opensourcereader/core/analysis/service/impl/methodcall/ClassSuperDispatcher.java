@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import com.opensourcereader.core.analysis.entity.repo.TypeKind;
-import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,38 +23,57 @@ import lombok.RequiredArgsConstructor;
 public class ClassSuperDispatcher {
 
   private final DeclaredTypeRepository declaredTypeRepository;
-  private final CodeMethodRepository codeMethodRepository;
+  private final MethodRepository methodRepository;
 
-  public List<DeclaredMethod> dispatchSupers(Long repoId) {
+  public void dispatchSupers(Long repoId) {
     List<DeclaredType> classes =
         declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
-    Set<DeclaredMethod> result = new HashSet<>();
+    Set<Method> result = new HashSet<>();
     for (DeclaredType classType : classes) {
-      result.addAll(dispatchSuperMethod(classType));
+      result.addAll(dispatchSuperRecursively(classType, new HashSet<>()));
     }
-    return codeMethodRepository.saveAll(result);
+    methodRepository.saveAll(result);
   }
 
-  private List<DeclaredMethod> dispatchSuperMethod(DeclaredType childType) {
-    List<DeclaredMethod> result = new ArrayList<>();
+  private Set<Method> dispatchSuperRecursively(DeclaredType type, Set<Long> visited) {
+    if (visited.contains(type.getId())) {
+      return new HashSet<>();
+    }
+    visited.add(type.getId());
+    Set<Method> result = new HashSet<>();
+    if (type.getSuperType() != null) {
+      result.addAll(dispatchSuperRecursively(type.getSuperType(), visited));
+    }
+    result.addAll(dispatchSuperMethod(type));
+    return result;
+  }
+
+  private List<Method> dispatchSuperMethod(DeclaredType childType) {
+    List<Method> result = new ArrayList<>();
     DeclaredType superType = childType.getSuperType();
     if (superType == null) {
       return new ArrayList<>();
     }
-    Map<CodeMethodSignature, DeclaredMethod> childMethods =
-        childType.getDeclaredMethods().stream()
-            .collect(Collectors.toMap(DeclaredMethod::getMethodSignature, it -> it));
-    for (DeclaredMethod superMethod : superType.getDeclaredMethods()) {
-      DeclaredMethod childMethodSameWithSuper = childMethods.get(superMethod.getMethodSignature());
+    Map<MethodSignature, Method> childMethods =
+        childType.getMethods().stream()
+            .collect(Collectors.toMap(Method::getMethodSignature, it -> it));
+    for (Method superMethod : superType.getMethods()) {
+      Method childMethodSameWithSuper = childMethods.get(superMethod.getMethodSignature());
       if (childMethodSameWithSuper == null) {
-        childMethodSameWithSuper =
-            DeclaredMethod.internalInheritanceDeclared(superMethod, childType);
+        childMethodSameWithSuper = getMethodSameWithSuper(childType, superMethod, superType);
         childType.updateMethod(childMethodSameWithSuper);
       }
       superMethod.addOutgoingCall(childMethodSameWithSuper);
       result.add(superMethod);
     }
+    return result;
+  }
 
-    return codeMethodRepository.saveAll(result);
+  private Method getMethodSameWithSuper(
+      DeclaredType childType, Method superMethod, DeclaredType superType) {
+    if (superType.isInternal()) {
+      return Method.inheritedInternal(superMethod, childType);
+    }
+    return Method.inheritedExternal(superMethod, childType);
   }
 }

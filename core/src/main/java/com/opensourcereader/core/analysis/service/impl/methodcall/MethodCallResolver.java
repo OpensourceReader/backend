@@ -11,11 +11,11 @@ import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,24 +24,24 @@ import lombok.RequiredArgsConstructor;
 public class MethodCallResolver {
 
   private final DeclaredTypeRepository declaredTypeRepository;
-  private final CodeMethodRepository codeMethodRepository;
+  private final MethodRepository methodRepository;
 
   // 여기서 flatMap으로 한번 뽑아줄 수 있을듯, for문 하나 축소가능
-  public List<DeclaredMethod> create(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
-    Set<DeclaredMethod> result = new HashSet<>();
+  public List<Method> create(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
+    Set<Method> result = new HashSet<>();
     for (TypeStructureMeta typeStructureMeta : typeStructureMetas) {
       for (MethodStructure method : typeStructureMeta.methods()) {
         DeclaredMethodInfo methodInfo = method.methodInfo();
-        String declaredMethodSignature = CodeMethodSignature.of(methodInfo).methodSignature();
-        DeclaredMethod declaredMethod =
-            codeMethodRepository
+        String declaredMethodSignature = MethodSignature.of(methodInfo).methodSignature();
+        Method declaredMethod =
+            methodRepository
                 .findCodeMethod(repoId, methodInfo.className(), declaredMethodSignature)
                 .orElseThrow(IllegalArgumentException::new);
 
         for (MethodCallInfo calleeMethodInfo : method.calleeMethods()) {
-          CodeMethodSignature calleeMethodSignature = CodeMethodSignature.of(calleeMethodInfo);
-          Optional<DeclaredMethod> calleeMethod =
-              codeMethodRepository.findCodeMethod(
+          MethodSignature calleeMethodSignature = MethodSignature.of(calleeMethodInfo);
+          Optional<Method> calleeMethod =
+              methodRepository.findCodeMethod(
                   repoId, calleeMethodInfo.className(), calleeMethodSignature.methodSignature());
           if (calleeMethod.isPresent()) {
             declaredMethod.addOutgoingCall(calleeMethod.get());
@@ -52,14 +52,13 @@ public class MethodCallResolver {
               declaredTypeRepository.findByRepoAndTypeInternalName(
                   repoId, calleeMethodInfo.className());
           if (calleeDeclaredType.isPresent()) {
-            DeclaredMethod internalInheritanceDeclared =
-                DeclaredMethod.internalInheritanceDeclared(calleeMethodInfo, calleeMethodSignature);
+            Method internalInheritanceDeclared =
+                Method.inheritedInternal(calleeMethodInfo, calleeMethodSignature);
             declaredMethod.addOutgoingCall(internalInheritanceDeclared);
             result.add(declaredMethod);
           }
           if (calleeDeclaredType.isEmpty()) {
-            DeclaredMethod external =
-                DeclaredMethod.external(calleeMethodInfo, calleeMethodSignature);
+            Method external = Method.external(calleeMethodInfo, calleeMethodSignature);
             declaredMethod.addOutgoingCall(external);
             result.add(declaredMethod);
           }
@@ -67,6 +66,6 @@ public class MethodCallResolver {
       }
     }
 
-    return codeMethodRepository.saveAll(result);
+    return methodRepository.saveAll(result);
   }
 }

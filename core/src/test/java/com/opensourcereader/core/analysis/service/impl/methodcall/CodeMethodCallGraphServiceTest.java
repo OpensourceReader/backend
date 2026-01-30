@@ -11,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.repo.TypeKind;
-import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
@@ -29,7 +29,7 @@ class CodeMethodCallGraphServiceTest {
 
   @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
   @Autowired DeclaredTypeRepository declaredTypeRepository;
-  @Autowired CodeMethodRepository codeMethodRepository;
+  @Autowired MethodRepository methodRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Transactional
@@ -74,30 +74,30 @@ class CodeMethodCallGraphServiceTest {
         TestRepoFixtures.saveRepo(
             openSourceRepoRepository, "new-cloneUrl", List.of(callerType, targetType, calleeType));
 
-    DeclaredMethod callerMethod =
+    Method callerMethod =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(repo.getId(), callerTypeName)
             .orElseThrow()
-            .getDeclaredMethods()
+            .getMethods()
             .get(0);
-    DeclaredMethod targetMethod =
+    Method targetMethod =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(repo.getId(), targetTypeName)
             .orElseThrow()
-            .getDeclaredMethods()
+            .getMethods()
             .get(0);
-    DeclaredMethod calleeMethod =
+    Method calleeMethod =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(repo.getId(), calleeTypeName)
             .orElseThrow()
-            .getDeclaredMethods()
+            .getMethods()
             .get(0);
     targetMethod.addIngoingCall(callerMethod);
     targetMethod.addOutgoingCall(calleeMethod);
-    codeMethodRepository.saveAll(List.of(targetMethod, calleeMethod, callerMethod));
+    methodRepository.saveAll(List.of(targetMethod, calleeMethod, callerMethod));
 
     // when
-    DeclaredMethod target = codeMethodCallGraphService.getCodeMethodById(targetMethod.getId());
+    Method target = codeMethodCallGraphService.getCodeMethodById(targetMethod.getId());
 
     // then
     assertThat(target.getOutgoingCalls())

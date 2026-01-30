@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CodeMethodCallEdge extends BaseEntity {
+public class MethodCallEdge extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "method_call_origin")
@@ -29,29 +29,27 @@ public class CodeMethodCallEdge extends BaseEntity {
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "caller_id")
-  private DeclaredMethod caller;
+  private Method caller;
 
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "callee_id")
-  private DeclaredMethod callee;
+  private Method callee;
 
-  private CodeMethodCallEdge(
-      DeclaredMethod caller, DeclaredMethod callee, MethodCallOrigin methodCallOrigin) {
+  private MethodCallEdge(Method caller, Method callee, MethodCallOrigin methodCallOrigin) {
     this.caller = caller;
     this.callee = callee;
     this.methodCallOrigin = methodCallOrigin;
   }
 
-  static CodeMethodCallEdge of(DeclaredMethod caller, DeclaredMethod callee) {
-    return new CodeMethodCallEdge(caller, callee, getCodeMethodCallEdge(caller, callee));
+  static MethodCallEdge of(Method caller, Method callee) {
+    return new MethodCallEdge(caller, callee, getCodeMethodCallEdge(caller, callee));
   }
 
-  private static MethodCallOrigin getCodeMethodCallEdge(
-      DeclaredMethod caller, DeclaredMethod callee) {
-    if (caller.getOrigin().equals(MethodOrigin.EXTERNAL_RESOLVED)
-        || callee.getOrigin().equals(MethodOrigin.EXTERNAL_RESOLVED)) {
+  private static MethodCallOrigin getCodeMethodCallEdge(Method caller, Method callee) {
+    if (caller.getOrigin().equals(MethodOrigin.EXTERNAL)
+        || callee.getOrigin().equals(MethodOrigin.EXTERNAL)) {
       return MethodCallOrigin.EXTERNAL;
     }
     return MethodCallOrigin.INTERNAL;
@@ -59,7 +57,7 @@ public class CodeMethodCallEdge extends BaseEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof CodeMethodCallEdge that)) {
+    if (!(o instanceof MethodCallEdge that)) {
       return false;
     }
     return methodCallOrigin == that.methodCallOrigin

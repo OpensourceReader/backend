@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeclaredMethod extends BaseEntity {
+public class Method extends BaseEntity {
 
   @Column(name = "class_internal_name")
   private String typeInternalName;
@@ -45,11 +45,11 @@ public class DeclaredMethod extends BaseEntity {
 
   @JdbcTypeCode(SqlTypes.JSON)
   @Column(name = "method_modifier")
-  private List<MethodModifier> methodModifiers; // 수정필요
+  private List<MethodModifier> methodModifiers;
 
   @Column(name = "method_signature")
   @Embedded
-  private CodeMethodSignature methodSignature;
+  private MethodSignature methodSignature;
 
   @Column(name = "start_line")
   private Integer startLine;
@@ -65,52 +65,64 @@ public class DeclaredMethod extends BaseEntity {
       mappedBy = "caller",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-  private final List<CodeMethodCallEdge> outgoingCalls = new ArrayList<>();
+  private final List<MethodCallEdge> outgoingCalls = new ArrayList<>();
 
   @OneToMany(
       mappedBy = "callee",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-  private final List<CodeMethodCallEdge> ingoingCalls = new ArrayList<>();
+  private final List<MethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "declared_type_id")
   private DeclaredType declaredType;
 
-  public static DeclaredMethod internal(
-      DeclaredMethodInfo methodExtractResult, DeclaredType declaredType) {
-    return new DeclaredMethod(
+  public static Method declared(DeclaredMethodInfo methodInfo, DeclaredType declaredType) {
+    return new Method(
         declaredType.getTypeInternalName(),
-        methodExtractResult.methodName(),
-        methodExtractResult.methodDescriptor().methodReturnType(),
-        methodExtractResult.methodDescriptor().argumentTypes(),
-        methodExtractResult.methodModifiers().stream().toList(),
-        CodeMethodSignature.of(methodExtractResult),
-        methodExtractResult.startLine(),
-        methodExtractResult.endLine(),
-        MethodOrigin.INTERNAL_DECLARED,
+        methodInfo.methodName(),
+        methodInfo.methodDescriptor().methodReturnType(),
+        methodInfo.methodDescriptor().argumentTypes(),
+        methodInfo.methodModifiers().stream().toList(),
+        MethodSignature.of(methodInfo),
+        methodInfo.startLine(),
+        methodInfo.endLine(),
+        MethodOrigin.DECLARED,
         declaredType);
   }
 
-  public static DeclaredMethod internalInheritanceDeclared(
-      DeclaredMethod superDeclaredMethod, DeclaredType childDeclaredType) {
-    return new DeclaredMethod(
-        childDeclaredType.getTypeInternalName(),
-        superDeclaredMethod.methodName,
-        superDeclaredMethod.returnType,
-        superDeclaredMethod.paramTypes,
-        superDeclaredMethod.methodModifiers,
-        superDeclaredMethod.getMethodSignature(),
+  public static Method inheritedExternal(Method superMethod, DeclaredType childType) {
+    return new Method(
+        childType.getTypeInternalName(),
+        superMethod.methodName,
+        superMethod.returnType,
+        superMethod.paramTypes,
+        superMethod.methodModifiers,
+        superMethod.getMethodSignature(),
         null,
         null,
-        MethodOrigin.INTERNAL_INHERITED_DECLARATION,
-        childDeclaredType);
+        MethodOrigin.INHERITED_EXTERNAL,
+        childType);
   }
 
-  // declaredType을 사용해서 넣어줘야함
-  public static DeclaredMethod internalInheritanceDeclared(
-      MethodCallInfo callee, CodeMethodSignature methodSignature) {
-    return new DeclaredMethod(
+  public static Method inheritedInternal(Method interfaceMethod, DeclaredType implType) {
+    return new Method(
+        implType.getTypeInternalName(),
+        interfaceMethod.methodName,
+        interfaceMethod.returnType,
+        interfaceMethod.paramTypes,
+        interfaceMethod.methodModifiers,
+        interfaceMethod.getMethodSignature(),
+        null,
+        null,
+        MethodOrigin.INHERITED_INTERNAL,
+        implType);
+  }
+
+  ///
+  // 밑에 두개가 문제인데...
+  public static Method inheritedInternal(MethodCallInfo callee, MethodSignature methodSignature) {
+    return new Method(
         callee.className(),
         callee.methodName(),
         callee.descriptor().methodReturnType(),
@@ -119,14 +131,12 @@ public class DeclaredMethod extends BaseEntity {
         methodSignature,
         null,
         null,
-        MethodOrigin.INTERNAL_INHERITED_RESOLVED,
+        MethodOrigin.INHERITED_INTERNAL,
         null);
   }
 
-  // declaredType을 사용해서 넣어줘야함
-  public static DeclaredMethod external(
-      MethodCallInfo callee, CodeMethodSignature methodSignature) {
-    return new DeclaredMethod(
+  public static Method external(MethodCallInfo callee, MethodSignature methodSignature) {
+    return new Method(
         callee.className(),
         callee.methodName(),
         callee.descriptor().methodReturnType(),
@@ -135,17 +145,19 @@ public class DeclaredMethod extends BaseEntity {
         methodSignature,
         null,
         null,
-        MethodOrigin.EXTERNAL_RESOLVED,
+        MethodOrigin.EXTERNAL,
         null);
   }
 
-  private DeclaredMethod(
+  ///
+
+  private Method(
       String typeInternalName,
       String methodName,
       String returnType,
       List<String> paramTypes,
       List<MethodModifier> methodModifiers,
-      CodeMethodSignature methodSignature,
+      MethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
       MethodOrigin methodOrigin,
@@ -162,11 +174,11 @@ public class DeclaredMethod extends BaseEntity {
     this.declaredType = declaredType;
   }
 
-  public void addIngoingCall(DeclaredMethod caller) {
+  public void addIngoingCall(Method caller) {
     if (caller == null) {
       return;
     }
-    CodeMethodCallEdge ingoingCall = CodeMethodCallEdge.of(caller, this);
+    MethodCallEdge ingoingCall = MethodCallEdge.of(caller, this);
     if (this.ingoingCalls.contains(ingoingCall)) {
       return;
     }
@@ -175,11 +187,11 @@ public class DeclaredMethod extends BaseEntity {
     caller.syncOutgoingCall(ingoingCall);
   }
 
-  public void addOutgoingCall(DeclaredMethod callee) {
+  public void addOutgoingCall(Method callee) {
     if (callee == null) {
       return;
     }
-    CodeMethodCallEdge outgoingCall = CodeMethodCallEdge.of(this, callee);
+    MethodCallEdge outgoingCall = MethodCallEdge.of(this, callee);
     if (this.outgoingCalls.contains(outgoingCall)) {
       return;
     }
@@ -188,7 +200,7 @@ public class DeclaredMethod extends BaseEntity {
     callee.syncIngoingCall(outgoingCall);
   }
 
-  private void syncIngoingCall(CodeMethodCallEdge targetOutgoingCall) {
+  private void syncIngoingCall(MethodCallEdge targetOutgoingCall) {
     if (targetOutgoingCall == null) {
       return;
     }
@@ -198,7 +210,7 @@ public class DeclaredMethod extends BaseEntity {
     this.ingoingCalls.add(targetOutgoingCall);
   }
 
-  private void syncOutgoingCall(CodeMethodCallEdge targetIngoingCall) {
+  private void syncOutgoingCall(MethodCallEdge targetIngoingCall) {
     if (targetIngoingCall == null) {
       return;
     }
@@ -210,7 +222,7 @@ public class DeclaredMethod extends BaseEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof DeclaredMethod that)) {
+    if (!(o instanceof Method that)) {
       return false;
     }
     return Objects.equals(typeInternalName, that.typeInternalName)

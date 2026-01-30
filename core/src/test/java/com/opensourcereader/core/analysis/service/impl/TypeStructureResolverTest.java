@@ -12,8 +12,8 @@ import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
@@ -83,7 +83,7 @@ class TypeStructureResolverTest {
             12);
     ParsedSourceFile parsedFile =
         new ParsedSourceFile(
-            typeInternalName, Map.of(CodeMethodSignature.of(parseResult), parseResult));
+            typeInternalName, Map.of(MethodSignature.of(parseResult), parseResult));
     Map<String, ByteCodeClassStructure> bytecodes =
         getByteCodeClassStructure(typeInternalName, methodInternalName);
 

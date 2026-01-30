@@ -8,8 +8,8 @@ import com.opensourcereader.api.dto.CodeMethodRequest;
 import com.opensourcereader.api.dto.CodeMethodResponse;
 import com.opensourcereader.api.dto.CodeMethodSummary;
 import com.opensourcereader.api.viewpolicy.CodeMethodViewPolicy;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class OpenSourceCodeMethodFacade {
   private final CodeMethodViewPolicy codeMethodViewPolicy;
 
   public CodeMethodResponse getCodeMethodById(CodeMethodRequest request) {
-    DeclaredMethod method = codeMethodCallGraphService.getCodeMethodById(request.codeMethodId());
+    Method method = codeMethodCallGraphService.getCodeMethodById(request.codeMethodId());
 
     return new CodeMethodResponse(
         method.getId(),
@@ -35,23 +35,23 @@ public class OpenSourceCodeMethodFacade {
         filterOutgoing(method, request));
   }
 
-  private List<CodeMethodSummary> filterIngoing(DeclaredMethod method, CodeMethodRequest request) {
+  private List<CodeMethodSummary> filterIngoing(Method method, CodeMethodRequest request) {
     return method.getIngoingCalls().stream()
-        .map(CodeMethodCallEdge::getCaller)
+        .map(MethodCallEdge::getCaller)
         .filter(caller -> codeMethodViewPolicy.isVisible(caller, request))
         .map(CodeMethodSummary::from)
         .toList();
   }
 
-  private List<CodeMethodSummary> filterOutgoing(DeclaredMethod method, CodeMethodRequest request) {
+  private List<CodeMethodSummary> filterOutgoing(Method method, CodeMethodRequest request) {
     return method.getOutgoingCalls().stream()
-        .map(CodeMethodCallEdge::getCallee)
+        .map(MethodCallEdge::getCallee)
         .filter(callee -> codeMethodViewPolicy.isVisible(callee, request))
         .map(CodeMethodSummary::from)
         .toList();
   }
 
-  private String extractRawText(DeclaredMethod method) {
+  private String extractRawText(Method method) {
     if (method.getDeclaredType().getOpenSourceRepoContent() == null) {
       return null;
     }

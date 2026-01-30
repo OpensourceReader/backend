@@ -5,17 +5,16 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 
 public final class CallGraphTestSupport {
 
   private CallGraphTestSupport() {}
 
-  public static List<CodeMethodCallEdge> getOutgoingCallEdges(
-      List<DeclaredMethod> declaredMethods) {
-    return declaredMethods.stream().flatMap(method -> method.getOutgoingCalls().stream()).toList();
+  public static List<MethodCallEdge> getOutgoingCallEdges(List<Method> methods) {
+    return methods.stream().flatMap(method -> method.getOutgoingCalls().stream()).toList();
   }
 
   public static DeclaredMethodInfo getDeclaredMethodInfo(

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,12 +54,11 @@ public class DeclaredType extends BaseEntity {
       mappedBy = "declaredType",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<DeclaredMethod> declaredMethods;
+  private List<Method> methods;
 
   @Enumerated(EnumType.STRING)
   private TypeOrigin typeOrigin;
 
-  //  @OneToOne(cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
   @OneToOne
   @JoinColumn(name = "repo_content_id")
   private OpenSourceRepoContent openSourceRepoContent;
@@ -81,14 +80,14 @@ public class DeclaredType extends BaseEntity {
         typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
   }
 
-  public void updateMethod(DeclaredMethod newMethod) {
+  public void updateMethod(Method newMethod) {
     if (newMethod == null) {
       return;
     }
-    if (declaredMethods.contains(newMethod)) {
+    if (methods.contains(newMethod)) {
       return;
     }
-    declaredMethods.add(newMethod);
+    methods.add(newMethod);
   }
 
   public void updateRelations(DeclaredType newSuperType, List<DeclaredType> interfaceTypes) {
@@ -144,12 +143,12 @@ public class DeclaredType extends BaseEntity {
       TypeKind typeKind,
       TypeOrigin typeOrigin,
       OpenSourceRepoContent openSourceRepoContent,
-      List<DeclaredMethod> declaredMethods) {
+      List<Method> methods) {
     this.typeInternalName = typeInternalName;
     this.typeKind = typeKind;
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
-    this.declaredMethods = declaredMethods;
+    this.methods = methods;
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
   }
@@ -161,7 +160,7 @@ public class DeclaredType extends BaseEntity {
       OpenSourceRepoContent openSourceRepoContent) {
     this.typeInternalName = extractedTypeName(typeInfo);
     this.typeKind = typeInfo.typeKind();
-    this.declaredMethods = getCodeMethods(methodExtractResults);
+    this.methods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
     this.implementedInterfaces = new ArrayList<>();
@@ -175,10 +174,14 @@ public class DeclaredType extends BaseEntity {
     return typeInfo.internalName();
   }
 
-  private List<DeclaredMethod> getCodeMethods(List<DeclaredMethodInfo> methodExtractResults) {
+  private List<Method> getCodeMethods(List<DeclaredMethodInfo> methodExtractResults) {
     return methodExtractResults.stream()
-        .map(extractResult -> DeclaredMethod.internal(extractResult, this))
+        .map(extractResult -> Method.declared(extractResult, this))
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  public boolean isInternal() {
+    return this.typeOrigin.equals(TypeOrigin.INTERNAL);
   }
 
   @Override

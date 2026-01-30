@@ -12,7 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class DeclaredMethodSignatureTest {
+class MethodSignatureTest {
 
   @DisplayName("CodeMethodSignature는 JVM descriptor 기준으로 short name 시그니처를 생성한다")
   @ParameterizedTest(name = "[{index}] descriptor={0}")
@@ -32,10 +32,10 @@ class DeclaredMethodSignatureTest {
             null);
 
     // when
-    CodeMethodSignature codeMethodSignature = CodeMethodSignature.of(methodExtractResult);
+    MethodSignature methodSignature = MethodSignature.of(methodExtractResult);
 
     // then
-    Assertions.assertThat(codeMethodSignature.methodSignature()).isEqualTo(expectedSignature);
+    Assertions.assertThat(methodSignature.methodSignature()).isEqualTo(expectedSignature);
   }
 
   static Stream<Arguments> methodSignatureTestCases() {

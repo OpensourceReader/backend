@@ -17,14 +17,14 @@ import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.repo.TypeKind;
-import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 class MethodCallResolverTest {
 
   @Autowired MethodCallResolver resolver;
-  @Autowired CodeMethodRepository codeMethodRepository;
+  @Autowired MethodRepository methodRepository;
   @Autowired DeclaredTypeRepository declaredTypeRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
@@ -102,13 +102,13 @@ class MethodCallResolverTest {
     openSourceRepoRepository.save(openSourceRepo);
 
     // when
-    List<DeclaredMethod> declaredMethods =
+    List<Method> methods =
         resolver.create(
             openSourceRepo.getId(),
             TypeStructureMeta.from(List.of(calleeTypeStructure, callerTypeStructure)));
 
     // then
-    List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+    List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
     assertThat(outgoingCalls)
         .extracting(
             e -> e.getCaller().getTypeInternalName(),

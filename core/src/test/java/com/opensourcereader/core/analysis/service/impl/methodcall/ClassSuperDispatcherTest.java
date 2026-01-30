@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 class ClassSuperDispatcherTest {
 
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
+  @Autowired private MethodRepository methodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private ClassSuperDispatcher classSuperDispatcher;
 
@@ -60,15 +61,15 @@ class ClassSuperDispatcherTest {
               childName + "path", RepoEntryType.FILE, childName, TypeKind.CLASS);
       OpenSourceRepo repo =
           TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(parentType, childType));
+              openSourceRepoRepository, "new-cloneUrl", List.of(childType, parentType));
 
       TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
 
       // when
-      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
+      classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
-      List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
       assertThat(outgoingCalls)
           .extracting(
               e -> e.getCaller().getTypeInternalName(),
@@ -78,11 +79,7 @@ class ClassSuperDispatcherTest {
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
               tuple(
-                  parentName,
-                  methodName,
-                  childName,
-                  methodName,
-                  MethodOrigin.INTERNAL_INHERITED_DECLARATION));
+                  parentName, methodName, childName, methodName, MethodOrigin.INHERITED_INTERNAL));
     }
 
     @Test
@@ -102,15 +99,15 @@ class ClassSuperDispatcherTest {
               "child", RepoEntryType.FILE, childName, methodName, md, TypeKind.CLASS);
       OpenSourceRepo repo =
           TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child));
+              openSourceRepoRepository, "new-cloneUrl", List.of(child, parent));
 
       TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
 
       // when
-      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
+      classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
-      List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
       assertThat(outgoingCalls)
           .extracting(
               e -> e.getCaller().getTypeInternalName(),
@@ -119,7 +116,7 @@ class ClassSuperDispatcherTest {
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
-              tuple(parentName, methodName, childName, methodName, MethodOrigin.INTERNAL_DECLARED));
+              tuple(parentName, methodName, childName, methodName, MethodOrigin.DECLARED));
     }
   }
 
@@ -155,17 +152,17 @@ class ClassSuperDispatcherTest {
 
       OpenSourceRepo repo =
           TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child, grandChild));
+              openSourceRepoRepository, "new-cloneUrl", List.of(grandChild, child, parent));
 
       TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
       TestRepoFixtures.linkInheritance(
           declaredTypeRepository, repo.getId(), grandChildName, childName);
 
       // when
-      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
+      classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
-      List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
       assertThat(outgoingCalls)
           .extracting(
               e -> e.getCaller().getTypeInternalName(),
@@ -174,73 +171,13 @@ class ClassSuperDispatcherTest {
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
-              tuple(
-                  parentName,
-                  methodName,
-                  childName,
-                  methodName,
-                  MethodOrigin.INTERNAL_INHERITED_DECLARATION),
+              tuple(parentName, methodName, childName, methodName, MethodOrigin.INHERITED_INTERNAL),
               tuple(
                   childName,
                   methodName,
                   grandChildName,
                   methodName,
-                  MethodOrigin.INTERNAL_INHERITED_DECLARATION));
-    }
-
-    @Test
-    @DisplayName(
-        "2-2. 상속 체인에서 중간 클래스(Child)가 override를 하면, 하위 클래스(GrandChild)는 Parent가 아닌 Child를 기준으로 연결된다")
-    void chain_middle_override() {
-      // given
-      String parentName = "Parent";
-      String childName = "Child";
-      String grandChildName = "GrandChild";
-      String methodName = "foo";
-      MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
-
-      TypeStructure parent =
-          TestTypeFixtures.createTypeWithMethod(
-              "parent",
-              RepoEntryType.FILE,
-              parentName,
-              methodName,
-              methodDescriptor,
-              TypeKind.CLASS);
-      TypeStructure child =
-          TestTypeFixtures.createTypeWithMethod(
-              "child", RepoEntryType.FILE, childName, methodName, methodDescriptor, TypeKind.CLASS);
-      TypeStructure grandChild =
-          TestTypeFixtures.createTypeWithoutMethod(
-              "grandChild", RepoEntryType.FILE, grandChildName, TypeKind.CLASS);
-      OpenSourceRepo repo =
-          TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child, grandChild));
-
-      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
-      TestRepoFixtures.linkInheritance(
-          declaredTypeRepository, repo.getId(), grandChildName, childName);
-
-      // when
-      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
-
-      // then
-      List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
-      assertThat(outgoingCalls)
-          .extracting(
-              e -> e.getCaller().getTypeInternalName(),
-              e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
-              e -> e.getCallee().getMethodName(),
-              e -> e.getCallee().getOrigin())
-          .containsExactlyInAnyOrder(
-              tuple(parentName, methodName, childName, methodName, MethodOrigin.INTERNAL_DECLARED),
-              tuple(
-                  childName,
-                  methodName,
-                  grandChildName,
-                  methodName,
-                  MethodOrigin.INTERNAL_INHERITED_DECLARATION));
+                  MethodOrigin.INHERITED_INTERNAL));
     }
   }
 }

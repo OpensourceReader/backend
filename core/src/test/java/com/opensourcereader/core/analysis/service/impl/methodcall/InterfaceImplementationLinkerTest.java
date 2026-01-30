@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
+import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
@@ -30,11 +30,11 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class InterfacePolymorphicDispatcherTest {
+class InterfaceImplementationLinkerTest {
 
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
-  @Autowired private InterfacePolymorphicDispatcher dispatcher;
+  @Autowired private InterfaceImplementationLinker dispatcher;
 
   @Nested
   @DisplayName("1. 인터페이스 기본")
@@ -67,7 +67,7 @@ class InterfacePolymorphicDispatcherTest {
               TypeKind.INTERFACE);
       OpenSourceRepo repo =
           TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implClassType));
+              openSourceRepoRepository, "new-cloneUrl", List.of(implClassType, interfaceType));
 
       DeclaredType interType =
           declaredTypeRepository
@@ -81,10 +81,10 @@ class InterfacePolymorphicDispatcherTest {
       declaredTypeRepository.save(implType);
 
       // when
-      List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
+      List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
 
       // then
-      List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
       assertThat(outgoingCalls)
           .extracting(
               edge -> edge.getCaller().getTypeInternalName(),
@@ -121,7 +121,7 @@ class InterfacePolymorphicDispatcherTest {
                 "inter2", RepoEntryType.FILE, i2Name, TypeKind.INTERFACE);
         OpenSourceRepo repo =
             TestRepoFixtures.saveRepo(
-                openSourceRepoRepository, "new-cloneUrl", List.of(interface1Type, interface2Type));
+                openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
         DeclaredType inter1Type =
             declaredTypeRepository
@@ -135,10 +135,10 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.save(inter2Type);
 
         // when
-        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
+        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
 
         // then
-        List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+        List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
         assertThat(outgoingCalls)
             .extracting(
                 e -> e.getCaller().getTypeInternalName(),
@@ -185,7 +185,7 @@ class InterfacePolymorphicDispatcherTest {
             TestRepoFixtures.saveRepo(
                 openSourceRepoRepository,
                 "new-cloneUrl",
-                List.of(interface1Type, interface2Type, implAType));
+                List.of(implAType, interface2Type, interface1Type));
 
         DeclaredType inter1Type =
             declaredTypeRepository
@@ -204,10 +204,10 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.saveAll(List.of(inter2Type, impAType));
 
         // when
-        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
+        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
 
         // then
-        List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+        List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
         assertThat(outgoingCalls)
             .extracting(
                 e -> e.getCaller().getTypeInternalName(),
@@ -246,7 +246,7 @@ class InterfacePolymorphicDispatcherTest {
                 "impl", RepoEntryType.FILE, implName, TypeKind.CLASS);
         OpenSourceRepo repo =
             TestRepoFixtures.saveRepo(
-                openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implType));
+                openSourceRepoRepository, "new-cloneUrl", List.of(implType, interfaceType));
 
         DeclaredType interface1Type =
             declaredTypeRepository
@@ -260,10 +260,10 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.save(implAType);
 
         // when
-        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
+        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
 
         // then: 엣지 1개 (I.foo -> A.foo(virtual))
-        List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+        List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
         assertThat(outgoingCalls)
             .extracting(
                 e -> e.getCaller().getTypeInternalName(),
@@ -277,7 +277,7 @@ class InterfacePolymorphicDispatcherTest {
                     methodName,
                     implName,
                     methodName,
-                    MethodOrigin.INTERNAL_INHERITED_DECLARATION) // I.foo -> A.foo (virtual)
+                    MethodOrigin.INHERITED_INTERNAL) // I.foo -> A.foo (virtual)
                 );
       }
 
@@ -321,10 +321,10 @@ class InterfacePolymorphicDispatcherTest {
         declaredTypeRepository.save(implAType);
 
         // when
-        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
+        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
 
         // then
-        List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
+        List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
         assertThat(outgoingCalls)
             .extracting(
                 e -> e.getCaller().getTypeInternalName(),
@@ -333,12 +333,7 @@ class InterfacePolymorphicDispatcherTest {
                 e -> e.getCallee().getMethodName(),
                 e -> e.getCallee().getOrigin())
             .containsExactlyInAnyOrder(
-                tuple(
-                    interfaceName,
-                    methodName,
-                    implName,
-                    methodName,
-                    MethodOrigin.INTERNAL_DECLARED));
+                tuple(interfaceName, methodName, implName, methodName, MethodOrigin.DECLARED));
       }
     }
   }
@@ -375,7 +370,7 @@ class InterfacePolymorphicDispatcherTest {
               TypeKind.INTERFACE);
       OpenSourceRepo repo =
           TestRepoFixtures.saveRepo(
-              openSourceRepoRepository, "new-cloneUrl", List.of(interface1Type, interface2Type));
+              openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
       DeclaredType i1Type =
           declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
@@ -388,7 +383,7 @@ class InterfacePolymorphicDispatcherTest {
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then
-      assertThatThrownBy(() -> dispatcher.dispatchImplementations(repo.getId()))
+      assertThatThrownBy(() -> dispatcher.linkAllInterfaceImplementations(repo.getId()))
           .isInstanceOf(IllegalStateException.class);
     }
   }
