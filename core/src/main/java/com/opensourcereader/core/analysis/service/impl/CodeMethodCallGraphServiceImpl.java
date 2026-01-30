@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.impl.methodcall.ClassSuperDispatcher;

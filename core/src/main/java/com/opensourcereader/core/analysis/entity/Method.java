@@ -1,5 +1,7 @@
-package com.opensourcereader.core.analysis.entity.method;
+package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
+import com.opensourcereader.core.analysis.entity.shared.MethodOrigin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +9,6 @@ import java.util.Objects;
 import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -119,7 +120,7 @@ public class Method extends BaseEntity {
         implType);
   }
 
-  ///
+  /// resolver에 두개가 쓰임
   // 밑에 두개가 문제인데...
   public static Method inheritedInternal(MethodCallInfo callee, MethodSignature methodSignature) {
     return new Method(
@@ -148,7 +149,6 @@ public class Method extends BaseEntity {
         MethodOrigin.EXTERNAL,
         null);
   }
-
   ///
 
   private Method(

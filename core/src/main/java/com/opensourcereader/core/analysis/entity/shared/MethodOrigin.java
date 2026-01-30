@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.method;
+package com.opensourcereader.core.analysis.entity.shared;
 
 public enum MethodOrigin {
   DECLARED,

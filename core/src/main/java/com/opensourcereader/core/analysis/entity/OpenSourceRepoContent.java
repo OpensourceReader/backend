@@ -1,5 +1,8 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.entity.shared.Extension;
+import com.opensourcereader.core.analysis.entity.shared.OpenSourceRepoContentOrigin;
+import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

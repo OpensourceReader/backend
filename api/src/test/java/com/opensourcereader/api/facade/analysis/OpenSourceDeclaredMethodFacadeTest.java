@@ -24,8 +24,8 @@
 // import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 // import com.opensourcereader.core.analysis.entity.method.NonAccessModifier;
 // import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
-// import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
-// import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
+// import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+// import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 // import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 // import com.opensourcereader.core.analysis.repository.OpenSourceContentRepository;
 // import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;

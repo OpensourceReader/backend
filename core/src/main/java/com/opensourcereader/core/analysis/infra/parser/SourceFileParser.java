@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.entity.repo.Extension;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
+import com.opensourcereader.core.analysis.entity.shared.Extension;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.ParsedSourceFile;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;

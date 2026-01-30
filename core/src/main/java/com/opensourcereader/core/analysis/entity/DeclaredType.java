@@ -1,5 +1,7 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.shared.TypeOrigin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,7 +10,6 @@ import java.util.stream.Collectors;
 import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.entity.method.Method;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -80,7 +81,7 @@ public class DeclaredType extends BaseEntity {
         typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
   }
 
-  public void updateMethod(Method newMethod) {
+  public void addMethod(Method newMethod) {
     if (newMethod == null) {
       return;
     }

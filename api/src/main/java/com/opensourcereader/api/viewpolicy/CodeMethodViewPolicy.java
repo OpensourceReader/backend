@@ -3,8 +3,8 @@ package com.opensourcereader.api.viewpolicy;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.api.dto.CodeMethodRequest;
-import com.opensourcereader.core.analysis.entity.method.Method;
-import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.entity.shared.MethodOrigin;
 
 @Component
 public class CodeMethodViewPolicy {

@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
 
 public record ByteCodeDeclaredMethodInfo(
     String className,

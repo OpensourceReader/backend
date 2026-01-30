@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.method;
+package com.opensourcereader.core.analysis.entity;
 
 import static com.opensourcereader.core.analysis.entity.shared.NameSeparators.PACKAGE_SEPARATOR;
 import static com.opensourcereader.core.analysis.entity.shared.NameSeparators.PATH_SEPARATOR;

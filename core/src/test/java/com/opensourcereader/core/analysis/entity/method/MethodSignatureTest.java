@@ -1,5 +1,7 @@
 package com.opensourcereader.core.analysis.entity.method;
 
+import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;

@@ -11,9 +11,9 @@ import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.method.Method;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
+import com.opensourcereader.core.analysis.entity.DeclaredType;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -27,6 +27,7 @@ public class MethodCallResolver {
   private final MethodRepository methodRepository;
 
   // 여기서 flatMap으로 한번 뽑아줄 수 있을듯, for문 하나 축소가능
+  // 이거는 한번 리펙토링 한다음 테스트 코드로 가자
   public List<Method> create(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
     Set<Method> result = new HashSet<>();
     for (TypeStructureMeta typeStructureMeta : typeStructureMetas) {

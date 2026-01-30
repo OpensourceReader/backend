@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.entity.DeclaredType;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;

@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.Method;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
+import com.opensourcereader.core.analysis.entity.DeclaredType;
+import com.opensourcereader.core.analysis.entity.shared.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -63,7 +63,8 @@ public class ClassSuperDispatcher {
       Method childMethodSameWithSuper = childMethods.get(superMethod.getMethodSignature());
       if (childMethodSameWithSuper == null) {
         childMethodSameWithSuper = getMethodSameWithSuper(childType, superMethod, superType);
-        childType.updateMethod(childMethodSameWithSuper);
+        childType.addMethod(childMethodSameWithSuper);
+        methodRepository.save(childMethodSameWithSuper); // 수정바람
       }
       superMethod.addOutgoingCall(childMethodSameWithSuper);
       result.add(superMethod);

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,7 +9,7 @@ import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;

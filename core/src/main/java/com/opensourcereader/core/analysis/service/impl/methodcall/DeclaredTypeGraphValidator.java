@@ -5,8 +5,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.DeclaredType;
+import com.opensourcereader.core.analysis.entity.DeclaredTypeImplementEdge;
 
 @Component
 public class DeclaredTypeGraphValidator {

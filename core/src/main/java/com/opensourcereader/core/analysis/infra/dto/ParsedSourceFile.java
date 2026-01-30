@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.infra.dto;
 
 import java.util.Map;
 
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
 
 public record ParsedSourceFile(
     String typeInternalName, Map<MethodSignature, SourceCodeParseResult> methods) {

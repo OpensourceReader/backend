@@ -2,8 +2,8 @@ package com.opensourcereader.api.dto;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.method.Method;
-import com.opensourcereader.core.analysis.entity.method.MethodCallEdge;
+import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.entity.MethodCallEdge;
 
 public record CodeMethodSummary(Long id, String classInternalName, String methodName) {
 

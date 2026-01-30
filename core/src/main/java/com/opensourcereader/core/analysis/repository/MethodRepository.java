@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.opensourcereader.core.analysis.entity.method.Method;
+import com.opensourcereader.core.analysis.entity.Method;
 
 public interface MethodRepository extends JpaRepository<Method, Long> {
 

@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.method.Method;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
-import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
-import com.opensourcereader.core.analysis.entity.repo.TypeKind;
+import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.entity.MethodSignature;
+import com.opensourcereader.core.analysis.entity.DeclaredType;
+import com.opensourcereader.core.analysis.entity.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.shared.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -59,6 +59,7 @@ public class InterfaceImplementationLinker {
             Method implMethod =
                 getImplMethod(nowInterfaceTypeMethod, nowInterfaceType, implTypeMethods, implType);
             nowInterfaceTypeMethod.addOutgoingCall(implMethod);
+            methodRepository.save(implMethod);
             result.add(nowInterfaceTypeMethod);
           }
           if (implType.getTypeKind().equals(TypeKind.INTERFACE)) {

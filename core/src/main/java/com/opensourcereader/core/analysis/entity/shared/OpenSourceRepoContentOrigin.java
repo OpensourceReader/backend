@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity.shared;
 
 public enum OpenSourceRepoContentOrigin {
   INTERNAL,
