@@ -2,11 +2,9 @@ package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
 
-import java.time.Duration;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +24,9 @@ import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 
 @Transactional
 @SpringBootTest
@@ -351,9 +347,9 @@ class InterfacePolymorphicDispatcherTest {
   @DisplayName("4. 안전성(순환)")
   class Safety {
 
-    @Disabled
     @Test
-    @DisplayName("4-1. 순환 인터페이스(I1↔I2)는 무한 루프 위험이 있으나, 자바 규칙상 해당케이스는 발생하지 않으므로 별도 방어 없이 둔다")
+    @DisplayName(
+        "4-1. 순환 인터페이스(I1↔I2)는 자바 규칙상 해당케이스는 발생하지 않으나, 코드상 무한 루프의 위험이 있으므로, 유효성 검사를 통해 예외처리한다")
     void cyclic_interface_should_not_infinite_loop() {
       // given
       String i1Name = "I1";
@@ -392,11 +388,8 @@ class InterfacePolymorphicDispatcherTest {
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then
-      assertThrows(
-          AssertionFailedError.class,
-          () ->
-              assertTimeout(
-                  Duration.ofMillis(300), () -> dispatcher.dispatchImplementations(repo.getId())));
+      assertThatThrownBy(() -> dispatcher.dispatchImplementations(repo.getId()))
+          .isInstanceOf(IllegalStateException.class);
     }
   }
 }

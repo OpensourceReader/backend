@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InterfacePolymorphicDispatcher {
 
+  private final DeclaredTypeGraphValidator declaredTypeGraphValidator;
   private final CodeMethodRepository codeMethodRepository;
   private final DeclaredTypeRepository declaredTypeRepository;
 
@@ -34,16 +35,17 @@ public class InterfacePolymorphicDispatcher {
 
     Set<DeclaredMethod> result = new HashSet<>();
     for (DeclaredType interfaceType : interfaces) {
+      declaredTypeGraphValidator.validateAcyclic(interfaceType);
       result.addAll(dispatchImplementationByBfs(interfaceType));
     }
 
     return codeMethodRepository.saveAll(result);
   }
 
-  private List<DeclaredMethod> dispatchImplementationByBfs(DeclaredType type) {
+  private List<DeclaredMethod> dispatchImplementationByBfs(DeclaredType interfaceType) {
     List<DeclaredMethod> result = new ArrayList<>();
     Queue<DeclaredType> queue = new LinkedList<>();
-    queue.add(type);
+    queue.add(interfaceType);
 
     while (!queue.isEmpty()) {
       int n = queue.size();
