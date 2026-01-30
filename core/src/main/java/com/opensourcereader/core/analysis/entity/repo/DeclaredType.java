@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.type;
+package com.opensourcereader.core.analysis.entity.repo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,6 @@ import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepoContent;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,23 +59,26 @@ public class DeclaredType extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private TypeOrigin typeOrigin;
 
+  //  @OneToOne(cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
   @OneToOne
   @JoinColumn(name = "repo_content_id")
   private OpenSourceRepoContent openSourceRepoContent;
 
-  public static DeclaredType internal(
+  static DeclaredType internal(
       TypeInfo typeInfo,
-      List<DeclaredMethodInfo> methodExtractResults,
+      List<DeclaredMethodInfo> declaredMethodInfos,
       OpenSourceRepoContent openSourceRepoContent) {
     if (typeInfo == null) {
       return null;
     }
     return new DeclaredType(
-        typeInfo, methodExtractResults, TypeOrigin.INTERNAL, openSourceRepoContent);
+        typeInfo, declaredMethodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
   }
 
-  public static DeclaredType external(String typeInternalName) {
-    return new DeclaredType(typeInternalName, null, TypeOrigin.EXTERNAL, null, null);
+  static DeclaredType external(
+      String typeInternalName, OpenSourceRepoContent openSourceRepoContent) {
+    return new DeclaredType(
+        typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
   }
 
   public void updateMethod(DeclaredMethod newMethod) {

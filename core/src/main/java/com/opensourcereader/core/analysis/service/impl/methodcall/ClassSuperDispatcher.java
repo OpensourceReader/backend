@@ -11,8 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
+import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,9 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClassSuperDispatcher {
 
+  private final DeclaredTypeRepository declaredTypeRepository;
   private final CodeMethodRepository codeMethodRepository;
 
-  public List<DeclaredMethod> dispatchSupers(List<DeclaredType> classes) {
+  public List<DeclaredMethod> dispatchSupers(Long repoId) {
+    List<DeclaredType> classes =
+        declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
     Set<DeclaredMethod> result = new HashSet<>();
     for (DeclaredType classType : classes) {
       result.addAll(dispatchSuperMethod(classType));

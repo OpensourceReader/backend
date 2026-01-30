@@ -3,6 +3,7 @@ package com.opensourcereader.core.analysis.entity.repo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.opensourcereader.core.BaseEntity;
@@ -10,7 +11,6 @@ import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -51,18 +51,22 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Column(name = "raw_text", columnDefinition = "LONGTEXT")
   private String rawText;
 
-  @OneToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "declared_type_id")
+  @Enumerated(EnumType.STRING)
+  private OpenSourceRepoContentOrigin origin;
+
+  @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private DeclaredType declaredType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
   private OpenSourceRepo openSourceRepo;
 
-  static OpenSourceRepoContent of(TypeStructure typeStructure, OpenSourceRepo openSourceRepo) {
+  static OpenSourceRepoContent internal(
+      TypeStructure typeStructure, OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoContent(
         typeStructure.path(),
         typeStructure.repoEntryType(),
+        OpenSourceRepoContentOrigin.INTERNAL,
         typeStructure.rawText(),
         typeStructure.typeInfo(),
         typeStructure.methods().stream()
@@ -71,9 +75,37 @@ public class OpenSourceRepoContent extends BaseEntity {
         openSourceRepo);
   }
 
+  static OpenSourceRepoContent external(String typeInternalName, OpenSourceRepo openSourceRepo) {
+    return new OpenSourceRepoContent(
+        typeInternalName,
+        typeInternalName + UUID.randomUUID(),
+        RepoEntryType.OTHERS,
+        OpenSourceRepoContentOrigin.EXTERNAL,
+        null,
+        openSourceRepo);
+  }
+
+  private OpenSourceRepoContent(
+      String typeInternalName,
+      String path,
+      RepoEntryType repoEntryType,
+      OpenSourceRepoContentOrigin origin,
+      String rawText,
+      OpenSourceRepo openSourceRepo) {
+    this.path = path;
+    this.extension = Extension.resolveExtension(path);
+    this.name = OpenSourceRepoContentName.from(path);
+    this.origin = origin;
+    this.repoEntryType = repoEntryType;
+    this.rawText = rawText;
+    this.declaredType = DeclaredType.external(typeInternalName, this);
+    this.openSourceRepo = openSourceRepo;
+  }
+
   private OpenSourceRepoContent(
       String path,
       RepoEntryType repoEntryType,
+      OpenSourceRepoContentOrigin origin,
       String rawText,
       TypeInfo typeInfo,
       List<DeclaredMethodInfo> methodInfoWithSources,
@@ -81,6 +113,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoContentName.from(path);
+    this.origin = origin;
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;
     this.declaredType = DeclaredType.internal(typeInfo, methodInfoWithSources, this);

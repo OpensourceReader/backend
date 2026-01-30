@@ -1,6 +1,5 @@
 package com.opensourcereader.core.analysis.service.impl.methodcall;
 
-import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getDeclaredMethodInfo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
@@ -11,13 +10,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
+import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,48 +30,70 @@ class CodeMethodCallGraphServiceTest {
   @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
   @Autowired DeclaredTypeRepository declaredTypeRepository;
   @Autowired CodeMethodRepository codeMethodRepository;
+  @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Transactional
   @Test
   @DisplayName("메서드 id로 조회하면 outgoing/ingoing 그래프를 함께 가져온다 (DeclaredType + DeclaredMethod + Edge만)")
   void getCodeMethodById_edgesOnly() {
     // given
+    String callerTypeName = "t/Other";
+    String callerMethodName = "run";
+    String targetTypeName = "t/Main";
+    String targetMethodName = "target";
+    String calleeTypeName = "t/Util";
+    String calleeMethodName = "help";
     MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-    String callerClassName = "t/Other";
-    String callerMethodName = "run";
-    DeclaredType callerType =
-        declaredTypeRepository.save(
-            DeclaredType.internal(
-                new TypeInfo(9, TypeKind.CLASS, callerClassName, null, null, null),
-                List.of(getDeclaredMethodInfo(callerClassName, callerMethodName, methodDescriptor)),
-                null));
+    // 메서드 하나씩 해서 선언을 가능함
+    TypeStructure callerType =
+        TestTypeFixtures.createTypeWithMethod(
+            "caller",
+            RepoEntryType.FILE,
+            callerTypeName,
+            callerMethodName,
+            methodDescriptor,
+            TypeKind.CLASS);
+    TypeStructure targetType =
+        TestTypeFixtures.createTypeWithMethod(
+            "caller",
+            RepoEntryType.FILE,
+            targetTypeName,
+            targetMethodName,
+            methodDescriptor,
+            TypeKind.CLASS);
+    TypeStructure calleeType =
+        TestTypeFixtures.createTypeWithMethod(
+            "caller",
+            RepoEntryType.FILE,
+            calleeTypeName,
+            calleeMethodName,
+            methodDescriptor,
+            TypeKind.CLASS);
+    OpenSourceRepo repo =
+        TestRepoFixtures.saveRepo(
+            openSourceRepoRepository, "new-cloneUrl", List.of(callerType, targetType, calleeType));
 
-    String targetClassName = "t/Main";
-    DeclaredType targetType =
-        declaredTypeRepository.save(
-            DeclaredType.internal(
-                new TypeInfo(9, TypeKind.CLASS, targetClassName, null, null, null),
-                List.of(getDeclaredMethodInfo(targetClassName, "target", methodDescriptor)),
-                null));
-
-    String calleeClassName = "t/Util";
-    String calleeMethodName = "help";
-    DeclaredType calleeType =
-        declaredTypeRepository.save(
-            DeclaredType.internal(
-                new TypeInfo(9, TypeKind.CLASS, calleeClassName, null, null, null),
-                List.of(getDeclaredMethodInfo(targetClassName, calleeMethodName, methodDescriptor)),
-                null));
-    declaredTypeRepository.saveAll(List.of(callerType, targetType, calleeType));
-
-    // given
-    DeclaredMethod callerMethod = callerType.getDeclaredMethods().get(0);
-    DeclaredMethod targetMethod = targetType.getDeclaredMethods().get(0);
-    DeclaredMethod calleeMethod = calleeType.getDeclaredMethods().get(0);
+    DeclaredMethod callerMethod =
+        declaredTypeRepository
+            .findByRepoAndTypeInternalName(repo.getId(), callerTypeName)
+            .orElseThrow()
+            .getDeclaredMethods()
+            .get(0);
+    DeclaredMethod targetMethod =
+        declaredTypeRepository
+            .findByRepoAndTypeInternalName(repo.getId(), targetTypeName)
+            .orElseThrow()
+            .getDeclaredMethods()
+            .get(0);
+    DeclaredMethod calleeMethod =
+        declaredTypeRepository
+            .findByRepoAndTypeInternalName(repo.getId(), calleeTypeName)
+            .orElseThrow()
+            .getDeclaredMethods()
+            .get(0);
     targetMethod.addIngoingCall(callerMethod);
     targetMethod.addOutgoingCall(calleeMethod);
-
     codeMethodRepository.saveAll(List.of(targetMethod, calleeMethod, callerMethod));
 
     // when

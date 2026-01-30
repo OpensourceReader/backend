@@ -13,10 +13,11 @@ import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.entity.method.CodeMethodSignature;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.DeclaredTypeImplementEdge;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
+import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,8 +26,12 @@ import lombok.RequiredArgsConstructor;
 public class InterfacePolymorphicDispatcher {
 
   private final CodeMethodRepository codeMethodRepository;
+  private final DeclaredTypeRepository declaredTypeRepository;
 
-  public List<DeclaredMethod> dispatchImplementations(List<DeclaredType> interfaces) {
+  public List<DeclaredMethod> dispatchImplementations(Long repoId) {
+    List<DeclaredType> interfaces =
+        declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
+
     Set<DeclaredMethod> result = new HashSet<>();
     for (DeclaredType interfaceType : interfaces) {
       result.addAll(dispatchImplementationByBfs(interfaceType));

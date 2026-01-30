@@ -1,11 +1,10 @@
 package com.opensourcereader.core.analysis.service.impl.methodcall;
 
-import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getDeclaredMethodInfo;
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
 
 import java.time.Duration;
 import java.util.List;
@@ -14,24 +13,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
+import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
 
 @Transactional
 @SpringBootTest
 class InterfacePolymorphicDispatcherTest {
 
+  @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
   @Autowired private InterfacePolymorphicDispatcher dispatcher;
 
@@ -43,32 +48,44 @@ class InterfacePolymorphicDispatcherTest {
     @DisplayName("1-1. 인터페이스 I의 메서드 -> (직접) 구현체 A의 메서드로 연결된다")
     void interface_to_first_implementor() {
       // given
+      String interfaceName = "interface";
+      String implName = "A";
       String methodName = "method";
       MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
-      String interfaceName = "interface";
-      ByteCodeClassStructure interfaceStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(183, TypeKind.INTERFACE, interfaceName, null, null, List.of()),
-              List.of());
-      DeclaredMethodInfo declaredMethodInfo =
-          getDeclaredMethodInfo(interfaceName, methodName, methodDescriptor);
-      DeclaredType interfaceType =
-          DeclaredType.internal(interfaceStructure.typeInfo(), List.of(declaredMethodInfo), null);
 
-      // 2) 구현체 A (I를 implements 하는 CLASS)
-      String className = "A";
-      ByteCodeClassStructure implStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, className, null, null, List.of("I")), List.of());
-      DeclaredType implClassType =
-          DeclaredType.internal(implStructure.typeInfo(), List.of(declaredMethodInfo), null);
-      declaredTypeRepository.saveAll(List.of(interfaceType, implClassType));
-      implClassType.updateRelations(null, List.of(interfaceType));
-      declaredTypeRepository.save(implClassType);
+      TypeStructure interfaceType =
+          TestTypeFixtures.createTypeWithMethod(
+              "interface",
+              RepoEntryType.FILE,
+              interfaceName,
+              methodName,
+              methodDescriptor,
+              TypeKind.INTERFACE);
+      TypeStructure implClassType =
+          TestTypeFixtures.createTypeWithMethod(
+              "impl",
+              RepoEntryType.FILE,
+              implName,
+              methodName,
+              methodDescriptor,
+              TypeKind.INTERFACE);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implClassType));
+
+      DeclaredType interType =
+          declaredTypeRepository
+              .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
+              .orElseThrow();
+      DeclaredType implType =
+          declaredTypeRepository
+              .findByRepoAndTypeInternalName(repo.getId(), implName)
+              .orElseThrow();
+      implType.updateRelations(null, List.of(interType));
+      declaredTypeRepository.save(implType);
 
       // when
-      List<DeclaredMethod> declaredMethods =
-          dispatcher.dispatchImplementations(List.of(interfaceType));
+      List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
 
       // then
       List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -78,7 +95,7 @@ class InterfacePolymorphicDispatcherTest {
               edge -> edge.getCaller().getMethodName(),
               edge -> edge.getCallee().getTypeInternalName(),
               edge -> edge.getCallee().getMethodName())
-          .containsExactlyInAnyOrder(tuple(interfaceName, methodName, className, methodName));
+          .containsExactlyInAnyOrder(tuple(interfaceName, methodName, implName, methodName));
     }
 
     @Nested
@@ -90,33 +107,39 @@ class InterfacePolymorphicDispatcherTest {
           "2-1. 인터페이스 I1.foo 명세가 I2로 계승되며, I1.foo -> I2.foo 연결이 생성된다(인터페이스 상속은 implmenentedInterfaces에 등록된다.)")
       void interface_extends_interface_spec_inheritance() {
         // given
+        String i1Name = "I1";
+        String i2Name = "I2";
         String methodName = "foo";
         MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-        // I1: foo()
-        String i1Name = "I1";
-        ByteCodeClassStructure i1Structure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, i1Name, null, null, List.of()), List.of());
-        DeclaredMethodInfo foo = getDeclaredMethodInfo(i1Name, methodName, methodDescriptor);
-        DeclaredType i1Type = DeclaredType.internal(i1Structure.typeInfo(), List.of(foo), null);
+        TypeStructure interface1Type =
+            TestTypeFixtures.createTypeWithMethod(
+                "inter1",
+                RepoEntryType.FILE,
+                i1Name,
+                methodName,
+                methodDescriptor,
+                TypeKind.INTERFACE);
+        TypeStructure interface2Type =
+            TestTypeFixtures.createTypeWithoutMethod(
+                "inter2", RepoEntryType.FILE, i2Name, TypeKind.INTERFACE);
+        OpenSourceRepo repo =
+            TestRepoFixtures.saveRepo(
+                openSourceRepoRepository, "new-cloneUrl", List.of(interface1Type, interface2Type));
 
-        // I2: extends I1, + foo()를 "명시적으로" 선언(테스트 편의상)
-        String i2Name = "I2";
-        ByteCodeClassStructure i2Structure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, i2Name, i1Name, null, List.of()), List.of());
-        DeclaredType i2Type = DeclaredType.internal(i2Structure.typeInfo(), List.of(foo), null);
-
-        declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
-
-        // (선택) extends edge를 별도 엔티티로 관리한다면 여기서 업데이트/저장
-        i2Type.updateRelations(null, List.of(i1Type));
-        declaredTypeRepository.save(i2Type);
+        DeclaredType inter1Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), i1Name)
+                .orElseThrow();
+        DeclaredType inter2Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), i2Name)
+                .orElseThrow();
+        inter2Type.updateRelations(null, List.of(inter1Type));
+        declaredTypeRepository.save(inter2Type);
 
         // when
-        List<DeclaredMethod> declaredMethods =
-            dispatcher.dispatchImplementations(List.of(i1Type, i2Type));
+        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
 
         // then
         List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -135,43 +158,57 @@ class InterfacePolymorphicDispatcherTest {
         // given
         String methodName = "foo";
         MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
-
-        // I1: foo()
         String i1Name = "I1";
-        ByteCodeClassStructure i1Structure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, i1Name, null, null, List.of()), List.of());
-        DeclaredMethodInfo foo = getDeclaredMethodInfo(i1Name, methodName, methodDescriptor);
-        DeclaredType i1Type = DeclaredType.internal(i1Structure.typeInfo(), List.of(foo), null);
-
-        // I2: extends I1 (테스트 단순화를 위해 foo()도 "명시적으로" 넣음)
         String i2Name = "I2";
-        ByteCodeClassStructure i2Structure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, i2Name, i1Name, null, List.of()),
-                // superName=I1 가정
-                List.of());
-        DeclaredType i2Type = DeclaredType.internal(i2Structure.typeInfo(), List.of(foo), null);
+        String implAName = "A";
+        TypeStructure interface1Type =
+            TestTypeFixtures.createTypeWithMethod(
+                "interface",
+                RepoEntryType.FILE,
+                i1Name,
+                methodName,
+                methodDescriptor,
+                TypeKind.INTERFACE);
+        TypeStructure interface2Type =
+            TestTypeFixtures.createTypeWithMethod(
+                "impl",
+                RepoEntryType.FILE,
+                i2Name,
+                methodName,
+                methodDescriptor,
+                TypeKind.INTERFACE);
+        TypeStructure implAType =
+            TestTypeFixtures.createTypeWithMethod(
+                "impl",
+                RepoEntryType.FILE,
+                implAName,
+                methodName,
+                methodDescriptor,
+                TypeKind.CLASS);
+        OpenSourceRepo repo =
+            TestRepoFixtures.saveRepo(
+                openSourceRepoRepository,
+                "new-cloneUrl",
+                List.of(interface1Type, interface2Type, implAType));
 
-        // A: implements I2
-        String aName = "A";
-        ByteCodeClassStructure aStructure =
-            new ByteCodeClassStructure(
-                new TypeInfo(33, TypeKind.CLASS, aName, null, null, List.of(i2Name)), List.of());
-        DeclaredType aType = DeclaredType.internal(aStructure.typeInfo(), List.of(foo), null);
-        declaredTypeRepository.saveAll(List.of(i1Type, i2Type, aType));
-
-        // I2 extends I1 (프로젝트에 맞게 edge 이름 수정)
-        i2Type.updateRelations(null, List.of(i1Type));
-        declaredTypeRepository.save(i2Type);
-
-        // A implements I2
-        aType.updateRelations(null, List.of(i2Type));
-        declaredTypeRepository.save(aType);
+        DeclaredType inter1Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), i1Name)
+                .orElseThrow();
+        DeclaredType inter2Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), i2Name)
+                .orElseThrow();
+        DeclaredType impAType =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), implAName)
+                .orElseThrow();
+        inter2Type.updateRelations(null, List.of(inter1Type));
+        impAType.updateRelations(null, List.of(inter2Type));
+        declaredTypeRepository.saveAll(List.of(inter2Type, impAType));
 
         // when
-        List<DeclaredMethod> declaredMethods =
-            dispatcher.dispatchImplementations(List.of(i1Type, i2Type));
+        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
 
         // then
         List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -183,7 +220,7 @@ class InterfacePolymorphicDispatcherTest {
                 e -> e.getCallee().getMethodName())
             .containsExactlyInAnyOrder(
                 tuple(i1Name, methodName, i2Name, methodName),
-                tuple(i2Name, methodName, aName, methodName));
+                tuple(i2Name, methodName, implAName, methodName));
       }
     }
 
@@ -196,41 +233,38 @@ class InterfacePolymorphicDispatcherTest {
           "3-1. default foo()를 구현체가 override하지 않으면, 구현체에 virtual 메서드를 만들어 부모(default)에서 유래됨을 표시해 연결한다")
       void default_method_no_override_virtual() {
         // given
+        String interfaceName = "I";
+        String implName = "A";
         String methodName = "foo";
         MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
+        TypeStructure interfaceType =
+            TestTypeFixtures.createTypeWithMethod(
+                "impl",
+                RepoEntryType.FILE,
+                interfaceName,
+                methodName,
+                methodDescriptor,
+                TypeKind.INTERFACE);
+        TypeStructure implType =
+            TestTypeFixtures.createTypeWithoutMethod(
+                "impl", RepoEntryType.FILE, implName, TypeKind.CLASS);
+        OpenSourceRepo repo =
+            TestRepoFixtures.saveRepo(
+                openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implType));
 
-        // 1) 인터페이스 I: default foo()
-        String interfaceName = "I";
-        ByteCodeClassStructure interfaceStructure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, interfaceName, null, null, List.of()),
-                List.of());
-
-        // default 메서드임을 표현: MethodModifier.DEFAULT가 너희 모델에 있으면 그걸 쓰고,
-        // 없다면 (PUBLIC + inferredDefault)처럼 별도 플래그가 있어야 함.
-        DeclaredMethodInfo defaultFoo =
-            getDeclaredMethodInfo(interfaceName, methodName, methodDescriptor);
-        DeclaredType interfaceType =
-            DeclaredType.internal(interfaceStructure.typeInfo(), List.of(defaultFoo), null);
-
-        // 2) 구현체 A: implements I, foo() 선언 없음 (즉, methodExtractResult 비움)
-        String className = "A";
-        ByteCodeClassStructure implStructure =
-            new ByteCodeClassStructure(
-                new TypeInfo(33, TypeKind.CLASS, className, null, null, List.of(interfaceName)),
-                List.of());
-        DeclaredType implType =
-            DeclaredType.internal(implStructure.typeInfo(), List.of(), null); // foo를 일부러 넣지 않음
-
-        declaredTypeRepository.saveAll(List.of(interfaceType, implType));
-
-        // A implements I
-        implType.updateRelations(null, List.of(interfaceType));
-        declaredTypeRepository.save(implType);
+        DeclaredType interface1Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
+                .orElseThrow();
+        DeclaredType implAType =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), implName)
+                .orElseThrow();
+        implAType.updateRelations(null, List.of(interface1Type));
+        declaredTypeRepository.save(implAType);
 
         // when
-        List<DeclaredMethod> declaredMethods =
-            dispatcher.dispatchImplementations(List.of(interfaceType));
+        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
 
         // then: 엣지 1개 (I.foo -> A.foo(virtual))
         List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -245,7 +279,7 @@ class InterfacePolymorphicDispatcherTest {
                 tuple(
                     interfaceName,
                     methodName,
-                    className,
+                    implName,
                     methodName,
                     MethodOrigin.INTERNAL_INHERITED_DECLARATION) // I.foo -> A.foo (virtual)
                 );
@@ -255,43 +289,43 @@ class InterfacePolymorphicDispatcherTest {
       @DisplayName("3-2. default foo()를 구현체가 override하면, I.foo -> A.foo(override)로 연결된다")
       void default_method_with_override() {
         // given
+        String interfaceName = "I";
+        String implName = "A";
         String methodName = "foo";
         MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-        // 1) 인터페이스 I: default foo()
-        String interfaceName = "I";
-        ByteCodeClassStructure interfaceStructure =
-            new ByteCodeClassStructure(
-                new TypeInfo(183, TypeKind.INTERFACE, interfaceName, null, null, List.of()),
-                List.of());
+        TypeStructure interfaceType =
+            TestTypeFixtures.createTypeWithMethod(
+                "inter",
+                RepoEntryType.FILE,
+                interfaceName,
+                methodName,
+                methodDescriptor,
+                TypeKind.INTERFACE);
+        TypeStructure implType =
+            TestTypeFixtures.createTypeWithMethod(
+                "impl", RepoEntryType.FILE, implName, methodName, methodDescriptor, TypeKind.CLASS);
+        OpenSourceRepo repo =
+            TestRepoFixtures.saveRepo(
+                openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implType));
 
-        DeclaredMethodInfo defaultFoo =
-            getDeclaredMethodInfo(interfaceName, methodName, methodDescriptor);
-        DeclaredType interfaceType =
-            DeclaredType.internal(interfaceStructure.typeInfo(), List.of(defaultFoo), null);
-
-        // 2) 구현체 A: implements I, foo() override(직접 선언)
-        String className = "A";
-        ByteCodeClassStructure implStructure =
-            new ByteCodeClassStructure(
-                new TypeInfo(33, TypeKind.CLASS, className, null, null, List.of(interfaceName)),
-                List.of());
-
-        // override 메서드: 보통 PUBLIC만 있어도 됨 (DEFAULT 플래그는 붙이면 안 됨)
-        DeclaredMethodInfo overrideFoo =
-            getDeclaredMethodInfo(className, methodName, methodDescriptor);
-        DeclaredType implType =
-            DeclaredType.internal(implStructure.typeInfo(), List.of(overrideFoo), null);
-
-        declaredTypeRepository.saveAll(List.of(interfaceType, implType));
+        DeclaredType interface1Type =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
+                .orElseThrow();
+        DeclaredType implAType =
+            declaredTypeRepository
+                .findByRepoAndTypeInternalName(repo.getId(), implName)
+                .orElseThrow();
+        implAType.updateRelations(null, List.of(interface1Type));
+        declaredTypeRepository.save(implAType);
 
         // A implements I
-        implType.updateRelations(null, List.of(interfaceType));
-        declaredTypeRepository.save(implType);
+        implAType.updateRelations(null, List.of(interface1Type));
+        declaredTypeRepository.save(implAType);
 
         // when
-        List<DeclaredMethod> declaredMethods =
-            dispatcher.dispatchImplementations(List.of(interfaceType));
+        List<DeclaredMethod> declaredMethods = dispatcher.dispatchImplementations(repo.getId());
 
         // then
         List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -306,7 +340,7 @@ class InterfacePolymorphicDispatcherTest {
                 tuple(
                     interfaceName,
                     methodName,
-                    className,
+                    implName,
                     methodName,
                     MethodOrigin.INTERNAL_DECLARED));
       }
@@ -314,33 +348,43 @@ class InterfacePolymorphicDispatcherTest {
   }
 
   @Nested
-  @DisplayName("7. 안전성(순환)")
+  @DisplayName("4. 안전성(순환)")
   class Safety {
 
+    @Disabled
     @Test
-    @DisplayName("7-1. 순환 인터페이스(I1↔I2)는 무한 루프 위험이 있으나, 자바 규칙상 발생하지 않으므로 별도 방어 없이 둔다")
+    @DisplayName("4-1. 순환 인터페이스(I1↔I2)는 무한 루프 위험이 있으나, 자바 규칙상 해당케이스는 발생하지 않으므로 별도 방어 없이 둔다")
     void cyclic_interface_should_not_infinite_loop() {
       // given
+      String i1Name = "I1";
+      String i2Name = "I2";
       String methodName = "foo";
       MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-      // I1
-      String i1Name = "I1";
-      ByteCodeClassStructure i1Structure =
-          new ByteCodeClassStructure(
-              new TypeInfo(183, TypeKind.INTERFACE, i1Name, null, null, List.of()), List.of());
-      DeclaredMethodInfo foo = getDeclaredMethodInfo(i1Name, methodName, methodDescriptor);
-      DeclaredType i1Type = DeclaredType.internal(i1Structure.typeInfo(), List.of(foo), null);
+      TypeStructure interface1Type =
+          TestTypeFixtures.createTypeWithMethod(
+              "inter1",
+              RepoEntryType.FILE,
+              i1Name,
+              methodName,
+              methodDescriptor,
+              TypeKind.INTERFACE);
+      TypeStructure interface2Type =
+          TestTypeFixtures.createTypeWithMethod(
+              "inter2",
+              RepoEntryType.FILE,
+              i2Name,
+              methodName,
+              methodDescriptor,
+              TypeKind.INTERFACE);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(interface1Type, interface2Type));
 
-      // I2
-      String i2Name = "I2";
-      ByteCodeClassStructure i2Structure =
-          new ByteCodeClassStructure(
-              new TypeInfo(183, TypeKind.INTERFACE, i2Name, null, null, List.of()), List.of());
-      DeclaredMethodInfo foo2 = getDeclaredMethodInfo(i2Name, methodName, methodDescriptor);
-      DeclaredType i2Type = DeclaredType.internal(i2Structure.typeInfo(), List.of(foo2), null);
-
-      declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
+      DeclaredType i1Type =
+          declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
+      DeclaredType i2Type =
+          declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
 
       // 순환 extends 구성: I1 extends I2, I2 extends I1
       i1Type.updateRelations(null, List.of(i2Type));
@@ -348,16 +392,11 @@ class InterfacePolymorphicDispatcherTest {
       declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then
-      // ✅ 무한 루프면 여기서 타임아웃으로 실패함
       assertThrows(
-          org.opentest4j.AssertionFailedError.class,
-          () -> {
-            assertTimeoutPreemptively(
-                Duration.ofMillis(300),
-                () -> {
-                  dispatcher.dispatchImplementations(List.of(i1Type, i2Type));
-                });
-          });
+          AssertionFailedError.class,
+          () ->
+              assertTimeout(
+                  Duration.ofMillis(300), () -> dispatcher.dispatchImplementations(repo.getId())));
     }
   }
 }

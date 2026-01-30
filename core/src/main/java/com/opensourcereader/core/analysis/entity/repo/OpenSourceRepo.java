@@ -24,7 +24,9 @@ public class OpenSourceRepo extends BaseEntity {
   @Column(name = "clone_url")
   private String cloneUrl;
 
-  @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
+  @OneToMany(
+      mappedBy = "openSourceRepo",
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<OpenSourceRepoContent> contents = new ArrayList<>();
 
   public static OpenSourceRepo of(String cloneUrl, List<TypeStructure> typeStructures) {
@@ -35,12 +37,16 @@ public class OpenSourceRepo extends BaseEntity {
     this.cloneUrl = cloneUrl;
     this.contents =
         typeStructures.stream()
-            .map(structure -> OpenSourceRepoContent.of(structure, this))
+            .map(structure -> OpenSourceRepoContent.internal(structure, this))
             .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public void addAllContents(List<OpenSourceRepoContent> contents) {
-    this.contents = contents;
+  public void addExternalContent(String typeInternalName) {
+    OpenSourceRepoContent newContent = OpenSourceRepoContent.external(typeInternalName, this);
+    if (this.contents.contains(newContent)) {
+      return;
+    }
+    contents.add(newContent);
   }
 
   @Override

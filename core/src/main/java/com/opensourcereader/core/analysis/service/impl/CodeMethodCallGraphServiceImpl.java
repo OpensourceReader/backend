@@ -9,8 +9,9 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.repository.CodeMethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.impl.methodcall.ClassSuperDispatcher;
+import com.opensourcereader.core.analysis.service.impl.methodcall.InterfacePolymorphicDispatcher;
 import com.opensourcereader.core.analysis.service.impl.methodcall.MethodCallResolver;
-import com.opensourcereader.core.analysis.service.impl.methodcall.MethodPolymorphicDispatcher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,14 +19,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphService {
 
-  private final MethodPolymorphicDispatcher methodPolymorphicDispatcher;
+  private final InterfacePolymorphicDispatcher interfacePolymorphicDispatcher;
+  private final ClassSuperDispatcher classSuperDispatcher;
   private final MethodCallResolver methodCallResolver;
   private final CodeMethodRepository codeMethodRepository;
 
   @Transactional
   @Override
   public void createMethodCallGraph(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
-    methodPolymorphicDispatcher.dispatch(repoId);
+    interfacePolymorphicDispatcher.dispatchImplementations(repoId);
+    classSuperDispatcher.dispatchSupers(repoId);
     methodCallResolver.create(repoId, typeStructureMetas);
   }
 

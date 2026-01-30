@@ -43,7 +43,7 @@ public class OpenSourceRepoFacade {
         opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
 
     List<TypeStructureMeta> typeStructureMetas = TypeStructureMeta.from(artifact.typeStructures());
-    declaredTypeRelationService.resolveTypeHierarchy(typeStructureMetas);
+    declaredTypeRelationService.resolve(openSourceRepo.getId(), typeStructureMetas);
     codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), typeStructureMetas);
 
     FileUtil.removeDirectory(artifact.savedLocalRepoPath());

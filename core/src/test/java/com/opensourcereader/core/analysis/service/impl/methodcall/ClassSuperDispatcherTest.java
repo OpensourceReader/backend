@@ -1,6 +1,5 @@
 package com.opensourcereader.core.analysis.service.impl.methodcall;
 
-import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getDeclaredMethodInfo;
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -11,16 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.method.CodeMethodCallEdge;
 import com.opensourcereader.core.analysis.entity.method.DeclaredMethod;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
+import com.opensourcereader.core.analysis.entity.repo.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.repo.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.repo.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
+import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
+import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 class ClassSuperDispatcherTest {
 
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
+  @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private ClassSuperDispatcher classSuperDispatcher;
 
   @Nested
@@ -38,37 +40,32 @@ class ClassSuperDispatcherTest {
 
     @Test
     @DisplayName("1-1. override가 없으면 Parent.foo -> Child.foo(virtual)로 연결된다")
-    void class_inheritance_no_override_virtual_to_parent() {
+    void givenNoOverride_whenDispatchSupers_thenLinkParentFooToChildFooVirtual() {
       // given
+      String parentName = "Parent";
+      String childName = "Child";
       String methodName = "foo";
       MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-      // 1) Parent (CLASS): foo()
-      String parentName = "Parent";
-      ByteCodeClassStructure parentStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredMethodInfo parentDeclaredFoo =
-          getDeclaredMethodInfo(parentName, methodName, methodDescriptor);
-      DeclaredType parentType =
-          DeclaredType.internal(parentStructure.typeInfo(), List.of(parentDeclaredFoo), null);
+      TypeStructure parentType =
+          TestTypeFixtures.createTypeWithMethod(
+              parentName + "path",
+              RepoEntryType.FILE,
+              parentName,
+              methodName,
+              methodDescriptor,
+              TypeKind.CLASS);
+      TypeStructure childType =
+          TestTypeFixtures.createTypeWithoutMethod(
+              childName + "path", RepoEntryType.FILE, childName, TypeKind.CLASS);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(parentType, childType));
 
-      // 2) Child (CLASS, extends Parent): foo() 선언 없음
-      String childName = "Child";
-      ByteCodeClassStructure childStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredType childType = DeclaredType.internal(childStructure.typeInfo(), List.of(), null);
-
-      declaredTypeRepository.saveAll(List.of(parentType, childType));
-
-      // Child extends Parent (너희 프로젝트 extends-edge로 교체)
-      childType.updateRelations(parentType, List.of());
-      declaredTypeRepository.save(childType);
+      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
 
       // when
-      List<DeclaredMethod> declaredMethods =
-          classSuperDispatcher.dispatchSupers(List.of(parentType, childType));
+      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
       List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -90,41 +87,27 @@ class ClassSuperDispatcherTest {
 
     @Test
     @DisplayName("1-2. override가 있으면 Parent.foo -> Child.foo(override) 로 연결된다")
-    void class_inheritance_with_override_parent_to_child() {
+    void givenOverrideExists_whenDispatchSupers_thenLinkParentFooToChildFooOverride() {
       // given
-      String methodName = "foo";
-      MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
-
-      // 1) Parent (CLASS): foo()
       String parentName = "Parent";
-      ByteCodeClassStructure parentStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredMethodInfo parentFoo =
-          getDeclaredMethodInfo(parentName, methodName, methodDescriptor);
-      DeclaredType parentType =
-          DeclaredType.internal(parentStructure.typeInfo(), List.of(parentFoo), null);
-
-      // 2) Child (CLASS, extends Parent): foo() override (직접 선언)
       String childName = "Child";
-      ByteCodeClassStructure childStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredMethodInfo childOverrideFoo =
-          getDeclaredMethodInfo(childName, methodName, methodDescriptor);
-      DeclaredType childType =
-          DeclaredType.internal(
-              childStructure.typeInfo(), List.of(childOverrideFoo), null); // ✅ override 선언
+      String methodName = "foo";
+      MethodDescriptor md = MethodDescriptor.from("()V");
 
-      declaredTypeRepository.saveAll(List.of(parentType, childType));
+      TypeStructure parent =
+          TestTypeFixtures.createTypeWithMethod(
+              "parent", RepoEntryType.FILE, parentName, methodName, md, TypeKind.CLASS);
+      TypeStructure child =
+          TestTypeFixtures.createTypeWithMethod(
+              "child", RepoEntryType.FILE, childName, methodName, md, TypeKind.CLASS);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child));
 
-      // Child extends Parent (너희 update 시그니처 기준: parentType을 바로 넣는 형태)
-      childType.updateRelations(parentType, List.of());
-      declaredTypeRepository.save(childType);
+      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
 
       // when
-      List<DeclaredMethod> declaredMethods =
-          classSuperDispatcher.dispatchSupers(List.of(parentType, childType));
+      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
       List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -149,47 +132,37 @@ class ClassSuperDispatcherTest {
         "2-1. Parent -> Child -> GrandChild 모두 override 없어도, Parent는 Child(Virtual)로 연결, Child는 GrandChild(Virtual)로 연결된다.")
     void chain_no_overrides() {
       // given
+      String parentName = "Parent";
+      String childName = "Child";
+      String grandChildName = "GrandChild";
       String methodName = "foo";
       MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-      // Parent: foo()
-      String parentName = "Parent";
-      ByteCodeClassStructure parentStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredMethodInfo parentFoo =
-          getDeclaredMethodInfo(parentName, methodName, methodDescriptor);
-      DeclaredType parentType =
-          DeclaredType.internal(parentStructure.typeInfo(), List.of(parentFoo), null);
+      TypeStructure parent =
+          TestTypeFixtures.createTypeWithMethod(
+              "parent",
+              RepoEntryType.FILE,
+              parentName,
+              methodName,
+              methodDescriptor,
+              TypeKind.CLASS);
+      TypeStructure child =
+          TestTypeFixtures.createTypeWithoutMethod(
+              "child", RepoEntryType.FILE, childName, TypeKind.CLASS);
+      TypeStructure grandChild =
+          TestTypeFixtures.createTypeWithoutMethod(
+              "grandChild", RepoEntryType.FILE, grandChildName, TypeKind.CLASS);
 
-      // Child extends Parent: foo() 없음
-      String childName = "Child";
-      ByteCodeClassStructure childStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredType childType = DeclaredType.internal(childStructure.typeInfo(), List.of(), null);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child, grandChild));
 
-      // GrandChild extends Child: foo() 없음
-      String grandChildName = "GrandChild";
-      ByteCodeClassStructure grandChildStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, grandChildName, childName, null, List.of()),
-              List.of());
-      DeclaredType grandChildType =
-          DeclaredType.internal(grandChildStructure.typeInfo(), List.of(), null);
-
-      declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
-
-      // 타입 그래프 세팅: Child -> Parent, GrandChild -> Child
-      childType.updateRelations(parentType, List.of());
-      declaredTypeRepository.save(childType);
-
-      grandChildType.updateRelations(childType, List.of());
-      declaredTypeRepository.save(grandChildType);
+      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
+      TestRepoFixtures.linkInheritance(
+          declaredTypeRepository, repo.getId(), grandChildName, childName);
 
       // when
-      List<DeclaredMethod> declaredMethods =
-          classSuperDispatcher.dispatchSupers(List.of(parentType, childType, grandChildType));
+      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
       List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);
@@ -220,49 +193,36 @@ class ClassSuperDispatcherTest {
         "2-2. 상속 체인에서 중간 클래스(Child)가 override를 하면, 하위 클래스(GrandChild)는 Parent가 아닌 Child를 기준으로 연결된다")
     void chain_middle_override() {
       // given
+      String parentName = "Parent";
+      String childName = "Child";
+      String grandChildName = "GrandChild";
       String methodName = "foo";
       MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
 
-      String parentName = "Parent";
-      ByteCodeClassStructure parentStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, parentName, null, null, List.of()), List.of());
-      DeclaredMethodInfo parentFoo =
-          getDeclaredMethodInfo(parentName, methodName, methodDescriptor);
-      DeclaredType parentType =
-          DeclaredType.internal(parentStructure.typeInfo(), List.of(parentFoo), null);
+      TypeStructure parent =
+          TestTypeFixtures.createTypeWithMethod(
+              "parent",
+              RepoEntryType.FILE,
+              parentName,
+              methodName,
+              methodDescriptor,
+              TypeKind.CLASS);
+      TypeStructure child =
+          TestTypeFixtures.createTypeWithMethod(
+              "child", RepoEntryType.FILE, childName, methodName, methodDescriptor, TypeKind.CLASS);
+      TypeStructure grandChild =
+          TestTypeFixtures.createTypeWithoutMethod(
+              "grandChild", RepoEntryType.FILE, grandChildName, TypeKind.CLASS);
+      OpenSourceRepo repo =
+          TestRepoFixtures.saveRepo(
+              openSourceRepoRepository, "new-cloneUrl", List.of(parent, child, grandChild));
 
-      // Child extends Parent: foo() override (직접 선언)
-      String childName = "Child";
-      ByteCodeClassStructure childStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, childName, parentName, null, List.of()), List.of());
-      DeclaredMethodInfo childOverrideFoo =
-          getDeclaredMethodInfo(childName, methodName, methodDescriptor);
-      DeclaredType childType =
-          DeclaredType.internal(childStructure.typeInfo(), List.of(childOverrideFoo), null);
-
-      // GrandChild extends Child: foo() 없음
-      String grandChildName = "GrandChild";
-      ByteCodeClassStructure grandChildStructure =
-          new ByteCodeClassStructure(
-              new TypeInfo(33, TypeKind.CLASS, grandChildName, childName, null, List.of()),
-              List.of());
-      DeclaredType grandChildType =
-          DeclaredType.internal(grandChildStructure.typeInfo(), List.of(), null);
-
-      declaredTypeRepository.saveAll(List.of(parentType, childType, grandChildType));
-
-      // Type Graph: Parent -> Child, Child -> GrandChild
-      childType.updateRelations(parentType, List.of());
-      declaredTypeRepository.save(childType);
-
-      grandChildType.updateRelations(childType, List.of());
-      declaredTypeRepository.save(grandChildType);
+      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
+      TestRepoFixtures.linkInheritance(
+          declaredTypeRepository, repo.getId(), grandChildName, childName);
 
       // when
-      List<DeclaredMethod> declaredMethods =
-          classSuperDispatcher.dispatchSupers(List.of(parentType, childType, grandChildType));
+      List<DeclaredMethod> declaredMethods = classSuperDispatcher.dispatchSupers(repo.getId());
 
       // then
       List<CodeMethodCallEdge> outgoingCalls = getOutgoingCallEdges(declaredMethods);

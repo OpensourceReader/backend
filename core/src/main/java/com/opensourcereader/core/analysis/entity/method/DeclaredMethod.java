@@ -7,7 +7,7 @@ import java.util.Objects;
 import com.opensourcereader.core.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.type.DeclaredType;
+import com.opensourcereader.core.analysis.entity.repo.DeclaredType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -77,19 +77,19 @@ public class DeclaredMethod extends BaseEntity {
   @JoinColumn(name = "declared_type_id")
   private DeclaredType declaredType;
 
-  public static DeclaredMethod internalInheritanceDeclared(
-      MethodCallInfo callee, CodeMethodSignature methodSignature) {
+  public static DeclaredMethod internal(
+      DeclaredMethodInfo methodExtractResult, DeclaredType declaredType) {
     return new DeclaredMethod(
-        callee.className(),
-        callee.methodName(),
-        callee.descriptor().methodReturnType(),
-        callee.descriptor().argumentTypes(),
-        null,
-        methodSignature,
-        null,
-        null,
-        MethodOrigin.INTERNAL_INHERITED_RESOLVED,
-        null);
+        declaredType.getTypeInternalName(),
+        methodExtractResult.methodName(),
+        methodExtractResult.methodDescriptor().methodReturnType(),
+        methodExtractResult.methodDescriptor().argumentTypes(),
+        methodExtractResult.methodModifiers().stream().toList(),
+        CodeMethodSignature.of(methodExtractResult),
+        methodExtractResult.startLine(),
+        methodExtractResult.endLine(),
+        MethodOrigin.INTERNAL_DECLARED,
+        declaredType);
   }
 
   public static DeclaredMethod internalInheritanceDeclared(
@@ -107,21 +107,23 @@ public class DeclaredMethod extends BaseEntity {
         childDeclaredType);
   }
 
-  public static DeclaredMethod internal(
-      DeclaredMethodInfo methodExtractResult, DeclaredType declaredType) {
+  // declaredType을 사용해서 넣어줘야함
+  public static DeclaredMethod internalInheritanceDeclared(
+      MethodCallInfo callee, CodeMethodSignature methodSignature) {
     return new DeclaredMethod(
-        declaredType.getTypeInternalName(),
-        methodExtractResult.methodName(),
-        methodExtractResult.methodDescriptor().methodReturnType(),
-        methodExtractResult.methodDescriptor().argumentTypes(),
-        methodExtractResult.methodModifiers().stream().toList(),
-        CodeMethodSignature.of(methodExtractResult),
-        methodExtractResult.startLine(),
-        methodExtractResult.endLine(),
-        MethodOrigin.INTERNAL_DECLARED,
-        declaredType);
+        callee.className(),
+        callee.methodName(),
+        callee.descriptor().methodReturnType(),
+        callee.descriptor().argumentTypes(),
+        null,
+        methodSignature,
+        null,
+        null,
+        MethodOrigin.INTERNAL_INHERITED_RESOLVED,
+        null);
   }
 
+  // declaredType을 사용해서 넣어줘야함
   public static DeclaredMethod external(
       MethodCallInfo callee, CodeMethodSignature methodSignature) {
     return new DeclaredMethod(
