@@ -1,4 +1,4 @@
-package com.opensourcereader.core.exception;
+package com.opensourcereader.core.shared.exception;
 
 import java.time.Instant;
 import java.util.HashMap;

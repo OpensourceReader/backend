@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.repo.DeclaredType;

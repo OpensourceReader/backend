@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;

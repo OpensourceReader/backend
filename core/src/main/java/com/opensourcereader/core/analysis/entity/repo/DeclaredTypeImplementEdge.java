@@ -1,6 +1,6 @@
 package com.opensourcereader.core.analysis.entity.repo;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

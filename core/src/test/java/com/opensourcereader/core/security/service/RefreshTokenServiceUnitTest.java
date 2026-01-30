@@ -11,7 +11,7 @@ import static org.mockito.Mockito.never;
 import java.time.Instant;
 import java.util.Optional;
 
-import com.opensourcereader.core.exception.OSRServerException;
+import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.security.entity.RefreshToken;
 import com.opensourcereader.core.security.exception.TokenRefreshException;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;

@@ -1,6 +1,6 @@
 package com.opensourcereader.core.analysis.exception;
 
-import com.opensourcereader.core.exception.OpenSourceReaderException;
+import com.opensourcereader.core.shared.exception.OpenSourceReaderException;
 
 import lombok.Getter;
 

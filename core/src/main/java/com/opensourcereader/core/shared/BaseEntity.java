@@ -1,4 +1,4 @@
-package com.opensourcereader.core;
+package com.opensourcereader.core.shared;
 
 import java.time.Instant;
 

@@ -1,6 +1,6 @@
 package com.opensourcereader.core.user.entity;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

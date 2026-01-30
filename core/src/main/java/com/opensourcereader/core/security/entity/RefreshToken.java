@@ -2,7 +2,7 @@ package com.opensourcereader.core.security.entity;
 
 import java.time.Instant;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.user.entity.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

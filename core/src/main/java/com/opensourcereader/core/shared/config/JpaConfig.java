@@ -1,4 +1,4 @@
-package com.opensourcereader.core.config;
+package com.opensourcereader.core.shared.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

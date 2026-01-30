@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.entity.method;
 
 import java.util.Objects;
 
-import com.opensourcereader.core.BaseEntity;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

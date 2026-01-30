@@ -1,4 +1,4 @@
-package com.opensourcereader.core.config;
+package com.opensourcereader.core.shared.config;
 
 import java.time.Duration;
 
