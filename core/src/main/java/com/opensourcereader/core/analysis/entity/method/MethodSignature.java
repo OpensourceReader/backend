@@ -1,7 +1,7 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.entity.method;
 
-import static com.opensourcereader.core.analysis.entity.shared.NameSeparators.PACKAGE_SEPARATOR;
-import static com.opensourcereader.core.analysis.entity.shared.NameSeparators.PATH_SEPARATOR;
+import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PACKAGE_SEPARATOR;
+import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PATH_SEPARATOR;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,15 +1,15 @@
 package com.opensourcereader.core.analysis.entity;
 
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
-import com.opensourcereader.core.analysis.entity.shared.TypeOrigin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeclaredType extends BaseEntity {
+public class Type extends BaseEntity {
 
   @Column(name = "class_internal_name")
   private String typeInternalName;
@@ -37,22 +37,22 @@ public class DeclaredType extends BaseEntity {
 
   @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "super_type_id")
-  private DeclaredType superType;
+  private Type superType;
 
   @OneToMany(
-      mappedBy = "type",
+      mappedBy = "implementedType",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<DeclaredTypeImplementEdge> implementedInterfaces;
+  private List<TypeImplementation> implementedInterfaces;
 
   @OneToMany(
       mappedBy = "interfaceType",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<DeclaredTypeImplementEdge> implementations;
+  private List<TypeImplementation> implementations;
 
   @OneToMany(
-      mappedBy = "declaredType",
+      mappedBy = "type",
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<Method> methods;
@@ -64,82 +64,21 @@ public class DeclaredType extends BaseEntity {
   @JoinColumn(name = "repo_content_id")
   private OpenSourceRepoContent openSourceRepoContent;
 
-  static DeclaredType internal(
+  static Type internal(
       TypeInfo typeInfo,
       List<DeclaredMethodInfo> declaredMethodInfos,
       OpenSourceRepoContent openSourceRepoContent) {
     if (typeInfo == null) {
       return null;
     }
-    return new DeclaredType(
-        typeInfo, declaredMethodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
+    return new Type(typeInfo, declaredMethodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
   }
 
-  static DeclaredType external(
-      String typeInternalName, OpenSourceRepoContent openSourceRepoContent) {
-    return new DeclaredType(
-        typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
+  static Type external(String typeInternalName, OpenSourceRepoContent openSourceRepoContent) {
+    return new Type(typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
   }
 
-  public void addMethod(Method newMethod) {
-    if (newMethod == null) {
-      return;
-    }
-    if (methods.contains(newMethod)) {
-      return;
-    }
-    methods.add(newMethod);
-  }
-
-  public void updateRelations(DeclaredType newSuperType, List<DeclaredType> interfaceTypes) {
-    if (newSuperType != null) {
-      this.superType = newSuperType;
-    }
-    List<DeclaredTypeImplementEdge> newInterfaceEdges =
-        interfaceTypes.stream()
-            .map(interfaceType -> DeclaredTypeImplementEdge.of(this, interfaceType))
-            .toList();
-    syncImplementedInterfaceEdges(newInterfaceEdges);
-  }
-
-  private void syncImplementedInterfaceEdges(List<DeclaredTypeImplementEdge> newEdges) {
-    if (newEdges == null) {
-      return;
-    }
-
-    this.implementedInterfaces.removeIf(
-        existing -> newEdges.stream().noneMatch(ne -> sameInterface(existing, ne)));
-
-    for (DeclaredTypeImplementEdge newEdge : newEdges) {
-      boolean exists =
-          this.implementedInterfaces.stream()
-              .anyMatch(existing -> sameInterface(existing, newEdge));
-      if (exists) {
-        continue;
-      }
-      this.implementedInterfaces.add(newEdge);
-      newEdge.getInterfaceType().updateImplementation(newEdge);
-    }
-  }
-
-  private void updateImplementation(DeclaredTypeImplementEdge newEdge) {
-    if (newEdge == null) {
-      return;
-    }
-    if (this.implementations.contains(newEdge)) {
-      return;
-    }
-
-    this.implementations.add(newEdge);
-  }
-
-  private boolean sameInterface(DeclaredTypeImplementEdge a, DeclaredTypeImplementEdge b) {
-    return a.getInterfaceType()
-        .getTypeInternalName()
-        .equals(b.getInterfaceType().getTypeInternalName());
-  }
-
-  private DeclaredType(
+  private Type(
       String typeInternalName,
       TypeKind typeKind,
       TypeOrigin typeOrigin,
@@ -154,7 +93,7 @@ public class DeclaredType extends BaseEntity {
     this.implementations = new ArrayList<>();
   }
 
-  private DeclaredType(
+  private Type(
       TypeInfo typeInfo,
       List<DeclaredMethodInfo> methodExtractResults,
       TypeOrigin typeOrigin,
@@ -181,13 +120,71 @@ public class DeclaredType extends BaseEntity {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
+  public void addMethod(Method newMethod) {
+    if (newMethod == null) {
+      return;
+    }
+    if (methods.contains(newMethod)) {
+      return;
+    }
+    methods.add(newMethod);
+  }
+
+  public void updateRelations(Type newSuperType, List<Type> interfaceTypes) {
+    if (newSuperType != null) {
+      this.superType = newSuperType;
+    }
+    List<TypeImplementation> newInterfaceEdges =
+        interfaceTypes.stream()
+            .map(interfaceType -> TypeImplementation.of(this, interfaceType))
+            .toList();
+    syncImplementedInterfaceEdges(newInterfaceEdges);
+  }
+
+  private void syncImplementedInterfaceEdges(List<TypeImplementation> newEdges) {
+    if (newEdges == null) {
+      return;
+    }
+
+    this.implementedInterfaces.removeIf(
+        existing -> newEdges.stream().noneMatch(ne -> sameInterface(existing, ne)));
+
+    for (TypeImplementation newEdge : newEdges) {
+      boolean exists =
+          this.implementedInterfaces.stream()
+              .anyMatch(existing -> sameInterface(existing, newEdge));
+      if (exists) {
+        continue;
+      }
+      this.implementedInterfaces.add(newEdge);
+      newEdge.getInterfaceType().updateImplementation(newEdge);
+    }
+  }
+
+  private void updateImplementation(TypeImplementation newEdge) {
+    if (newEdge == null) {
+      return;
+    }
+    if (this.implementations.contains(newEdge)) {
+      return;
+    }
+
+    this.implementations.add(newEdge);
+  }
+
+  private boolean sameInterface(TypeImplementation a, TypeImplementation b) {
+    return a.getInterfaceType()
+        .getTypeInternalName()
+        .equals(b.getInterfaceType().getTypeInternalName());
+  }
+
   public boolean isInternal() {
     return this.typeOrigin.equals(TypeOrigin.INTERNAL);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof DeclaredType that)) {
+    if (!(o instanceof Type that)) {
       return false;
     }
     return Objects.equals(typeInternalName, that.typeInternalName)

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.entity.content;
 
 import jakarta.persistence.Embeddable;
 

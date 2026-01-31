@@ -1,8 +1,9 @@
 package com.opensourcereader.core.analysis.testfixture;
 
+import java.util.List;
+
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import java.util.List;
 
 public final class CallGraphTestSupport {
 

@@ -1,14 +1,15 @@
 package com.opensourcereader.core.analysis.entity;
 
-import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
-import com.opensourcereader.core.analysis.entity.shared.MethodOrigin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -31,7 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Method extends BaseEntity {
 
-  @Column(name = "class_internal_name")
+  @Column(name = "type_internal_name")
   private String typeInternalName;
 
   @Column(name = "method_name")
@@ -59,7 +60,7 @@ public class Method extends BaseEntity {
   private Integer endLine;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "origin")
+  @Column(name = "method_origin")
   private MethodOrigin origin;
 
   @OneToMany(
@@ -75,12 +76,12 @@ public class Method extends BaseEntity {
   private final List<MethodCallEdge> ingoingCalls = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "declared_type_id")
-  private DeclaredType declaredType;
+  @JoinColumn(name = "type_id")
+  private Type type;
 
-  public static Method declared(DeclaredMethodInfo methodInfo, DeclaredType declaredType) {
+  static Method declared(DeclaredMethodInfo methodInfo, Type type) {
     return new Method(
-        declaredType.getTypeInternalName(),
+        type.getTypeInternalName(),
         methodInfo.methodName(),
         methodInfo.methodDescriptor().methodReturnType(),
         methodInfo.methodDescriptor().argumentTypes(),
@@ -89,10 +90,10 @@ public class Method extends BaseEntity {
         methodInfo.startLine(),
         methodInfo.endLine(),
         MethodOrigin.DECLARED,
-        declaredType);
+        type);
   }
 
-  public static Method inheritedExternal(Method superMethod, DeclaredType childType) {
+  public static Method inheritedExternal(Method superMethod, Type childType) {
     return new Method(
         childType.getTypeInternalName(),
         superMethod.methodName,
@@ -106,7 +107,7 @@ public class Method extends BaseEntity {
         childType);
   }
 
-  public static Method inheritedInternal(Method interfaceMethod, DeclaredType implType) {
+  public static Method inheritedInternal(Method interfaceMethod, Type implType) {
     return new Method(
         implType.getTypeInternalName(),
         interfaceMethod.methodName,
@@ -149,6 +150,7 @@ public class Method extends BaseEntity {
         MethodOrigin.EXTERNAL,
         null);
   }
+
   ///
 
   private Method(
@@ -161,7 +163,7 @@ public class Method extends BaseEntity {
       Integer startLine,
       Integer endLine,
       MethodOrigin methodOrigin,
-      DeclaredType declaredType) {
+      Type type) {
     this.typeInternalName = typeInternalName;
     this.methodName = methodName;
     this.returnType = returnType;
@@ -171,7 +173,7 @@ public class Method extends BaseEntity {
     this.startLine = startLine;
     this.endLine = endLine;
     this.origin = methodOrigin;
-    this.declaredType = declaredType;
+    this.type = type;
   }
 
   public void addIngoingCall(Method caller) {
@@ -227,11 +229,11 @@ public class Method extends BaseEntity {
     }
     return Objects.equals(typeInternalName, that.typeInternalName)
         && Objects.equals(methodSignature, that.methodSignature)
-        && Objects.equals(declaredType, that.declaredType);
+        && Objects.equals(type, that.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(typeInternalName, methodSignature, declaredType);
+    return Objects.hash(typeInternalName, methodSignature, type);
   }
 }

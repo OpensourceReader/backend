@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,11 +15,11 @@ import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import com.opensourcereader.core.analysis.entity.shared.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
@@ -69,11 +69,11 @@ class InterfaceImplementationLinkerTest {
           TestRepoFixtures.saveRepo(
               openSourceRepoRepository, "new-cloneUrl", List.of(implClassType, interfaceType));
 
-      DeclaredType interType =
+      Type interType =
           declaredTypeRepository
               .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
               .orElseThrow();
-      DeclaredType implType =
+      Type implType =
           declaredTypeRepository
               .findByRepoAndTypeInternalName(repo.getId(), implName)
               .orElseThrow();
@@ -123,11 +123,11 @@ class InterfaceImplementationLinkerTest {
             TestRepoFixtures.saveRepo(
                 openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
-        DeclaredType inter1Type =
+        Type inter1Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), i1Name)
                 .orElseThrow();
-        DeclaredType inter2Type =
+        Type inter2Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), i2Name)
                 .orElseThrow();
@@ -187,15 +187,15 @@ class InterfaceImplementationLinkerTest {
                 "new-cloneUrl",
                 List.of(implAType, interface2Type, interface1Type));
 
-        DeclaredType inter1Type =
+        Type inter1Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), i1Name)
                 .orElseThrow();
-        DeclaredType inter2Type =
+        Type inter2Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), i2Name)
                 .orElseThrow();
-        DeclaredType impAType =
+        Type impAType =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), implAName)
                 .orElseThrow();
@@ -248,11 +248,11 @@ class InterfaceImplementationLinkerTest {
             TestRepoFixtures.saveRepo(
                 openSourceRepoRepository, "new-cloneUrl", List.of(implType, interfaceType));
 
-        DeclaredType interface1Type =
+        Type interface1Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
                 .orElseThrow();
-        DeclaredType implAType =
+        Type implAType =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), implName)
                 .orElseThrow();
@@ -305,11 +305,11 @@ class InterfaceImplementationLinkerTest {
             TestRepoFixtures.saveRepo(
                 openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implType));
 
-        DeclaredType interface1Type =
+        Type interface1Type =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
                 .orElseThrow();
-        DeclaredType implAType =
+        Type implAType =
             declaredTypeRepository
                 .findByRepoAndTypeInternalName(repo.getId(), implName)
                 .orElseThrow();
@@ -372,9 +372,9 @@ class InterfaceImplementationLinkerTest {
           TestRepoFixtures.saveRepo(
               openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
-      DeclaredType i1Type =
+      Type i1Type =
           declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
-      DeclaredType i2Type =
+      Type i2Type =
           declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
 
       // 순환 extends 구성: I1 extends I2, I2 extends I1

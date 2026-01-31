@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +12,8 @@ import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.MethodSignature;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -49,7 +49,7 @@ public class MethodCallResolver {
             result.add(declaredMethod);
             continue;
           }
-          Optional<DeclaredType> calleeDeclaredType =
+          Optional<Type> calleeDeclaredType =
               declaredTypeRepository.findByRepoAndTypeInternalName(
                   repoId, calleeMethodInfo.className());
           if (calleeDeclaredType.isPresent()) {

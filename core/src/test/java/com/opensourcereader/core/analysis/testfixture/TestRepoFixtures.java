@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 
@@ -27,12 +27,12 @@ public final class TestRepoFixtures {
       Long repoId,
       String childInternalName,
       String parentInternalName) {
-    DeclaredType childType =
+    Type childType =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(repoId, childInternalName)
             .orElseThrow();
 
-    DeclaredType parentType =
+    Type parentType =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(repoId, parentInternalName)
             .orElseThrow();
@@ -41,7 +41,7 @@ public final class TestRepoFixtures {
     declaredTypeRepository.save(childType);
   }
 
-  public static List<DeclaredType> loadDeclaredTypes(
+  public static List<Type> loadDeclaredTypes(
       DeclaredTypeRepository declaredTypeRepository, Long repoId, String... typeInternalNames) {
     return Arrays.stream(typeInternalNames)
         .map(

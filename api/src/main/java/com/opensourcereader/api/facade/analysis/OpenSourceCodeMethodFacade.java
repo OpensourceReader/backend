@@ -52,9 +52,9 @@ public class OpenSourceCodeMethodFacade {
   }
 
   private String extractRawText(Method method) {
-    if (method.getDeclaredType().getOpenSourceRepoContent() == null) {
+    if (method.getType().getOpenSourceRepoContent() == null) {
       return null;
     }
-    return method.getDeclaredType().getOpenSourceRepoContent().getRawText();
+    return method.getType().getOpenSourceRepoContent().getRawText();
   }
 }

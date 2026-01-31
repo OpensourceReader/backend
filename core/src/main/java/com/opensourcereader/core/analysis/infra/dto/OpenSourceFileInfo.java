@@ -1,6 +1,6 @@
 package com.opensourcereader.core.analysis.infra.dto;
 
-import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
 
 public record OpenSourceFileInfo(String path, RepoEntryType repoEntryType, String rawText) {
 

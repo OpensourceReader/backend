@@ -1,19 +1,19 @@
 package com.opensourcereader.core.analysis.entity;
 
-import com.opensourcereader.core.analysis.entity.shared.Extension;
-import com.opensourcereader.core.analysis.entity.shared.OpenSourceRepoContentOrigin;
-import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.shared.BaseEntity;
 import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.entity.content.Extension;
+import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentName;
+import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentOrigin;
+import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -43,7 +43,7 @@ public class OpenSourceRepoContent extends BaseEntity {
   private OpenSourceRepoContentName name;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "content_type", nullable = false)
+  @Column(name = "repo_entry_type", nullable = false)
   private RepoEntryType repoEntryType;
 
   @Enumerated(EnumType.STRING)
@@ -58,7 +58,7 @@ public class OpenSourceRepoContent extends BaseEntity {
   private OpenSourceRepoContentOrigin origin;
 
   @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private DeclaredType declaredType;
+  private Type type;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "opensource_repository_id", nullable = false)
@@ -101,7 +101,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.origin = origin;
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;
-    this.declaredType = DeclaredType.external(typeInternalName, this);
+    this.type = Type.external(typeInternalName, this);
     this.openSourceRepo = openSourceRepo;
   }
 
@@ -119,7 +119,7 @@ public class OpenSourceRepoContent extends BaseEntity {
     this.origin = origin;
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;
-    this.declaredType = DeclaredType.internal(typeInfo, methodInfoWithSources, this);
+    this.type = Type.internal(typeInfo, methodInfoWithSources, this);
     this.openSourceRepo = openSourceRepo;
   }
 
@@ -134,5 +134,34 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(path, openSourceRepo);
+  }
+
+  @Getter
+  public enum RepoEntryType {
+    TREE("tree", "040000"),
+    FILE("blob", "100644"),
+    EXECUTABLE_FILE("blob", "100755"),
+    OTHERS("NOT_EXISTS", null);
+
+    private final String value;
+    private final String typeNumber;
+
+    RepoEntryType(String value, String typeNumber) {
+      this.value = value;
+      this.typeNumber = typeNumber;
+    }
+
+    public static RepoEntryType from(String typeNumber) {
+      for (RepoEntryType repoEntryType : RepoEntryType.values()) {
+        if (typeNumber.equals(repoEntryType.typeNumber)) {
+          return repoEntryType;
+        }
+      }
+      return OTHERS;
+    }
+
+    public boolean isSupported() {
+      return this != OTHERS;
+    }
   }
 }

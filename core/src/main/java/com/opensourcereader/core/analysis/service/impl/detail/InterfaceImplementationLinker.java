@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.MethodSignature;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
-import com.opensourcereader.core.analysis.entity.DeclaredTypeImplementEdge;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.TypeImplementation;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -30,11 +30,11 @@ public class InterfaceImplementationLinker {
   private final DeclaredTypeRepository declaredTypeRepository;
 
   public List<Method> linkAllInterfaceImplementations(Long repoId) {
-    List<DeclaredType> interfaces =
+    List<Type> interfaces =
         declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
 
     Set<Method> result = new HashSet<>();
-    for (DeclaredType interfaceType : interfaces) {
+    for (Type interfaceType : interfaces) {
       declaredTypeGraphValidator.validateAcyclic(interfaceType);
       result.addAll(linkInterfaceImplementations(interfaceType));
     }
@@ -42,17 +42,17 @@ public class InterfaceImplementationLinker {
     return methodRepository.saveAll(result);
   }
 
-  private List<Method> linkInterfaceImplementations(DeclaredType interfaceType) {
+  private List<Method> linkInterfaceImplementations(Type interfaceType) {
     List<Method> result = new ArrayList<>();
-    Queue<DeclaredType> queue = new LinkedList<>();
+    Queue<Type> queue = new LinkedList<>();
     queue.add(interfaceType);
 
     while (!queue.isEmpty()) {
       int n = queue.size();
       for (int i = 0; i < n; i++) {
-        DeclaredType nowInterfaceType = queue.poll();
-        for (DeclaredTypeImplementEdge implEdge : nowInterfaceType.getImplementations()) {
-          DeclaredType implType = implEdge.getType();
+        Type nowInterfaceType = queue.poll();
+        for (TypeImplementation implEdge : nowInterfaceType.getImplementations()) {
+          Type implType = implEdge.getImplementedType();
           Map<MethodSignature, Method> implTypeMethods =
               getImplementationTypeDeclaredMethods(implType);
           for (Method nowInterfaceTypeMethod : nowInterfaceType.getMethods()) {
@@ -74,9 +74,9 @@ public class InterfaceImplementationLinker {
 
   private static Method getImplMethod(
       Method nowInterfaceTypeMethod,
-      DeclaredType nowInterfaceType,
+      Type nowInterfaceType,
       Map<MethodSignature, Method> implTypeMethods,
-      DeclaredType implementationType) {
+      Type implementationType) {
     if (nowInterfaceType.isInternal()) {
       if (implTypeMethods.containsKey(nowInterfaceTypeMethod.getMethodSignature())) {
         return implTypeMethods.get(nowInterfaceTypeMethod.getMethodSignature());
@@ -88,7 +88,7 @@ public class InterfaceImplementationLinker {
   }
 
   private static Map<MethodSignature, Method> getImplementationTypeDeclaredMethods(
-      DeclaredType implementationType) {
+      Type implementationType) {
     return implementationType.getMethods().stream()
         .collect(Collectors.toMap(Method::getMethodSignature, it -> it));
   }

@@ -1,24 +1,24 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.DeclaredType;
-import com.opensourcereader.core.analysis.entity.DeclaredTypeImplementEdge;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.TypeImplementation;
 
 @Component
 public class DeclaredTypeGraphValidator {
 
-  public void validateAcyclic(DeclaredType startType) {
+  public void validateAcyclic(Type startType) {
     Set<Long> visited = new HashSet<>();
     Set<Long> recursionStack = new HashSet<>();
 
     dfs(startType, visited, recursionStack);
   }
 
-  private void dfs(DeclaredType current, Set<Long> visited, Set<Long> recursionStack) {
+  private void dfs(Type current, Set<Long> visited, Set<Long> recursionStack) {
 
     Long id = current.getId();
 
@@ -36,8 +36,8 @@ public class DeclaredTypeGraphValidator {
     recursionStack.add(id);
 
     // 구현 관계 탐색
-    for (DeclaredTypeImplementEdge edge : current.getImplementations()) {
-      DeclaredType next = edge.getType();
+    for (TypeImplementation edge : current.getImplementations()) {
+      Type next = edge.getImplementedType();
       dfs(next, visited, recursionStack);
     }
 

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.MethodSignature;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 
@@ -26,18 +26,17 @@ public class ClassSuperDispatcher {
   private final MethodRepository methodRepository;
 
   public void dispatchSupers(Long repoId) {
-    List<DeclaredType> classes =
-        declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
+    List<Type> classes = declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
 
     Set<Method> result = new HashSet<>();
     Set<Long> visited = new HashSet<>();
-    for (DeclaredType classType : classes) {
+    for (Type classType : classes) {
       result.addAll(dispatchSuperRecursively(classType, visited));
     }
     methodRepository.saveAll(result);
   }
 
-  private Set<Method> dispatchSuperRecursively(DeclaredType type, Set<Long> visited) {
+  private Set<Method> dispatchSuperRecursively(Type type, Set<Long> visited) {
     if (visited.contains(type.getId())) {
       return new HashSet<>();
     }
@@ -50,9 +49,9 @@ public class ClassSuperDispatcher {
     return result;
   }
 
-  private List<Method> dispatchSuperMethod(DeclaredType childType) {
+  private List<Method> dispatchSuperMethod(Type childType) {
     List<Method> result = new ArrayList<>();
-    DeclaredType superType = childType.getSuperType();
+    Type superType = childType.getSuperType();
     if (superType == null) {
       return new ArrayList<>();
     }
@@ -72,8 +71,7 @@ public class ClassSuperDispatcher {
     return result;
   }
 
-  private Method getMethodSameWithSuper(
-      DeclaredType childType, Method superMethod, DeclaredType superType) {
+  private Method getMethodSameWithSuper(Type childType, Method superMethod, Type superType) {
     if (superType.isInternal()) {
       return Method.inheritedInternal(superMethod, childType);
     }

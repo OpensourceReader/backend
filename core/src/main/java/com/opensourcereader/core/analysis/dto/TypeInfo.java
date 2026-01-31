@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.dto;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
 public record TypeInfo(
     int version,

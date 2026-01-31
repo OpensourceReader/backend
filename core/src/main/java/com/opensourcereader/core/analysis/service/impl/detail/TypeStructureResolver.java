@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import java.util.List;
 import java.util.Map;

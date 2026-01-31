@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.shared;
+package com.opensourcereader.core.analysis.entity.type;
 
 import aj.org.objectweb.asm.Opcodes;
 

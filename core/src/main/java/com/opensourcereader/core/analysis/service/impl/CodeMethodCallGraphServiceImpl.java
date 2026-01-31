@@ -9,9 +9,9 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.impl.methodcall.ClassSuperDispatcher;
-import com.opensourcereader.core.analysis.service.impl.methodcall.InterfaceImplementationLinker;
-import com.opensourcereader.core.analysis.service.impl.methodcall.MethodCallResolver;
+import com.opensourcereader.core.analysis.service.impl.detail.ClassSuperDispatcher;
+import com.opensourcereader.core.analysis.service.impl.detail.InterfaceImplementationLinker;
+import com.opensourcereader.core.analysis.service.impl.detail.MethodCallResolver;
 
 import lombok.RequiredArgsConstructor;
 

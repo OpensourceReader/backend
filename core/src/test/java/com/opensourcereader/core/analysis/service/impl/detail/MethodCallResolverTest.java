@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.methodcall;
+package com.opensourcereader.core.analysis.service.impl.detail;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,10 +19,10 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;

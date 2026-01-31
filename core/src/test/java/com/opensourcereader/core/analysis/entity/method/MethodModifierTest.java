@@ -2,7 +2,6 @@ package com.opensourcereader.core.analysis.entity.method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.opensourcereader.core.analysis.entity.shared.MethodModifier;
 import java.util.EnumSet;
 
 import aj.org.objectweb.asm.Opcodes;

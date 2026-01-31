@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
+import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
@@ -24,36 +24,36 @@ public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationServ
   private final DeclaredTypeRepository declaredTypeRepository;
   private final OpenSourceRepoRepository openSourceRepoRepository;
 
-  public List<DeclaredType> resolve(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
+  public List<Type> resolve(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
     if (repoId == null || typeStructureMetas == null || typeStructureMetas.isEmpty()) {
       return List.of();
     }
 
-    List<DeclaredType> declaredTypes = new ArrayList<>();
+    List<Type> types = new ArrayList<>();
     for (TypeInfo typeInfo : getClassInfos(typeStructureMetas)) {
-      DeclaredType declaredType =
+      Type type =
           declaredTypeRepository
               .findByRepoAndTypeInternalName(repoId, typeInfo.internalName())
               .orElseThrow(IllegalArgumentException::new);
-      declaredType.updateRelations(
+      type.updateRelations(
           findOrCreateExternal(repoId, typeInfo.superName()), getInterfaceTypes(repoId, typeInfo));
-      declaredTypes.add(declaredType);
+      types.add(type);
     }
 
-    return declaredTypeRepository.saveAll(declaredTypes);
+    return declaredTypeRepository.saveAll(types);
   }
 
-  private List<DeclaredType> getInterfaceTypes(Long repoId, TypeInfo typeInfo) {
+  private List<Type> getInterfaceTypes(Long repoId, TypeInfo typeInfo) {
     return typeInfo.interfaceNames().stream()
         .map(interfaceName -> this.findOrCreateExternal(repoId, interfaceName))
         .toList();
   }
 
-  private DeclaredType findOrCreateExternal(Long repoId, String typeName) {
+  private Type findOrCreateExternal(Long repoId, String typeName) {
     if (typeName == null) {
       return null;
     }
-    Optional<DeclaredType> declaredType =
+    Optional<Type> declaredType =
         declaredTypeRepository.findByRepoAndTypeInternalName(repoId, typeName);
     if (declaredType.isPresent()) {
       return declaredType.get();
@@ -63,7 +63,7 @@ public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationServ
     repo.addExternalContent(typeName);
     OpenSourceRepo saveRepo = openSourceRepoRepository.save(repo);
     OpenSourceRepoContent content = saveRepo.getContents().get(saveRepo.getContents().size() - 1);
-    return content.getDeclaredType();
+    return content.getType();
   }
 
   private List<TypeInfo> getClassInfos(List<TypeStructureMeta> typeStructureMetas) {

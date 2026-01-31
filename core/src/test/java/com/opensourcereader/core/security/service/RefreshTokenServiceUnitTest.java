@@ -11,10 +11,10 @@ import static org.mockito.Mockito.never;
 import java.time.Instant;
 import java.util.Optional;
 
-import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.security.entity.RefreshToken;
 import com.opensourcereader.core.security.exception.TokenRefreshException;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;
+import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;

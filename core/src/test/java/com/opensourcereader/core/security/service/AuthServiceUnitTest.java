@@ -21,9 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
-import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.security.dto.SignUpCommand;
 import com.opensourcereader.core.security.dto.UserInfo;
+import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;

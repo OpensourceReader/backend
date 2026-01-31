@@ -1,9 +1,9 @@
-package com.opensourcereader.core.analysis.entity.repo;
+package com.opensourcereader.core.analysis.entity.content;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import aj.org.objectweb.asm.Opcodes;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

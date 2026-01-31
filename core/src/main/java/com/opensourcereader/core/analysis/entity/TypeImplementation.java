@@ -14,26 +14,26 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeclaredTypeImplementEdge extends BaseEntity {
+public class TypeImplementation extends BaseEntity {
 
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "type_id")
-  private DeclaredType type;
+  @JoinColumn(name = "implemented_type_id")
+  private Type implementedType;
 
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "interface_type_id")
-  private DeclaredType interfaceType;
+  private Type interfaceType;
 
-  static DeclaredTypeImplementEdge of(DeclaredType type, DeclaredType interfaceType) {
-    return new DeclaredTypeImplementEdge(type, interfaceType);
+  static TypeImplementation of(Type type, Type interfaceType) {
+    return new TypeImplementation(type, interfaceType);
   }
 
-  private DeclaredTypeImplementEdge(DeclaredType type, DeclaredType interfaceType) {
-    this.type = type;
+  private TypeImplementation(Type implementedType, Type interfaceType) {
+    this.implementedType = implementedType;
     this.interfaceType = interfaceType;
   }
 }

@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.DeclaredType;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.shared.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.shared.TypeKind;
-import com.opensourcereader.core.analysis.entity.shared.TypeOrigin;
+import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
 import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class DeclaredTypeRelationServiceTest {
+class TypeRelationServiceTest {
 
   @Autowired private DeclaredTypeRepository declaredTypeRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
@@ -45,7 +45,7 @@ class DeclaredTypeRelationServiceTest {
     List<TypeStructureMeta> typeStructureMetas = List.of();
 
     // when
-    List<DeclaredType> result = service.resolve(null, typeStructureMetas);
+    List<Type> result = service.resolve(null, typeStructureMetas);
 
     // then
     assertThat(result).isEmpty();
@@ -69,12 +69,12 @@ class DeclaredTypeRelationServiceTest {
     // when
     List<TypeStructureMeta> typeStructureMetas =
         TypeStructureMeta.from(List.of(interfaceStructure, implementedClassStructure));
-    List<DeclaredType> result = service.resolve(openSourceRepo.getId(), typeStructureMetas);
+    List<Type> result = service.resolve(openSourceRepo.getId(), typeStructureMetas);
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
     assertThat(result)
-        .extracting(DeclaredType::getImplementedInterfaces)
+        .extracting(Type::getImplementedInterfaces)
         .flatExtracting(edges -> edges)
         .extracting(edge -> edge.getInterfaceType().getTypeInternalName())
         .containsExactlyInAnyOrder(interfaceName);
@@ -105,7 +105,7 @@ class DeclaredTypeRelationServiceTest {
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
 
-    DeclaredType savedChild =
+    Type savedChild =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), childInterfaceName)
             .orElseThrow();
@@ -136,7 +136,7 @@ class DeclaredTypeRelationServiceTest {
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(2);
 
-    DeclaredType savedSub =
+    Type savedSub =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), subClassName)
             .orElseThrow();
@@ -164,7 +164,7 @@ class DeclaredTypeRelationServiceTest {
 
     // then
     assertThat(declaredTypeRepository.findAll()).hasSize(4);
-    DeclaredType savedResult =
+    Type savedResult =
         declaredTypeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), className)
             .orElseThrow();
@@ -204,17 +204,17 @@ class DeclaredTypeRelationServiceTest {
 
     // then
     // B의 super는 미지의 외부 A입니다.
-    DeclaredType repoBSavedB =
+    Type repoBSavedB =
         declaredTypeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeB).orElseThrow();
 
     assertThat(repoBSavedB.getSuperType()).isNotNull();
     assertThat(repoBSavedB.getSuperType().getTypeInternalName()).isEqualTo(typeA);
     assertThat(repoBSavedB.getSuperType().getTypeOrigin()).isEqualTo(TypeOrigin.EXTERNAL);
 
-    DeclaredType repoBSavedA =
+    Type repoBSavedA =
         declaredTypeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeA).orElseThrow();
 
-    DeclaredType repoASavedA =
+    Type repoASavedA =
         declaredTypeRepository.findByRepoAndTypeInternalName(repoA.getId(), typeA).orElseThrow();
 
     // 가장 중요한 검증: repo2의 B가 repo1의 A를 참조하면 안 됨

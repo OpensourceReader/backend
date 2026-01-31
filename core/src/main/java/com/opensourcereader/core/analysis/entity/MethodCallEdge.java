@@ -39,8 +39,7 @@ public class MethodCallEdge extends BaseEntity {
     if (!(o instanceof MethodCallEdge that)) {
       return false;
     }
-    return Objects.equals(caller, that.caller) && Objects.equals(callee,
-        that.callee);
+    return Objects.equals(caller, that.caller) && Objects.equals(callee, that.callee);
   }
 
   @Override

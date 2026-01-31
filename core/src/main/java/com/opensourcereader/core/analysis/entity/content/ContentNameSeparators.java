@@ -1,10 +1,10 @@
-package com.opensourcereader.core.analysis.entity.shared;
+package com.opensourcereader.core.analysis.entity.content;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NameSeparators {
+public final class ContentNameSeparators {
   public static final String PATH_SEPARATOR = "/";
   public static final String PACKAGE_SEPARATOR = ".";
 }
