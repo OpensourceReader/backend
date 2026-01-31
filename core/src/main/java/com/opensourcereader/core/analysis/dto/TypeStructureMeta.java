@@ -12,7 +12,7 @@ public record TypeStructureMeta(TypeInfo typeInfo, List<MethodStructure> methods
 
   public record MethodCallInfo(
       int operationCode,
-      String className,
+      String typeInternalName,
       String methodName,
       MethodDescriptor descriptor,
       boolean isInterface) {

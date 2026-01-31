@@ -13,13 +13,13 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
-import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
+import com.opensourcereader.core.analysis.service.TypeHierarchyService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TypeRelationServiceImpl implements DeclaredTypeRelationService {
+public class TypeHierarchyServiceImpl implements TypeHierarchyService {
 
   private final TypeRepository typeRepository;
   private final OpenSourceRepoRepository openSourceRepoRepository;

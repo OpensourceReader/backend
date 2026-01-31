@@ -3,13 +3,13 @@ package com.opensourcereader.core.analysis.testfixture;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
@@ -44,21 +44,19 @@ public final class TestTypeFixtures {
   }
 
   public static TypeStructure createTypeWithMethodCall(
-      String filePath,
-      RepoEntryType repoEntryType,
+      TypeKind typeKind,
       String callerTypeInternalName,
       String callerMethodName,
       MethodDescriptor callerMethodDescriptor,
       String calleeTypeInternalName,
       String calleeMethodName,
-      MethodDescriptor calleeMethodDescriptor,
-      boolean isInterface) {
+      MethodDescriptor calleeMethodDescriptor) {
     TypeInfo callerTypeInfo =
-        new TypeInfo(33, TypeKind.CLASS, callerTypeInternalName, null, null, List.of());
+        new TypeInfo(33, typeKind, callerTypeInternalName, null, null, List.of());
 
     return new TypeStructure(
-        filePath,
-        repoEntryType,
+        callerTypeInternalName + "path",
+        RepoEntryType.FILE,
         null,
         callerTypeInfo,
         List.of(
@@ -70,12 +68,12 @@ public final class TestTypeFixtures {
                         calleeTypeInternalName,
                         calleeMethodName,
                         calleeMethodDescriptor,
-                        isInterface)))));
+                        false)))));
   }
 
-  private static DeclaredMethodInfo createMethodInfo(
+  private static MethodInfo createMethodInfo(
       String typeInternalName, String methodName, MethodDescriptor methodDescriptor) {
-    return new DeclaredMethodInfo(
+    return new MethodInfo(
         typeInternalName,
         methodName,
         EnumSet.of(MethodModifier.PUBLIC),

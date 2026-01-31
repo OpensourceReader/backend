@@ -7,7 +7,7 @@ import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
 
-public record DeclaredMethodInfo(
+public record MethodInfo(
     String className,
     String methodName,
     EnumSet<MethodModifier> methodModifiers,
@@ -17,10 +17,10 @@ public record DeclaredMethodInfo(
     Integer startLine,
     Integer endLine) {
 
-  public static DeclaredMethodInfo of(
+  public static MethodInfo of(
       ByteCodeDeclaredMethodInfo byteCodeDeclaredMethodInfo,
       SourceCodeParseResult codeParseResult) {
-    return new DeclaredMethodInfo(
+    return new MethodInfo(
         byteCodeDeclaredMethodInfo.className(),
         byteCodeDeclaredMethodInfo.methodName(),
         byteCodeDeclaredMethodInfo.methodModifiers(),

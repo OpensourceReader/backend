@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,6 +40,16 @@ public class OpenSourceRepo extends BaseEntity {
         typeStructures.stream()
             .map(structure -> OpenSourceRepoContent.internal(structure, this))
             .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  // ingoing으로 넣어주기
+  public void addExternalMethod(MethodCallInfo calleeMethodInfo, Method callerMethod) {
+    OpenSourceRepoContent newContent =
+        OpenSourceRepoContent.external(calleeMethodInfo, callerMethod, this);
+    if (this.contents.contains(newContent)) {
+      return;
+    }
+    contents.add(newContent);
   }
 
   public void addExternalContent(String typeInternalName) {

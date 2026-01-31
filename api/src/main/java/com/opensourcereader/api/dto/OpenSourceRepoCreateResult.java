@@ -1,7 +1,7 @@
 package com.opensourcereader.api.dto;
 
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 
 public record OpenSourceRepoCreateResult(String path, RepoEntryType type, Long id) {
 

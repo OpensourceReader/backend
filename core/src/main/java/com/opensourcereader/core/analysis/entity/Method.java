@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
@@ -79,7 +79,7 @@ public class Method extends BaseEntity {
   @JoinColumn(name = "type_id")
   private Type type;
 
-  static Method declared(DeclaredMethodInfo methodInfo, Type type) {
+  static Method declared(MethodInfo methodInfo, Type type) {
     return new Method(
         type.getTypeInternalName(),
         methodInfo.methodName(),
@@ -121,37 +121,19 @@ public class Method extends BaseEntity {
         childType);
   }
 
-  /// resolver에 두개가 쓰임
-  // 밑에 두개가 문제인데...
-  public static Method inheritedInternal(MethodCallInfo callee, MethodSignature methodSignature) {
+  public static Method external(MethodCallInfo calleeMethodInfo) {
     return new Method(
-        callee.className(),
-        callee.methodName(),
-        callee.descriptor().methodReturnType(),
-        callee.descriptor().argumentTypes(),
+        calleeMethodInfo.typeInternalName(),
+        calleeMethodInfo.methodName(),
+        calleeMethodInfo.descriptor().methodReturnType(),
+        calleeMethodInfo.descriptor().argumentTypes(),
         null,
-        methodSignature,
-        null,
-        null,
-        MethodOrigin.INHERITED_INTERNAL,
-        null);
-  }
-
-  public static Method external(MethodCallInfo callee, MethodSignature methodSignature) {
-    return new Method(
-        callee.className(),
-        callee.methodName(),
-        callee.descriptor().methodReturnType(),
-        callee.descriptor().argumentTypes(),
-        null,
-        methodSignature,
+        MethodSignature.of(calleeMethodInfo),
         null,
         null,
         MethodOrigin.EXTERNAL,
         null);
   }
-
-  ///
 
   private Method(
       String typeInternalName,

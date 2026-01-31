@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
 import com.opensourcereader.core.shared.BaseEntity;
@@ -66,12 +67,24 @@ public class Type extends BaseEntity {
 
   static Type internal(
       TypeInfo typeInfo,
-      List<DeclaredMethodInfo> declaredMethodInfos,
+      List<MethodInfo> methodInfos,
       OpenSourceRepoContent openSourceRepoContent) {
     if (typeInfo == null) {
       return null;
     }
-    return new Type(typeInfo, declaredMethodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
+    return new Type(typeInfo, methodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
+  }
+
+  static Type external(
+      MethodCallInfo calleeMethodInfo, Method caller, OpenSourceRepoContent openSourceRepoContent) {
+    Method externalCallee = Method.external(calleeMethodInfo);
+    externalCallee.addIngoingCall(caller);
+    return new Type(
+        calleeMethodInfo.typeInternalName(),
+        null,
+        TypeOrigin.EXTERNAL,
+        openSourceRepoContent,
+        new ArrayList<>(List.of(externalCallee)));
   }
 
   static Type external(String typeInternalName, OpenSourceRepoContent openSourceRepoContent) {
@@ -95,16 +108,16 @@ public class Type extends BaseEntity {
 
   private Type(
       TypeInfo typeInfo,
-      List<DeclaredMethodInfo> methodExtractResults,
+      List<MethodInfo> methodInfos,
       TypeOrigin typeOrigin,
       OpenSourceRepoContent openSourceRepoContent) {
     this.typeInternalName = extractedTypeName(typeInfo);
     this.typeKind = typeInfo.typeKind();
-    this.methods = getCodeMethods(methodExtractResults);
     this.typeOrigin = typeOrigin;
     this.openSourceRepoContent = openSourceRepoContent;
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
+    this.methods = getCodeMethods(methodInfos);
   }
 
   private String extractedTypeName(TypeInfo typeInfo) {
@@ -114,9 +127,9 @@ public class Type extends BaseEntity {
     return typeInfo.internalName();
   }
 
-  private List<Method> getCodeMethods(List<DeclaredMethodInfo> methodExtractResults) {
-    return methodExtractResults.stream()
-        .map(extractResult -> Method.declared(extractResult, this))
+  private List<Method> getCodeMethods(List<MethodInfo> methodInfos) {
+    return methodInfos.stream()
+        .map(methodInfo -> Method.declared(methodInfo, this))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 

@@ -6,13 +6,15 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.content.Extension;
 import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentName;
 import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentOrigin;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -88,6 +90,36 @@ public class OpenSourceRepoContent extends BaseEntity {
         openSourceRepo);
   }
 
+  static OpenSourceRepoContent external(
+      MethodCallInfo calleeMethodInfo, Method callerMethod, OpenSourceRepo openSourceRepo) {
+    return new OpenSourceRepoContent(
+        calleeMethodInfo,
+        calleeMethodInfo.typeInternalName() + UUID.randomUUID(),
+        RepoEntryType.OTHERS,
+        OpenSourceRepoContentOrigin.EXTERNAL,
+        null,
+        callerMethod,
+        openSourceRepo);
+  }
+
+  private OpenSourceRepoContent(
+      MethodCallInfo calleeMethodInfo,
+      String path,
+      RepoEntryType repoEntryType,
+      OpenSourceRepoContentOrigin origin,
+      String rawText,
+      Method caller,
+      OpenSourceRepo openSourceRepo) {
+    this.path = path;
+    this.extension = Extension.resolveExtension(path);
+    this.name = OpenSourceRepoContentName.from(path);
+    this.origin = origin;
+    this.repoEntryType = repoEntryType;
+    this.rawText = rawText;
+    this.type = Type.external(calleeMethodInfo, caller, this);
+    this.openSourceRepo = openSourceRepo;
+  }
+
   private OpenSourceRepoContent(
       String typeInternalName,
       String path,
@@ -111,7 +143,7 @@ public class OpenSourceRepoContent extends BaseEntity {
       OpenSourceRepoContentOrigin origin,
       String rawText,
       TypeInfo typeInfo,
-      List<DeclaredMethodInfo> methodInfoWithSources,
+      List<MethodInfo> methodInfoWithSources,
       OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
@@ -134,34 +166,5 @@ public class OpenSourceRepoContent extends BaseEntity {
   @Override
   public int hashCode() {
     return Objects.hash(path, openSourceRepo);
-  }
-
-  @Getter
-  public enum RepoEntryType {
-    TREE("tree", "040000"),
-    FILE("blob", "100644"),
-    EXECUTABLE_FILE("blob", "100755"),
-    OTHERS("NOT_EXISTS", null);
-
-    private final String value;
-    private final String typeNumber;
-
-    RepoEntryType(String value, String typeNumber) {
-      this.value = value;
-      this.typeNumber = typeNumber;
-    }
-
-    public static RepoEntryType from(String typeNumber) {
-      for (RepoEntryType repoEntryType : RepoEntryType.values()) {
-        if (typeNumber.equals(repoEntryType.typeNumber)) {
-          return repoEntryType;
-        }
-      }
-      return OTHERS;
-    }
-
-    public boolean isSupported() {
-      return this != OTHERS;
-    }
   }
 }

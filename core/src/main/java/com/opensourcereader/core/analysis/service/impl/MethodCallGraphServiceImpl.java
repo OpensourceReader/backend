@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
-import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 import com.opensourcereader.core.analysis.service.impl.detail.InheritanceMethodDispatcher;
 import com.opensourcereader.core.analysis.service.impl.detail.InterfaceMethodDispatcher;
 import com.opensourcereader.core.analysis.service.impl.detail.MethodCallResolver;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MethodCallGraphServiceImpl implements CodeMethodCallGraphService {
+public class MethodCallGraphServiceImpl implements MethodCallGraphService {
 
   private final InterfaceMethodDispatcher interfaceMethodDispatcher;
   private final InheritanceMethodDispatcher inheritanceMethodDispatcher;

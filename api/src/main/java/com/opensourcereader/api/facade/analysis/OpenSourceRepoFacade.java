@@ -10,10 +10,10 @@ import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
+import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
+import com.opensourcereader.core.analysis.service.TypeHierarchyService;
 import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
 
@@ -31,8 +31,8 @@ public class OpenSourceRepoFacade {
 
   private final RepositoryArtifactService repositoryArtifactService;
   private final OpenSourceRepoService opensourceRepoService;
-  private final DeclaredTypeRelationService declaredTypeRelationService;
-  private final CodeMethodCallGraphService codeMethodCallGraphService;
+  private final TypeHierarchyService typeHierarchyService;
+  private final MethodCallGraphService methodCallGraphService;
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
@@ -43,8 +43,8 @@ public class OpenSourceRepoFacade {
         opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
 
     List<TypeStructureMeta> typeStructureMetas = TypeStructureMeta.from(artifact.typeStructures());
-    declaredTypeRelationService.resolve(openSourceRepo.getId(), typeStructureMetas);
-    codeMethodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), typeStructureMetas);
+    typeHierarchyService.resolve(openSourceRepo.getId(), typeStructureMetas);
+    methodCallGraphService.createMethodCallGraph(openSourceRepo.getId(), typeStructureMetas);
 
     FileUtil.removeDirectory(artifact.savedLocalRepoPath());
     return OpenSourceRepoResponse.from(openSourceRepo);

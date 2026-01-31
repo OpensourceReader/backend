@@ -6,7 +6,7 @@ import static com.opensourcereader.core.analysis.entity.content.ContentNameSepar
 import java.util.ArrayList;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
@@ -29,11 +29,11 @@ public record MethodSignature(String methodSignature) {
         method.methodDescriptor().methodReturnType());
   }
 
-  public static MethodSignature of(DeclaredMethodInfo declaredMethodInfo) {
+  public static MethodSignature of(MethodInfo methodInfo) {
     return of(
-        declaredMethodInfo.methodName(),
-        declaredMethodInfo.methodDescriptor().argumentTypes(),
-        declaredMethodInfo.methodDescriptor().methodReturnType());
+        methodInfo.methodName(),
+        methodInfo.methodDescriptor().argumentTypes(),
+        methodInfo.methodDescriptor().methodReturnType());
   }
 
   public static MethodSignature of(SourceCodeParseResult codeParseResult) {

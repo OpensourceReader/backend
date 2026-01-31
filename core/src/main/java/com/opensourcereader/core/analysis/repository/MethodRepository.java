@@ -19,7 +19,7 @@ public interface MethodRepository extends JpaRepository<Method, Long> {
               AND m.methodSignature.methodSignature = :methodSignature
 
           """)
-  Optional<Method> findCodeMethod(
+  Optional<Method> findMethod(
       @Param("repoId") Long repoId,
       @Param("typeInternalName") String typeInternalName,
       @Param("methodSignature") String methodSignature);

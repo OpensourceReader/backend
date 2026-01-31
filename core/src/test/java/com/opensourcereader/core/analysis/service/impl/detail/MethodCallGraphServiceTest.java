@@ -13,12 +13,12 @@ import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
-import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class MethodCallGraphServiceTest {
 
-  @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
+  @Autowired MethodCallGraphService methodCallGraphService;
   @Autowired TypeRepository typeRepository;
   @Autowired MethodRepository methodRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
@@ -97,7 +97,7 @@ class MethodCallGraphServiceTest {
     methodRepository.saveAll(List.of(targetMethod, calleeMethod, callerMethod));
 
     // when
-    Method target = codeMethodCallGraphService.getCodeMethodById(targetMethod.getId());
+    Method target = methodCallGraphService.getCodeMethodById(targetMethod.getId());
 
     // then
     assertThat(target.getOutgoingCalls())

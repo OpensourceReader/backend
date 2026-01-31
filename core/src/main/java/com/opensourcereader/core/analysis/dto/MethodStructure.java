@@ -7,16 +7,16 @@ import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeMethodStructure;
 import com.opensourcereader.core.analysis.infra.dto.ParsedSourceFile;
 
-public record MethodStructure(DeclaredMethodInfo methodInfo, List<MethodCallInfo> calleeMethods) {
+public record MethodStructure(MethodInfo methodInfo, List<MethodCallInfo> calleeMethods) {
 
   public static MethodStructure of(
       ByteCodeMethodStructure byteCodeMethodStructure, ParsedSourceFile parsedSourceFile) {
     MethodSignature signature =
         MethodSignature.of(byteCodeMethodStructure.byteCodeDeclaredMethodInfo());
-    DeclaredMethodInfo declaredMethodInfo =
-        DeclaredMethodInfo.of(
+    MethodInfo methodInfo =
+        MethodInfo.of(
             byteCodeMethodStructure.byteCodeDeclaredMethodInfo(),
             parsedSourceFile.methods().get(signature));
-    return new MethodStructure(declaredMethodInfo, byteCodeMethodStructure.calleeMethods());
+    return new MethodStructure(methodInfo, byteCodeMethodStructure.calleeMethods());
   }
 }

@@ -1,27 +1,22 @@
 package com.opensourcereader.core.analysis.service.impl.detail;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeWithMethod;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeWithMethodCall;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
-import java.util.EnumSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.MethodStructure;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
-import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
@@ -34,9 +29,9 @@ import org.junit.jupiter.api.Test;
 @Transactional
 class MethodCallResolverTest {
 
-  @Autowired MethodCallResolver resolver;
   @Autowired MethodRepository methodRepository;
   @Autowired TypeRepository typeRepository;
+  @Autowired MethodCallResolver methodCallResolver;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Test
@@ -46,69 +41,38 @@ class MethodCallResolverTest {
     String calleeClassName = "b/B";
     String calleeMethodName = "b";
     MethodDescriptor calleeMethodDescriptor = MethodDescriptor.from("()V");
-    TypeInfo calleeTypeInfo =
-        new TypeInfo(183, TypeKind.CLASS, calleeClassName, null, null, List.of());
     TypeStructure calleeTypeStructure =
-        new TypeStructure(
+        createTypeWithMethod(
             "callee",
             RepoEntryType.FILE,
-            null,
-            calleeTypeInfo,
-            List.of(
-                new MethodStructure(
-                    new DeclaredMethodInfo(
-                        calleeClassName,
-                        calleeMethodName,
-                        EnumSet.of(MethodModifier.PUBLIC),
-                        calleeMethodDescriptor,
-                        null,
-                        null,
-                        1,
-                        1),
-                    List.of())));
+            calleeClassName,
+            calleeMethodName,
+            calleeMethodDescriptor,
+            TypeKind.CLASS);
 
     String callerClassName = "a/A";
     String callerMethodName = "a";
     MethodDescriptor callerMethodDescriptor = MethodDescriptor.from("()V");
-    TypeInfo callerTypeInfo =
-        new TypeInfo(183, TypeKind.CLASS, callerClassName, null, null, List.of());
     TypeStructure callerTypeStructure =
-        new TypeStructure(
-            "caller",
-            RepoEntryType.FILE,
-            null,
-            callerTypeInfo,
-            List.of(
-                new MethodStructure(
-                    new DeclaredMethodInfo(
-                        callerClassName,
-                        callerMethodName,
-                        EnumSet.of(MethodModifier.PUBLIC),
-                        callerMethodDescriptor,
-                        null,
-                        null,
-                        1,
-                        1),
-                    List.of(
-                        new MethodCallInfo(
-                            9,
-                            calleeClassName,
-                            calleeMethodName,
-                            calleeMethodDescriptor,
-                            false)))));
-
+        createTypeWithMethodCall(
+            TypeKind.CLASS,
+            callerClassName,
+            callerMethodName,
+            callerMethodDescriptor,
+            calleeClassName,
+            calleeMethodName,
+            calleeMethodDescriptor);
     OpenSourceRepo openSourceRepo =
-        OpenSourceRepo.of("new-cloneUrl", List.of(calleeTypeStructure, callerTypeStructure));
-    openSourceRepoRepository.save(openSourceRepo);
+        openSourceRepoRepository.save(
+            OpenSourceRepo.of("new-cloneUrl", List.of(callerTypeStructure, calleeTypeStructure)));
 
     // when
-    List<Method> methods =
-        resolver.create(
-            openSourceRepo.getId(),
-            TypeStructureMeta.from(List.of(calleeTypeStructure, callerTypeStructure)));
+    methodCallResolver.create(
+        openSourceRepo.getId(),
+        TypeStructureMeta.from(List.of(calleeTypeStructure, callerTypeStructure)));
 
     // then
-    List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
+    List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
     assertThat(outgoingCalls)
         .extracting(
             e -> e.getCaller().getTypeInternalName(),

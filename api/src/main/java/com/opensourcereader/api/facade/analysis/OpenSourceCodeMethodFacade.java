@@ -10,7 +10,7 @@ import com.opensourcereader.api.dto.CodeMethodSummary;
 import com.opensourcereader.api.viewpolicy.CodeMethodViewPolicy;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
+import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OpenSourceCodeMethodFacade {
 
-  private final CodeMethodCallGraphService codeMethodCallGraphService;
+  private final MethodCallGraphService methodCallGraphService;
   private final CodeMethodViewPolicy codeMethodViewPolicy;
 
   public CodeMethodResponse getCodeMethodById(CodeMethodRequest request) {
-    Method method = codeMethodCallGraphService.getCodeMethodById(request.codeMethodId());
+    Method method = methodCallGraphService.getCodeMethodById(request.codeMethodId());
 
     return new CodeMethodResponse(
         method.getId(),

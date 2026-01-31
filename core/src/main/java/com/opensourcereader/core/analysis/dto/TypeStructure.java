@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.dto;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 
 public record TypeStructure(

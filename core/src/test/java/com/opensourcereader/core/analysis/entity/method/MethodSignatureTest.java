@@ -4,8 +4,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.opensourcereader.core.analysis.dto.DeclaredMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,8 +20,8 @@ class MethodSignatureTest {
   void codeSignatureParameterizedTest(String descriptor, String expectedSignature) {
 
     // given
-    DeclaredMethodInfo methodExtractResult =
-        new DeclaredMethodInfo(
+    MethodInfo methodExtractResult =
+        new MethodInfo(
             "internalName",
             "methodName",
             EnumSet.noneOf(MethodModifier.class),
