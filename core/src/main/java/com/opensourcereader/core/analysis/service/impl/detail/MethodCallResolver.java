@@ -14,8 +14,8 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MethodCallResolver {
 
-  private final DeclaredTypeRepository declaredTypeRepository;
+  private final TypeRepository typeRepository;
   private final MethodRepository methodRepository;
 
   // 여기서 flatMap으로 한번 뽑아줄 수 있을듯, for문 하나 축소가능
@@ -50,8 +50,7 @@ public class MethodCallResolver {
             continue;
           }
           Optional<Type> calleeDeclaredType =
-              declaredTypeRepository.findByRepoAndTypeInternalName(
-                  repoId, calleeMethodInfo.className());
+              typeRepository.findByRepoAndTypeInternalName(repoId, calleeMethodInfo.className());
           if (calleeDeclaredType.isPresent()) {
             Method internalInheritanceDeclared =
                 Method.inheritedInternal(calleeMethodInfo, calleeMethodSignature);

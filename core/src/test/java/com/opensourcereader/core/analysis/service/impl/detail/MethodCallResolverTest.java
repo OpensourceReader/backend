@@ -23,9 +23,9 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class MethodCallResolverTest {
 
   @Autowired MethodCallResolver resolver;
   @Autowired MethodRepository methodRepository;
-  @Autowired DeclaredTypeRepository declaredTypeRepository;
+  @Autowired TypeRepository typeRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Test

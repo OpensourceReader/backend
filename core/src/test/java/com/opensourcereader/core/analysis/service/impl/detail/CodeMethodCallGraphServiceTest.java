@@ -15,9 +15,9 @@ import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 class CodeMethodCallGraphServiceTest {
 
   @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
-  @Autowired DeclaredTypeRepository declaredTypeRepository;
+  @Autowired TypeRepository typeRepository;
   @Autowired MethodRepository methodRepository;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
@@ -75,19 +75,19 @@ class CodeMethodCallGraphServiceTest {
             openSourceRepoRepository, "new-cloneUrl", List.of(callerType, targetType, calleeType));
 
     Method callerMethod =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(repo.getId(), callerTypeName)
             .orElseThrow()
             .getMethods()
             .get(0);
     Method targetMethod =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(repo.getId(), targetTypeName)
             .orElseThrow()
             .getMethods()
             .get(0);
     Method calleeMethod =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(repo.getId(), calleeTypeName)
             .orElseThrow()
             .getMethods()

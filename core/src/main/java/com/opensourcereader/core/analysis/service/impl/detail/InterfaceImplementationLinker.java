@@ -16,8 +16,8 @@ import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,11 +27,10 @@ public class InterfaceImplementationLinker {
 
   private final DeclaredTypeGraphValidator declaredTypeGraphValidator;
   private final MethodRepository methodRepository;
-  private final DeclaredTypeRepository declaredTypeRepository;
+  private final TypeRepository typeRepository;
 
   public List<Method> linkAllInterfaceImplementations(Long repoId) {
-    List<Type> interfaces =
-        declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
+    List<Type> interfaces = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
 
     Set<Method> result = new HashSet<>();
     for (Type interfaceType : interfaces) {
@@ -72,6 +71,7 @@ public class InterfaceImplementationLinker {
     return result;
   }
 
+  // 이 부분 따로 넣어줘야함
   private static Method getImplMethod(
       Method nowInterfaceTypeMethod,
       Type nowInterfaceType,

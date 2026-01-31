@@ -17,8 +17,8 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntry
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class TypeRelationServiceTest {
 
-  @Autowired private DeclaredTypeRepository declaredTypeRepository;
+  @Autowired private TypeRepository typeRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
 
   @Autowired private DeclaredTypeRelationService service;
@@ -72,7 +72,7 @@ class TypeRelationServiceTest {
     List<Type> result = service.resolve(openSourceRepo.getId(), typeStructureMetas);
 
     // then
-    assertThat(declaredTypeRepository.findAll()).hasSize(2);
+    assertThat(typeRepository.findAll()).hasSize(2);
     assertThat(result)
         .extracting(Type::getImplementedInterfaces)
         .flatExtracting(edges -> edges)
@@ -103,10 +103,10 @@ class TypeRelationServiceTest {
     service.resolve(openSourceRepo.getId(), structureMetas);
 
     // then
-    assertThat(declaredTypeRepository.findAll()).hasSize(2);
+    assertThat(typeRepository.findAll()).hasSize(2);
 
     Type savedChild =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), childInterfaceName)
             .orElseThrow();
     assertThat(savedChild.getImplementedInterfaces())
@@ -134,10 +134,10 @@ class TypeRelationServiceTest {
         openSourceRepo.getId(), TypeStructureMeta.from(List.of(superStructure, subStructure)));
 
     // then
-    assertThat(declaredTypeRepository.findAll()).hasSize(2);
+    assertThat(typeRepository.findAll()).hasSize(2);
 
     Type savedSub =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), subClassName)
             .orElseThrow();
     assertThat(savedSub.getSuperType()).isNotNull();
@@ -163,9 +163,9 @@ class TypeRelationServiceTest {
     service.resolve(openSourceRepo.getId(), TypeStructureMeta.from(List.of(typeStructure)));
 
     // then
-    assertThat(declaredTypeRepository.findAll()).hasSize(4);
+    assertThat(typeRepository.findAll()).hasSize(4);
     Type savedResult =
-        declaredTypeRepository
+        typeRepository
             .findByRepoAndTypeInternalName(openSourceRepo.getId(), className)
             .orElseThrow();
 
@@ -205,17 +205,17 @@ class TypeRelationServiceTest {
     // then
     // B의 super는 미지의 외부 A입니다.
     Type repoBSavedB =
-        declaredTypeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeB).orElseThrow();
+        typeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeB).orElseThrow();
 
     assertThat(repoBSavedB.getSuperType()).isNotNull();
     assertThat(repoBSavedB.getSuperType().getTypeInternalName()).isEqualTo(typeA);
     assertThat(repoBSavedB.getSuperType().getTypeOrigin()).isEqualTo(TypeOrigin.EXTERNAL);
 
     Type repoBSavedA =
-        declaredTypeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeA).orElseThrow();
+        typeRepository.findByRepoAndTypeInternalName(repoB.getId(), typeA).orElseThrow();
 
     Type repoASavedA =
-        declaredTypeRepository.findByRepoAndTypeInternalName(repoA.getId(), typeA).orElseThrow();
+        typeRepository.findByRepoAndTypeInternalName(repoA.getId(), typeA).orElseThrow();
 
     // 가장 중요한 검증: repo2의 B가 repo1의 A를 참조하면 안 됨
     assertThat(repoBSavedB.getSuperType().getId()).isEqualTo(repoBSavedA.getId());
@@ -223,7 +223,7 @@ class TypeRelationServiceTest {
 
     // sanity: 동일 internalName A가 repo별로 각각 존재해야 함
     assertThat(
-            declaredTypeRepository.findAll().stream()
+            typeRepository.findAll().stream()
                 .filter(t -> t.getTypeInternalName().equals(typeA))
                 .toList())
         .hasSize(2);

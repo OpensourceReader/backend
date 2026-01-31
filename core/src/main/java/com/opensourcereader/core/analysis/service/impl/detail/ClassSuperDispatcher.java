@@ -13,8 +13,8 @@ import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,11 +22,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClassSuperDispatcher {
 
-  private final DeclaredTypeRepository declaredTypeRepository;
+  private final TypeRepository typeRepository;
   private final MethodRepository methodRepository;
 
   public void dispatchSupers(Long repoId) {
-    List<Type> classes = declaredTypeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
+    List<Type> classes = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
 
     Set<Method> result = new HashSet<>();
     Set<Long> visited = new HashSet<>();
@@ -59,22 +59,14 @@ public class ClassSuperDispatcher {
         childType.getMethods().stream()
             .collect(Collectors.toMap(Method::getMethodSignature, it -> it));
     for (Method superMethod : superType.getMethods()) {
-      Method childMethodSameWithSuper = childMethods.get(superMethod.getMethodSignature());
-      if (childMethodSameWithSuper == null) {
-        childMethodSameWithSuper = getMethodSameWithSuper(childType, superMethod, superType);
-        childType.addMethod(childMethodSameWithSuper);
-        methodRepository.save(childMethodSameWithSuper); // 수정바람
+      Method inheritedOverride = childMethods.get(superMethod.getMethodSignature());
+      if (inheritedOverride == null) {
+        childType.addInheritedVirtualMethod(superMethod);
+        typeRepository.save(childType);
       }
-      superMethod.addOutgoingCall(childMethodSameWithSuper);
+      superMethod.addOutgoingCall(inheritedOverride);
       result.add(superMethod);
     }
     return result;
-  }
-
-  private Method getMethodSameWithSuper(Type childType, Method superMethod, Type superType) {
-    if (superType.isInternal()) {
-      return Method.inheritedInternal(superMethod, childType);
-    }
-    return Method.inheritedExternal(superMethod, childType);
   }
 }

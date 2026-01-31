@@ -120,14 +120,26 @@ public class Type extends BaseEntity {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public void addMethod(Method newMethod) {
-    if (newMethod == null) {
+  public void addInheritedVirtualMethod(Method superMethod) {
+    if (superMethod == null) {
       return;
     }
-    if (methods.contains(newMethod)) {
+    if (this.superType == null) {
       return;
     }
-    methods.add(newMethod);
+    Method inheritedVirtual = createInheritedVirtual(superMethod);
+    if (methods.contains(inheritedVirtual)) {
+      return;
+    }
+    methods.add(inheritedVirtual);
+    superMethod.addOutgoingCall(inheritedVirtual);
+  }
+
+  private Method createInheritedVirtual(Method superMethod) {
+    if (this.superType.isInternal()) {
+      return Method.inheritedInternal(superMethod, this);
+    }
+    return Method.inheritedExternal(superMethod, this);
   }
 
   public void updateRelations(Type newSuperType, List<Type> interfaceTypes) {
@@ -179,6 +191,9 @@ public class Type extends BaseEntity {
   }
 
   public boolean isInternal() {
+    if (this.typeOrigin == null) {
+      return false;
+    }
     return this.typeOrigin.equals(TypeOrigin.INTERNAL);
   }
 

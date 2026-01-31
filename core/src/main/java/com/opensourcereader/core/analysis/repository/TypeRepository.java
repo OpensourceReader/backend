@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 
-public interface DeclaredTypeRepository extends JpaRepository<Type, Long> {
+public interface TypeRepository extends JpaRepository<Type, Long> {
 
   @Query(
       """

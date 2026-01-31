@@ -17,9 +17,9 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class ClassSuperDispatcherTest {
 
-  @Autowired private DeclaredTypeRepository declaredTypeRepository;
+  @Autowired private TypeRepository typeRepository;
   @Autowired private MethodRepository methodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private ClassSuperDispatcher classSuperDispatcher;
@@ -63,7 +63,7 @@ class ClassSuperDispatcherTest {
           TestRepoFixtures.saveRepo(
               openSourceRepoRepository, "new-cloneUrl", List.of(childType, parentType));
 
-      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
+      TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), childName, parentName);
 
       // when
       classSuperDispatcher.dispatchSupers(repo.getId());
@@ -101,7 +101,7 @@ class ClassSuperDispatcherTest {
           TestRepoFixtures.saveRepo(
               openSourceRepoRepository, "new-cloneUrl", List.of(child, parent));
 
-      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
+      TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), childName, parentName);
 
       // when
       classSuperDispatcher.dispatchSupers(repo.getId());
@@ -154,9 +154,8 @@ class ClassSuperDispatcherTest {
           TestRepoFixtures.saveRepo(
               openSourceRepoRepository, "new-cloneUrl", List.of(grandChild, child, parent));
 
-      TestRepoFixtures.linkInheritance(declaredTypeRepository, repo.getId(), childName, parentName);
-      TestRepoFixtures.linkInheritance(
-          declaredTypeRepository, repo.getId(), grandChildName, childName);
+      TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), childName, parentName);
+      TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), grandChildName, childName);
 
       // when
       classSuperDispatcher.dispatchSupers(repo.getId());

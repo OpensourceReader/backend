@@ -11,8 +11,8 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent;
 import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.DeclaredTypeRelationService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationService {
 
-  private final DeclaredTypeRepository declaredTypeRepository;
+  private final TypeRepository typeRepository;
   private final OpenSourceRepoRepository openSourceRepoRepository;
 
   public List<Type> resolve(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
@@ -32,7 +32,7 @@ public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationServ
     List<Type> types = new ArrayList<>();
     for (TypeInfo typeInfo : getClassInfos(typeStructureMetas)) {
       Type type =
-          declaredTypeRepository
+          typeRepository
               .findByRepoAndTypeInternalName(repoId, typeInfo.internalName())
               .orElseThrow(IllegalArgumentException::new);
       type.updateRelations(
@@ -40,7 +40,7 @@ public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationServ
       types.add(type);
     }
 
-    return declaredTypeRepository.saveAll(types);
+    return typeRepository.saveAll(types);
   }
 
   private List<Type> getInterfaceTypes(Long repoId, TypeInfo typeInfo) {
@@ -53,8 +53,7 @@ public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationServ
     if (typeName == null) {
       return null;
     }
-    Optional<Type> declaredType =
-        declaredTypeRepository.findByRepoAndTypeInternalName(repoId, typeName);
+    Optional<Type> declaredType = typeRepository.findByRepoAndTypeInternalName(repoId, typeName);
     if (declaredType.isPresent()) {
       return declaredType.get();
     }

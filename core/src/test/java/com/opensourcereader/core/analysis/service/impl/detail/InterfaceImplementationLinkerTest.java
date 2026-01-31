@@ -20,8 +20,8 @@ import com.opensourcereader.core.analysis.entity.OpenSourceRepoContent.RepoEntry
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 class InterfaceImplementationLinkerTest {
 
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
-  @Autowired private DeclaredTypeRepository declaredTypeRepository;
+  @Autowired private TypeRepository typeRepository;
   @Autowired private InterfaceImplementationLinker dispatcher;
 
   @Nested
@@ -70,15 +70,11 @@ class InterfaceImplementationLinkerTest {
               openSourceRepoRepository, "new-cloneUrl", List.of(implClassType, interfaceType));
 
       Type interType =
-          declaredTypeRepository
-              .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
-              .orElseThrow();
+          typeRepository.findByRepoAndTypeInternalName(repo.getId(), interfaceName).orElseThrow();
       Type implType =
-          declaredTypeRepository
-              .findByRepoAndTypeInternalName(repo.getId(), implName)
-              .orElseThrow();
+          typeRepository.findByRepoAndTypeInternalName(repo.getId(), implName).orElseThrow();
       implType.updateRelations(null, List.of(interType));
-      declaredTypeRepository.save(implType);
+      typeRepository.save(implType);
 
       // when
       List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
@@ -124,15 +120,11 @@ class InterfaceImplementationLinkerTest {
                 openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
         Type inter1Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), i1Name)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
         Type inter2Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), i2Name)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
         inter2Type.updateRelations(null, List.of(inter1Type));
-        declaredTypeRepository.save(inter2Type);
+        typeRepository.save(inter2Type);
 
         // when
         List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
@@ -188,20 +180,14 @@ class InterfaceImplementationLinkerTest {
                 List.of(implAType, interface2Type, interface1Type));
 
         Type inter1Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), i1Name)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
         Type inter2Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), i2Name)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
         Type impAType =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), implAName)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), implAName).orElseThrow();
         inter2Type.updateRelations(null, List.of(inter1Type));
         impAType.updateRelations(null, List.of(inter2Type));
-        declaredTypeRepository.saveAll(List.of(inter2Type, impAType));
+        typeRepository.saveAll(List.of(inter2Type, impAType));
 
         // when
         List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
@@ -249,15 +235,11 @@ class InterfaceImplementationLinkerTest {
                 openSourceRepoRepository, "new-cloneUrl", List.of(implType, interfaceType));
 
         Type interface1Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), interfaceName).orElseThrow();
         Type implAType =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), implName)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), implName).orElseThrow();
         implAType.updateRelations(null, List.of(interface1Type));
-        declaredTypeRepository.save(implAType);
+        typeRepository.save(implAType);
 
         // when
         List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
@@ -306,19 +288,15 @@ class InterfaceImplementationLinkerTest {
                 openSourceRepoRepository, "new-cloneUrl", List.of(interfaceType, implType));
 
         Type interface1Type =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), interfaceName)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), interfaceName).orElseThrow();
         Type implAType =
-            declaredTypeRepository
-                .findByRepoAndTypeInternalName(repo.getId(), implName)
-                .orElseThrow();
+            typeRepository.findByRepoAndTypeInternalName(repo.getId(), implName).orElseThrow();
         implAType.updateRelations(null, List.of(interface1Type));
-        declaredTypeRepository.save(implAType);
+        typeRepository.save(implAType);
 
         // A implements I
         implAType.updateRelations(null, List.of(interface1Type));
-        declaredTypeRepository.save(implAType);
+        typeRepository.save(implAType);
 
         // when
         List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
@@ -373,14 +351,14 @@ class InterfaceImplementationLinkerTest {
               openSourceRepoRepository, "new-cloneUrl", List.of(interface2Type, interface1Type));
 
       Type i1Type =
-          declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
+          typeRepository.findByRepoAndTypeInternalName(repo.getId(), i1Name).orElseThrow();
       Type i2Type =
-          declaredTypeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
+          typeRepository.findByRepoAndTypeInternalName(repo.getId(), i2Name).orElseThrow();
 
       // 순환 extends 구성: I1 extends I2, I2 extends I1
       i1Type.updateRelations(null, List.of(i2Type));
       i2Type.updateRelations(null, List.of(i1Type));
-      declaredTypeRepository.saveAll(List.of(i1Type, i2Type));
+      typeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then
       assertThatThrownBy(() -> dispatcher.linkAllInterfaceImplementations(repo.getId()))

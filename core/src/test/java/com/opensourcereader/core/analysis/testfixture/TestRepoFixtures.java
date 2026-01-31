@@ -6,8 +6,8 @@ import java.util.List;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.repository.DeclaredTypeRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
+import com.opensourcereader.core.analysis.repository.TypeRepository;
 
 public final class TestRepoFixtures {
 
@@ -23,30 +23,24 @@ public final class TestRepoFixtures {
   }
 
   public static void linkInheritance(
-      DeclaredTypeRepository declaredTypeRepository,
+      TypeRepository typeRepository,
       Long repoId,
       String childInternalName,
       String parentInternalName) {
     Type childType =
-        declaredTypeRepository
-            .findByRepoAndTypeInternalName(repoId, childInternalName)
-            .orElseThrow();
+        typeRepository.findByRepoAndTypeInternalName(repoId, childInternalName).orElseThrow();
 
     Type parentType =
-        declaredTypeRepository
-            .findByRepoAndTypeInternalName(repoId, parentInternalName)
-            .orElseThrow();
+        typeRepository.findByRepoAndTypeInternalName(repoId, parentInternalName).orElseThrow();
 
     childType.updateRelations(parentType, List.of());
-    declaredTypeRepository.save(childType);
+    typeRepository.save(childType);
   }
 
   public static List<Type> loadDeclaredTypes(
-      DeclaredTypeRepository declaredTypeRepository, Long repoId, String... typeInternalNames) {
+      TypeRepository typeRepository, Long repoId, String... typeInternalNames) {
     return Arrays.stream(typeInternalNames)
-        .map(
-            name ->
-                declaredTypeRepository.findByRepoAndTypeInternalName(repoId, name).orElseThrow())
+        .map(name -> typeRepository.findByRepoAndTypeInternalName(repoId, name).orElseThrow())
         .toList();
   }
 }
