@@ -23,25 +23,25 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class InterfaceImplementationLinker {
+public class InterfaceMethodDispatcher {
 
   private final TypeGraphValidator typeGraphValidator;
   private final MethodRepository methodRepository;
   private final TypeRepository typeRepository;
 
-  public List<Method> linkAllInterfaceImplementations(Long repoId) {
+  public List<Method> connectInterfaceImplementations(Long repoId) {
     List<Type> interfaces = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
 
     Set<Method> result = new HashSet<>();
     for (Type interfaceType : interfaces) {
-      typeGraphValidator.validateAcyclic(interfaceType);
-      result.addAll(linkInterfaceImplementations(interfaceType));
+      typeGraphValidator.validateCyclic(interfaceType);
+      result.addAll(connectMethodsToImplementation(interfaceType));
     }
 
     return methodRepository.saveAll(result);
   }
 
-  private List<Method> linkInterfaceImplementations(Type interfaceType) {
+  private List<Method> connectMethodsToImplementation(Type interfaceType) {
     List<Method> result = new ArrayList<>();
     Queue<Type> queue = new LinkedList<>();
     queue.add(interfaceType);
@@ -52,7 +52,7 @@ public class InterfaceImplementationLinker {
         Type polledInterfaceType = queue.poll();
         for (TypeImplementation implEdge : polledInterfaceType.getImplementations()) {
           Type implType = implEdge.getImplementedType();
-          Map<MethodSignature, Method> implTypeMethods = getImplementationTypeMethods(implType);
+          Map<MethodSignature, Method> implTypeMethods = indexMethodsBySignature(implType);
           for (Method interfaceTypeMethod : polledInterfaceType.getMethods()) {
             Method implMethod = implTypeMethods.get(interfaceTypeMethod.getMethodSignature());
             if (implMethod == null) {
@@ -72,7 +72,7 @@ public class InterfaceImplementationLinker {
     return result;
   }
 
-  private Map<MethodSignature, Method> getImplementationTypeMethods(Type implementationType) {
+  private Map<MethodSignature, Method> indexMethodsBySignature(Type implementationType) {
     return implementationType.getMethods().stream()
         .collect(Collectors.toMap(Method::getMethodSignature, it -> it));
   }

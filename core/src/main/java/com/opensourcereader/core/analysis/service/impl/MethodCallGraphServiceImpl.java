@@ -9,26 +9,26 @@ import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.service.CodeMethodCallGraphService;
-import com.opensourcereader.core.analysis.service.impl.detail.ClassSuperDispatcher;
-import com.opensourcereader.core.analysis.service.impl.detail.InterfaceImplementationLinker;
+import com.opensourcereader.core.analysis.service.impl.detail.InheritanceMethodDispatcher;
+import com.opensourcereader.core.analysis.service.impl.detail.InterfaceMethodDispatcher;
 import com.opensourcereader.core.analysis.service.impl.detail.MethodCallResolver;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CodeMethodCallGraphServiceImpl implements CodeMethodCallGraphService {
+public class MethodCallGraphServiceImpl implements CodeMethodCallGraphService {
 
-  private final InterfaceImplementationLinker interfaceImplementationLinker;
-  private final ClassSuperDispatcher classSuperDispatcher;
+  private final InterfaceMethodDispatcher interfaceMethodDispatcher;
+  private final InheritanceMethodDispatcher inheritanceMethodDispatcher;
   private final MethodCallResolver methodCallResolver;
   private final MethodRepository methodRepository;
 
   @Transactional
   @Override
   public void createMethodCallGraph(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
-    interfaceImplementationLinker.linkAllInterfaceImplementations(repoId);
-    classSuperDispatcher.dispatchSupers(repoId);
+    interfaceMethodDispatcher.connectInterfaceImplementations(repoId);
+    inheritanceMethodDispatcher.connectInheritance(repoId);
     methodCallResolver.create(repoId, typeStructureMetas);
   }
 

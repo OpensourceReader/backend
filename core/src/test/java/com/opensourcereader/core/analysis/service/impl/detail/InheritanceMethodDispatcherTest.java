@@ -28,12 +28,12 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class ClassSuperDispatcherTest {
+class InheritanceMethodDispatcherTest {
 
   @Autowired private TypeRepository typeRepository;
   @Autowired private MethodRepository methodRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
-  @Autowired private ClassSuperDispatcher classSuperDispatcher;
+  @Autowired private InheritanceMethodDispatcher inheritanceMethodDispatcher;
 
   @Nested
   @DisplayName("1. 클래스 상속")
@@ -66,7 +66,7 @@ class ClassSuperDispatcherTest {
       TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), childName, parentName);
 
       // when
-      classSuperDispatcher.dispatchSupers(repo.getId());
+      inheritanceMethodDispatcher.connectInheritance(repo.getId());
 
       // then
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
@@ -104,7 +104,7 @@ class ClassSuperDispatcherTest {
       TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), childName, parentName);
 
       // when
-      classSuperDispatcher.dispatchSupers(repo.getId());
+      inheritanceMethodDispatcher.connectInheritance(repo.getId());
 
       // then
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());
@@ -158,7 +158,7 @@ class ClassSuperDispatcherTest {
       TestRepoFixtures.linkInheritance(typeRepository, repo.getId(), grandChildName, childName);
 
       // when
-      classSuperDispatcher.dispatchSupers(repo.getId());
+      inheritanceMethodDispatcher.connectInheritance(repo.getId());
 
       // then
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methodRepository.findAll());

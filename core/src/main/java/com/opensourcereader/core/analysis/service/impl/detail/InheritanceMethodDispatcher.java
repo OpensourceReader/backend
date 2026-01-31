@@ -20,36 +20,36 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class ClassSuperDispatcher {
+public class InheritanceMethodDispatcher {
 
   private final TypeRepository typeRepository;
   private final MethodRepository methodRepository;
 
-  public void dispatchSupers(Long repoId) {
-    List<Type> classes = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
+  public void connectInheritance(Long repoId) {
+    List<Type> types = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.CLASS);
 
     Set<Method> result = new HashSet<>();
     Set<Long> visited = new HashSet<>();
-    for (Type classType : classes) {
-      result.addAll(dispatchSuperRecursively(classType, visited));
+    for (Type type : types) {
+      result.addAll(traverseInheritanceHierarchy(type, visited));
     }
     methodRepository.saveAll(result);
   }
 
-  private Set<Method> dispatchSuperRecursively(Type type, Set<Long> visited) {
+  private Set<Method> traverseInheritanceHierarchy(Type type, Set<Long> visited) {
     if (visited.contains(type.getId())) {
       return new HashSet<>();
     }
     visited.add(type.getId());
     Set<Method> result = new HashSet<>();
     if (type.getSuperType() != null) {
-      result.addAll(dispatchSuperRecursively(type.getSuperType(), visited));
+      result.addAll(traverseInheritanceHierarchy(type.getSuperType(), visited));
     }
-    result.addAll(dispatchSuperMethod(type));
+    result.addAll(connectMethodsWithSuperType(type));
     return result;
   }
 
-  private List<Method> dispatchSuperMethod(Type childType) {
+  private List<Method> connectMethodsWithSuperType(Type childType) {
     List<Method> result = new ArrayList<>();
     Type superType = childType.getSuperType();
     if (superType == null) {

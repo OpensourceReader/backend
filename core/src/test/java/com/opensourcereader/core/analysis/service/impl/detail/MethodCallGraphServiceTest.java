@@ -25,7 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest
-class CodeMethodCallGraphServiceTest {
+class MethodCallGraphServiceTest {
 
   @Autowired CodeMethodCallGraphService codeMethodCallGraphService;
   @Autowired TypeRepository typeRepository;

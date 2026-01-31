@@ -30,11 +30,11 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class InterfaceImplementationLinkerTest {
+class InterfaceMethodDispatcherTest {
 
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
   @Autowired private TypeRepository typeRepository;
-  @Autowired private InterfaceImplementationLinker dispatcher;
+  @Autowired private InterfaceMethodDispatcher dispatcher;
 
   @Nested
   @DisplayName("1. 인터페이스 기본")
@@ -77,7 +77,7 @@ class InterfaceImplementationLinkerTest {
       typeRepository.save(implType);
 
       // when
-      List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
+      List<Method> methods = dispatcher.connectInterfaceImplementations(repo.getId());
 
       // then
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
@@ -127,7 +127,7 @@ class InterfaceImplementationLinkerTest {
         typeRepository.save(inter2Type);
 
         // when
-        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
+        List<Method> methods = dispatcher.connectInterfaceImplementations(repo.getId());
 
         // then
         List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
@@ -190,7 +190,7 @@ class InterfaceImplementationLinkerTest {
         typeRepository.saveAll(List.of(inter2Type, impAType));
 
         // when
-        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
+        List<Method> methods = dispatcher.connectInterfaceImplementations(repo.getId());
 
         // then
         List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
@@ -242,7 +242,7 @@ class InterfaceImplementationLinkerTest {
         typeRepository.save(implAType);
 
         // when
-        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
+        List<Method> methods = dispatcher.connectInterfaceImplementations(repo.getId());
 
         // then: 엣지 1개 (I.foo -> A.foo(virtual))
         List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
@@ -299,7 +299,7 @@ class InterfaceImplementationLinkerTest {
         typeRepository.save(implAType);
 
         // when
-        List<Method> methods = dispatcher.linkAllInterfaceImplementations(repo.getId());
+        List<Method> methods = dispatcher.connectInterfaceImplementations(repo.getId());
 
         // then
         List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(methods);
@@ -361,7 +361,7 @@ class InterfaceImplementationLinkerTest {
       typeRepository.saveAll(List.of(i1Type, i2Type));
 
       // when + then
-      assertThatThrownBy(() -> dispatcher.linkAllInterfaceImplementations(repo.getId()))
+      assertThatThrownBy(() -> dispatcher.connectInterfaceImplementations(repo.getId()))
           .isInstanceOf(IllegalStateException.class);
     }
   }

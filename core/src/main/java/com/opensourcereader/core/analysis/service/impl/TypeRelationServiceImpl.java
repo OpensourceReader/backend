@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DeclaredTypeRelationServiceImpl implements DeclaredTypeRelationService {
+public class TypeRelationServiceImpl implements DeclaredTypeRelationService {
 
   private final TypeRepository typeRepository;
   private final OpenSourceRepoRepository openSourceRepoRepository;

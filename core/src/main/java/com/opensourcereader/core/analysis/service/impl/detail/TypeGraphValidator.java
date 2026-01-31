@@ -11,7 +11,7 @@ import com.opensourcereader.core.analysis.entity.TypeImplementation;
 @Component
 public class TypeGraphValidator {
 
-  public void validateAcyclic(Type startType) {
+  public void validateCyclic(Type startType) {
     Set<Long> visited = new HashSet<>();
     Set<Long> recursionStack = new HashSet<>();
 
