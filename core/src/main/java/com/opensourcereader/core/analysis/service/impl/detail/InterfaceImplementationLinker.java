@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InterfaceImplementationLinker {
 
-  private final DeclaredTypeGraphValidator declaredTypeGraphValidator;
+  private final TypeGraphValidator typeGraphValidator;
   private final MethodRepository methodRepository;
   private final TypeRepository typeRepository;
 
@@ -34,7 +34,7 @@ public class InterfaceImplementationLinker {
 
     Set<Method> result = new HashSet<>();
     for (Type interfaceType : interfaces) {
-      declaredTypeGraphValidator.validateAcyclic(interfaceType);
+      typeGraphValidator.validateAcyclic(interfaceType);
       result.addAll(linkInterfaceImplementations(interfaceType));
     }
 
@@ -49,17 +49,18 @@ public class InterfaceImplementationLinker {
     while (!queue.isEmpty()) {
       int n = queue.size();
       for (int i = 0; i < n; i++) {
-        Type nowInterfaceType = queue.poll();
-        for (TypeImplementation implEdge : nowInterfaceType.getImplementations()) {
+        Type polledInterfaceType = queue.poll();
+        for (TypeImplementation implEdge : polledInterfaceType.getImplementations()) {
           Type implType = implEdge.getImplementedType();
-          Map<MethodSignature, Method> implTypeMethods =
-              getImplementationTypeDeclaredMethods(implType);
-          for (Method nowInterfaceTypeMethod : nowInterfaceType.getMethods()) {
-            Method implMethod =
-                getImplMethod(nowInterfaceTypeMethod, nowInterfaceType, implTypeMethods, implType);
-            nowInterfaceTypeMethod.addOutgoingCall(implMethod);
-            methodRepository.save(implMethod);
-            result.add(nowInterfaceTypeMethod);
+          Map<MethodSignature, Method> implTypeMethods = getImplementationTypeMethods(implType);
+          for (Method interfaceTypeMethod : polledInterfaceType.getMethods()) {
+            Method implMethod = implTypeMethods.get(interfaceTypeMethod.getMethodSignature());
+            if (implMethod == null) {
+              implType.addImplementationVirtualMethod(interfaceTypeMethod);
+              typeRepository.save(implType);
+            }
+            interfaceTypeMethod.addOutgoingCall(implMethod);
+            result.add(interfaceTypeMethod);
           }
           if (implType.getTypeKind().equals(TypeKind.INTERFACE)) {
             queue.add(implType);
@@ -71,24 +72,7 @@ public class InterfaceImplementationLinker {
     return result;
   }
 
-  // 이 부분 따로 넣어줘야함
-  private static Method getImplMethod(
-      Method nowInterfaceTypeMethod,
-      Type nowInterfaceType,
-      Map<MethodSignature, Method> implTypeMethods,
-      Type implementationType) {
-    if (nowInterfaceType.isInternal()) {
-      if (implTypeMethods.containsKey(nowInterfaceTypeMethod.getMethodSignature())) {
-        return implTypeMethods.get(nowInterfaceTypeMethod.getMethodSignature());
-      }
-      return Method.inheritedInternal(nowInterfaceTypeMethod, implementationType);
-    }
-
-    return Method.inheritedExternal(nowInterfaceTypeMethod, implementationType);
-  }
-
-  private static Map<MethodSignature, Method> getImplementationTypeDeclaredMethods(
-      Type implementationType) {
+  private Map<MethodSignature, Method> getImplementationTypeMethods(Type implementationType) {
     return implementationType.getMethods().stream()
         .collect(Collectors.toMap(Method::getMethodSignature, it -> it));
   }

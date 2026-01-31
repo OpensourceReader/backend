@@ -61,7 +61,7 @@ public class ClassSuperDispatcher {
     for (Method superMethod : superType.getMethods()) {
       Method inheritedOverride = childMethods.get(superMethod.getMethodSignature());
       if (inheritedOverride == null) {
-        childType.addInheritedVirtualMethod(superMethod);
+        childType.addChildVirtualMethod(superMethod);
         typeRepository.save(childType);
       }
       superMethod.addOutgoingCall(inheritedOverride);

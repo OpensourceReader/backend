@@ -93,7 +93,7 @@ public class Method extends BaseEntity {
         type);
   }
 
-  public static Method inheritedInternal(Method interfaceMethod, Type implType) {
+  static Method inheritedInternal(Method interfaceMethod, Type implType) {
     return new Method(
         implType.getTypeInternalName(),
         interfaceMethod.methodName,
@@ -105,6 +105,20 @@ public class Method extends BaseEntity {
         null,
         MethodOrigin.INHERITED_INTERNAL,
         implType);
+  }
+
+  static Method inheritedExternal(Method superMethod, Type childType) {
+    return new Method(
+        childType.getTypeInternalName(),
+        superMethod.methodName,
+        superMethod.returnType,
+        superMethod.paramTypes,
+        superMethod.methodModifiers,
+        superMethod.getMethodSignature(),
+        null,
+        null,
+        MethodOrigin.INHERITED_EXTERNAL,
+        childType);
   }
 
   /// resolver에 두개가 쓰임
@@ -122,22 +136,6 @@ public class Method extends BaseEntity {
         MethodOrigin.INHERITED_INTERNAL,
         null);
   }
-
-  public static Method inheritedExternal(Method superMethod, Type childType) {
-    return new Method(
-        childType.getTypeInternalName(),
-        superMethod.methodName,
-        superMethod.returnType,
-        superMethod.paramTypes,
-        superMethod.methodModifiers,
-        superMethod.getMethodSignature(),
-        null,
-        null,
-        MethodOrigin.INHERITED_EXTERNAL,
-        childType);
-  }
-
-  ///
 
   public static Method external(MethodCallInfo callee, MethodSignature methodSignature) {
     return new Method(

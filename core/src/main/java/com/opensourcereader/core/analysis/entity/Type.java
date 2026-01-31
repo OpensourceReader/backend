@@ -120,14 +120,26 @@ public class Type extends BaseEntity {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public void addInheritedVirtualMethod(Method superMethod) {
+  public void addImplementationVirtualMethod(Method interfaceMethod) {
+    if (interfaceMethod == null) {
+      return;
+    }
+    Method inheritedVirtual = createVirtualMethod(interfaceMethod.getType(), interfaceMethod);
+    if (methods.contains(inheritedVirtual)) {
+      return;
+    }
+    methods.add(inheritedVirtual);
+    interfaceMethod.addOutgoingCall(inheritedVirtual);
+  }
+
+  public void addChildVirtualMethod(Method superMethod) {
     if (superMethod == null) {
       return;
     }
     if (this.superType == null) {
       return;
     }
-    Method inheritedVirtual = createInheritedVirtual(superMethod);
+    Method inheritedVirtual = createVirtualMethod(this.superType, superMethod);
     if (methods.contains(inheritedVirtual)) {
       return;
     }
@@ -135,11 +147,11 @@ public class Type extends BaseEntity {
     superMethod.addOutgoingCall(inheritedVirtual);
   }
 
-  private Method createInheritedVirtual(Method superMethod) {
-    if (this.superType.isInternal()) {
-      return Method.inheritedInternal(superMethod, this);
+  private Method createVirtualMethod(Type upperType, Method upperMethod) {
+    if (upperType.isInternal()) {
+      return Method.inheritedInternal(upperMethod, this);
     }
-    return Method.inheritedExternal(superMethod, this);
+    return Method.inheritedExternal(upperMethod, this);
   }
 
   public void updateRelations(Type newSuperType, List<Type> interfaceTypes) {

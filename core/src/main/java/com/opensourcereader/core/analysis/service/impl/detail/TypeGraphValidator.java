@@ -9,7 +9,7 @@ import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.TypeImplementation;
 
 @Component
-public class DeclaredTypeGraphValidator {
+public class TypeGraphValidator {
 
   public void validateAcyclic(Type startType) {
     Set<Long> visited = new HashSet<>();
