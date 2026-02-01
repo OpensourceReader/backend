@@ -1,12 +1,12 @@
 package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -52,7 +52,7 @@ public class OpenSourceRepo extends BaseEntity {
     contents.add(newContent);
   }
 
-  public void addExternalContent(String typeInternalName) {
+  public void addExternalType(String typeInternalName) {
     OpenSourceRepoContent newContent = OpenSourceRepoContent.external(typeInternalName, this);
     if (this.contents.contains(newContent)) {
       return;

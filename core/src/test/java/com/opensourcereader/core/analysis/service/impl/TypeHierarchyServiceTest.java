@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-class TypeRelationServiceTest {
+class TypeHierarchyServiceTest {
 
   @Autowired private TypeRepository typeRepository;
   @Autowired private OpenSourceRepoRepository openSourceRepoRepository;
@@ -221,7 +221,7 @@ class TypeRelationServiceTest {
     assertThat(repoBSavedB.getSuperType().getId()).isEqualTo(repoBSavedA.getId());
     assertThat(repoBSavedB.getSuperType().getId()).isNotEqualTo(repoASavedA.getId());
 
-    // sanity: 동일 internalName A가 repo별로 각각 존재해야 함
+    // sanity: 동일 typeInternalName A가 repo별로 각각 존재해야 함
     assertThat(
             typeRepository.findAll().stream()
                 .filter(t -> t.getTypeInternalName().equals(typeA))

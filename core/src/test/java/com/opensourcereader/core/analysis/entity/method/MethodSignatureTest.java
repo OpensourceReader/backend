@@ -22,7 +22,7 @@ class MethodSignatureTest {
     // given
     MethodInfo methodExtractResult =
         new MethodInfo(
-            "internalName",
+            "typeInternalName",
             "methodName",
             EnumSet.noneOf(MethodModifier.class),
             MethodDescriptor.from(descriptor),

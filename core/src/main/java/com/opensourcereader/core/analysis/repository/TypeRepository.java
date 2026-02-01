@@ -34,5 +34,5 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
               and dt.typeInternalName = :internalName
           """)
   Optional<Type> findByRepoAndTypeInternalName(
-      @Param("repoId") Long repoId, @Param("internalName") String internalName);
+      @Param("repoId") Long repoId, @Param("typeInternalName") String internalName);
 }

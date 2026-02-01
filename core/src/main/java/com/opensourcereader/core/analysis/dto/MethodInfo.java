@@ -8,7 +8,7 @@ import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
 
 public record MethodInfo(
-    String className,
+    String typeName,
     String methodName,
     EnumSet<MethodModifier> methodModifiers,
     MethodDescriptor methodDescriptor,

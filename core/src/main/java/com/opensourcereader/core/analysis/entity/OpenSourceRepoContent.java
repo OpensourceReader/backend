@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +11,6 @@ import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.content.Extension;
 import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentName;
 import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentOrigin;

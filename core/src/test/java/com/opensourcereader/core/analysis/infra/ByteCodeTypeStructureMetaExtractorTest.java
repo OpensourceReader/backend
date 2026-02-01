@@ -89,7 +89,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result, tuple("t/Main", "java/lang/Object", "<init>", "void", List.of()));
@@ -120,7 +120,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result, tuple("t/Main", "java/lang/Object", "<init>", "void", List.of()));
@@ -148,7 +148,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -185,7 +185,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -222,7 +222,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -253,7 +253,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -299,7 +299,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -337,7 +337,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Child");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Child");
 
             assertEdgesExactly(
                 result,
@@ -378,7 +378,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -419,7 +419,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -454,7 +454,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,
@@ -495,7 +495,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
       // then
       assertSoftly(
           softly -> {
-            softly.assertThat(result.typeInfo().internalName()).isEqualTo("t/Main");
+            softly.assertThat(result.typeInfo().typeInternalName()).isEqualTo("t/Main");
 
             assertEdgesExactly(
                 result,

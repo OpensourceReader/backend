@@ -44,7 +44,7 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
         bytecodeClassStructureExtractor
             .extract(gitRepoLoadResult.savedLocalRepoPath(), reference, workingTreeDirName)
             .stream()
-            .collect(Collectors.toMap(bcs -> bcs.typeInfo().internalName(), bcs -> bcs));
+            .collect(Collectors.toMap(bcs -> bcs.typeInfo().typeInternalName(), bcs -> bcs));
 
     return gitRepoLoadResult.files().stream()
         .filter(sourceFile -> sourceFile.repoEntryType().isSupported())

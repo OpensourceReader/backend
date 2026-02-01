@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.testfixture;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;

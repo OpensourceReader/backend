@@ -8,7 +8,7 @@ import com.opensourcereader.core.analysis.entity.type.TypeKind;
 public record TypeInfo(
     int version,
     TypeKind typeKind,
-    String internalName,
+    String typeInternalName,
     String signature,
     String superName,
     List<String> interfaceNames) {

@@ -136,10 +136,10 @@
 //    return codeMethodRepository.save(DeclaredMethod.internal(extract, content));
 //  }
 //
-//  private DeclaredMethod saveExternalMethod(String internalName, String methodName, String
+//  private DeclaredMethod saveExternalMethod(String typeInternalName, String methodName, String
 // descriptor) {
 //    MethodCallInfo callInfo =
-//        new MethodCallInfo(184, internalName, methodName, MethodDescriptor.from(descriptor),
+//        new MethodCallInfo(184, typeInternalName, methodName, MethodDescriptor.from(descriptor),
 // false);
 //    CodeMethodSignature sig =
 //        CodeMethodSignature.of(

@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl.detail;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.Type;
@@ -41,7 +41,7 @@ public class MethodCallResolver {
             methodRepository
                 .findMethod(
                     repoId,
-                    callerMethodInfo.className(),
+                    callerMethodInfo.typeName(),
                     MethodSignature.of(callerMethodInfo).methodSignature())
                 .orElseThrow(IllegalArgumentException::new);
 

@@ -63,7 +63,7 @@ public class ClassStructureVisitor extends ClassVisitor {
       public void visitEnd() {
         ByteCodeDeclaredMethodInfo byteCodeDeclaredMethodInfo =
             ByteCodeDeclaredMethodInfo.of(
-                typeInfo.internalName(),
+                typeInfo.typeInternalName(),
                 classAccess,
                 methodAccess,
                 callerMethodName,

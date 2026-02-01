@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.entity;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
 import com.opensourcereader.core.shared.BaseEntity;
@@ -75,6 +75,7 @@ public class Type extends BaseEntity {
     return new Type(typeInfo, methodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
   }
 
+  // 이게 말이 되는 거냐... 여기서 상태변경을 해준다는게
   static Type external(
       MethodCallInfo calleeMethodInfo, Method caller, OpenSourceRepoContent openSourceRepoContent) {
     Method externalCallee = Method.external(calleeMethodInfo);
@@ -124,7 +125,7 @@ public class Type extends BaseEntity {
     if (typeInfo == null) {
       return null;
     }
-    return typeInfo.internalName();
+    return typeInfo.typeInternalName();
   }
 
   private List<Method> getCodeMethods(List<MethodInfo> methodInfos) {
