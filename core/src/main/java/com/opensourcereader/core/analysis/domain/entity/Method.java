@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.Objects;
 
 import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
-import com.opensourcereader.core.analysis.entity.method.MethodModifier;
-import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -9,9 +9,9 @@ import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.method.MethodModifier;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 
 public final class TestTypeFixtures {
 

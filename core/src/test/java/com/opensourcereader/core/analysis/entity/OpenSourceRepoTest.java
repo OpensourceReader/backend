@@ -3,6 +3,9 @@ package com.opensourcereader.core.analysis.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.Type;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -12,9 +15,9 @@ import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.method.MethodModifier;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.opensourcereader.core.analysis.entity.file.OpenSourceRepoFileName;
+import com.opensourcereader.core.analysis.domain.entity.file.OpenSourceRepoFileName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

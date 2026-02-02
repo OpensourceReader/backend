@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.service;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 
 public interface OpenSourceRepoService {
 

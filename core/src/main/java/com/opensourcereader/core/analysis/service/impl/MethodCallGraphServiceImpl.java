@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.Method;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.service.MethodCallGraphService;
-import com.opensourcereader.core.analysis.service.impl.detail.InheritanceMethodDispatcher;
-import com.opensourcereader.core.analysis.service.impl.detail.InterfaceMethodDispatcher;
-import com.opensourcereader.core.analysis.service.impl.detail.MethodCallResolver;
+import com.opensourcereader.core.analysis.domain.service.InheritanceMethodDispatcher;
+import com.opensourcereader.core.analysis.domain.service.InterfaceMethodDispatcher;
+import com.opensourcereader.core.analysis.domain.service.MethodCallResolver;
 
 import lombok.RequiredArgsConstructor;
 

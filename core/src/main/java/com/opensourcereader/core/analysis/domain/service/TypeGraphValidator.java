@@ -1,12 +1,11 @@
-package com.opensourcereader.core.analysis.service.impl.detail;
+package com.opensourcereader.core.analysis.domain.service;
 
+import com.opensourcereader.core.analysis.domain.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-
-import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.entity.TypeImplementation;
 
 @Component
 public class TypeGraphValidator {

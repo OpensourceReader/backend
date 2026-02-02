@@ -6,6 +6,7 @@ import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.cr
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
+import com.opensourcereader.core.analysis.domain.service.MethodCallResolver;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
@@ -31,7 +32,8 @@ class MethodCallResolverTest {
 
   @Autowired MethodRepository methodRepository;
   @Autowired TypeRepository typeRepository;
-  @Autowired MethodCallResolver methodCallResolver;
+  @Autowired
+  MethodCallResolver methodCallResolver;
   @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Test

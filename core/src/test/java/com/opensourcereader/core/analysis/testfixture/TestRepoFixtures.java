@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.TypeHierarchyService;
 

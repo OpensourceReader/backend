@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity;
 
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;

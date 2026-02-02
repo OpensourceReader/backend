@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity;
 
 import java.util.Objects;
 

@@ -4,6 +4,7 @@ import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSuppor
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 
+import com.opensourcereader.core.analysis.domain.service.InheritanceMethodDispatcher;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.MethodCallEdge;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;

@@ -1,5 +1,7 @@
-package com.opensourcereader.core.analysis.service.impl.detail;
+package com.opensourcereader.core.analysis.domain.service;
 
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +13,7 @@ import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
-import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;

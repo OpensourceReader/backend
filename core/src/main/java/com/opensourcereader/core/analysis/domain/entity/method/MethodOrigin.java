@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.method;
+package com.opensourcereader.core.analysis.domain.entity.method;
 
 public enum MethodOrigin {
   INTERNAL_DECLARED,

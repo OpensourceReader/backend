@@ -1,12 +1,12 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity;
 
 import java.util.Objects;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.file.Extension;
-import com.opensourcereader.core.analysis.entity.file.OpenSourceRepoFileName;
-import com.opensourcereader.core.analysis.entity.file.OpenSourceRepoFileOrigin;
-import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.Extension;
+import com.opensourcereader.core.analysis.domain.entity.file.OpenSourceRepoFileName;
+import com.opensourcereader.core.analysis.domain.entity.file.OpenSourceRepoFileOrigin;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
 import com.opensourcereader.core.analysis.dto.ExternalTypeStructure;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.entity.type.TypeOrigin;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

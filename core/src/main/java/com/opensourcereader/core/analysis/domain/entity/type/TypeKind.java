@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.type;
+package com.opensourcereader.core.analysis.domain.entity.type;
 
 import aj.org.objectweb.asm.Opcodes;
 

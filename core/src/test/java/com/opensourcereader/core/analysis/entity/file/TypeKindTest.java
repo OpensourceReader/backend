@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.entity.file;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import aj.org.objectweb.asm.Opcodes;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -8,8 +8,8 @@ import com.opensourcereader.api.dto.CodeMethodRequest;
 import com.opensourcereader.api.dto.CodeMethodResponse;
 import com.opensourcereader.api.dto.CodeMethodSummary;
 import com.opensourcereader.api.viewpolicy.CodeMethodViewPolicy;
-import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.MethodCallEdge;
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 
 import lombok.RequiredArgsConstructor;

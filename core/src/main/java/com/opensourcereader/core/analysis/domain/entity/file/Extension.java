@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.file;
+package com.opensourcereader.core.analysis.domain.entity.file;
 
 public enum Extension {
   JAVA,

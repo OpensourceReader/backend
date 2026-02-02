@@ -1,5 +1,8 @@
-package com.opensourcereader.core.analysis.service.impl.detail;
+package com.opensourcereader.core.analysis.domain.service;
 
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,11 +14,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.entity.TypeImplementation;
-import com.opensourcereader.core.analysis.entity.method.MethodSignature;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
 

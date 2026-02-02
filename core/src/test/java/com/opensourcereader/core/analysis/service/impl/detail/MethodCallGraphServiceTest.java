@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
-import com.opensourcereader.core.analysis.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
