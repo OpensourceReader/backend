@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.entity.content;
+package com.opensourcereader.core.analysis.entity.file;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -12,7 +12,7 @@ import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;

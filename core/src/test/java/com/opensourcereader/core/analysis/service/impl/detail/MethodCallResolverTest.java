@@ -16,7 +16,7 @@ import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;

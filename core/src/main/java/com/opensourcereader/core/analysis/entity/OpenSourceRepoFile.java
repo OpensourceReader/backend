@@ -3,10 +3,10 @@ package com.opensourcereader.core.analysis.entity;
 import java.util.Objects;
 
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.entity.content.Extension;
-import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentName;
-import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoFileOrigin;
-import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.file.Extension;
+import com.opensourcereader.core.analysis.entity.file.OpenSourceRepoFileName;
+import com.opensourcereader.core.analysis.entity.file.OpenSourceRepoFileOrigin;
+import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -32,7 +32,7 @@ public class OpenSourceRepoFile extends BaseEntity {
 
   @Embedded
   @Column(name = "name", nullable = false)
-  private OpenSourceRepoContentName name;
+  private OpenSourceRepoFileName name;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "repo_entry_type", nullable = false)
@@ -72,7 +72,7 @@ public class OpenSourceRepoFile extends BaseEntity {
       OpenSourceRepo openSourceRepo) {
     this.path = path;
     this.extension = Extension.resolveExtension(path);
-    this.name = OpenSourceRepoContentName.from(path);
+    this.name = OpenSourceRepoFileName.from(path);
     this.origin = origin;
     this.repoEntryType = repoEntryType;
     this.rawText = rawText;

@@ -1,14 +1,14 @@
 package com.opensourcereader.core.analysis.infra.parser;
 
-import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PACKAGE_SEPARATOR;
-import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PATH_SEPARATOR;
+import static com.opensourcereader.core.analysis.entity.file.FileNameSeparators.PACKAGE_SEPARATOR;
+import static com.opensourcereader.core.analysis.entity.file.FileNameSeparators.PATH_SEPARATOR;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.entity.content.Extension;
+import com.opensourcereader.core.analysis.entity.file.Extension;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.ParsedSourceFile;

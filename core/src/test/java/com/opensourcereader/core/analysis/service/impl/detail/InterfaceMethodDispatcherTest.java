@@ -17,7 +17,7 @@ import com.opensourcereader.core.analysis.entity.Method;
 import com.opensourcereader.core.analysis.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.Type;
-import com.opensourcereader.core.analysis.entity.content.RepoEntryType;
+import com.opensourcereader.core.analysis.entity.file.RepoEntryType;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
