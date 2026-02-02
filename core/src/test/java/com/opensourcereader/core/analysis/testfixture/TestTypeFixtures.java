@@ -1,9 +1,9 @@
 package com.opensourcereader.core.analysis.testfixture;
 
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;

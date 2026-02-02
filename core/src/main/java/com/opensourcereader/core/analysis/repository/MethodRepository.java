@@ -14,7 +14,7 @@ public interface MethodRepository extends JpaRepository<Method, Long> {
       """
           SELECT m
           FROM Method m
-          WHERE m.type.openSourceRepoContent.openSourceRepo.id = :repoId
+          WHERE m.type.openSourceRepoFile.openSourceRepo.id = :repoId
               AND m.type.typeInternalName = :typeInternalName
               AND m.methodSignature.methodSignature = :methodSignature
 
@@ -29,7 +29,7 @@ public interface MethodRepository extends JpaRepository<Method, Long> {
         SELECT DISTINCT m
         FROM Method m
         LEFT JOIN FETCH m.type dt
-        LEFT JOIN FETCH dt.openSourceRepoContent orc
+        LEFT JOIN FETCH dt.openSourceRepoFile orc
         LEFT JOIN FETCH m.outgoingCalls oc
         LEFT JOIN FETCH oc.callee
         WHERE m.id = :codeMethodId
@@ -41,7 +41,7 @@ public interface MethodRepository extends JpaRepository<Method, Long> {
       SELECT DISTINCT m
       FROM Method m
       LEFT JOIN FETCH m.type dt
-      LEFT JOIN FETCH dt.openSourceRepoContent orc
+      LEFT JOIN FETCH dt.openSourceRepoFile orc
       LEFT JOIN FETCH m.ingoingCalls ic
       LEFT JOIN FETCH ic.caller
       WHERE m.id = :codeMethodId

@@ -16,7 +16,7 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
       """
             select dt
             from Type dt
-            left join dt.openSourceRepoContent orc
+            left join dt.openSourceRepoFile orc
             left join orc.openSourceRepo osr
             where osr.id = :repoId
               and dt.typeKind = :typeKind
@@ -28,7 +28,7 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
       """
             select dt
             from Type dt
-            left join dt.openSourceRepoContent orc
+            left join dt.openSourceRepoFile orc
             left join orc.openSourceRepo osr
             where osr.id = :repoId
               and dt.typeInternalName = :internalName

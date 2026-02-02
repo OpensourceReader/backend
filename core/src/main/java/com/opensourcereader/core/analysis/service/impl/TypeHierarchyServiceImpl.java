@@ -1,14 +1,17 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.TypeHierarchyService;
-import java.util.ArrayList;
-import java.util.List;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +25,10 @@ public class TypeHierarchyServiceImpl implements TypeHierarchyService {
     }
     List<Type> types = new ArrayList<>();
     for (TypeInfo typeInfo : getRepoInnerTypeInfos(typeStructureMetas)) {
-      Type type = typeRepository.findByRepoAndTypeInternalName(repoId, typeInfo.typeInternalName())
-          .orElseThrow(IllegalArgumentException::new);
+      Type type =
+          typeRepository
+              .findByRepoAndTypeInternalName(repoId, typeInfo.typeInternalName())
+              .orElseThrow(IllegalArgumentException::new);
       type.updateRelations(
           getUpperType(repoId, typeInfo.superName()), getInterfaceTypes(repoId, typeInfo));
       types.add(type);
@@ -43,7 +48,8 @@ public class TypeHierarchyServiceImpl implements TypeHierarchyService {
     if (typeName == null) {
       return null;
     }
-    return typeRepository.findByRepoAndTypeInternalName(repoId, typeName)
+    return typeRepository
+        .findByRepoAndTypeInternalName(repoId, typeName)
         .orElseThrow(IllegalArgumentException::new);
   }
 

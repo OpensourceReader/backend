@@ -1,6 +1,5 @@
 package com.opensourcereader.core.analysis.service.impl.detail;
 
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -8,11 +7,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructureMeta;
 import com.opensourcereader.core.analysis.entity.Method;
-import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.entity.Type;
 import com.opensourcereader.core.analysis.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
@@ -30,9 +29,6 @@ public class MethodCallResolver {
   private final MethodRepository methodRepository;
 
   public List<Method> create(Long repoId, List<TypeStructureMeta> typeStructureMetas) {
-    OpenSourceRepo repo =
-        openSourceRepoRepository.findById(repoId).orElseThrow(IllegalArgumentException::new);
-
     Set<Method> result = new HashSet<>();
     for (TypeStructureMeta typeStructureMeta : typeStructureMetas) {
       for (MethodStructure callerMethodStructure : typeStructureMeta.methods()) {
@@ -60,12 +56,11 @@ public class MethodCallResolver {
               typeRepository.findByRepoAndTypeInternalName(
                   repoId, calleeMethodInfo.typeInternalName());
           if (calleeType.isEmpty()) {
-            repo.addExternalMethod(calleeMethodInfo, callerMethod);
+            // 수정 바람
           }
         }
       }
     }
-    openSourceRepoRepository.save(repo);
     return methodRepository.saveAll(result);
   }
 }

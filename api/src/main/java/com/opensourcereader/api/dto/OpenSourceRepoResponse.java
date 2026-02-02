@@ -10,7 +10,7 @@ public record OpenSourceRepoResponse(
 
   public static OpenSourceRepoResponse from(OpenSourceRepo opensourceRepo) {
     List<OpenSourceRepoCreateResult> openSourceRepoCreateResults =
-        opensourceRepo.getContents().stream().map(OpenSourceRepoCreateResult::from).toList();
+        opensourceRepo.getFiles().stream().map(OpenSourceRepoCreateResult::from).toList();
     return new OpenSourceRepoResponse(openSourceRepoCreateResults);
   }
 }

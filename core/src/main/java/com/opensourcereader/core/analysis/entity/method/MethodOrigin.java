@@ -1,7 +1,7 @@
 package com.opensourcereader.core.analysis.entity.method;
 
 public enum MethodOrigin {
-  DECLARED,
+  INTERNAL_DECLARED,
   SYNTHETIC,
   INHERITED_INTERNAL,
   INHERITED_EXTERNAL,

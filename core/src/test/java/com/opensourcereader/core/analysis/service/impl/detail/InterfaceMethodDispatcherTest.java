@@ -311,7 +311,12 @@ class InterfaceMethodDispatcherTest {
                 e -> e.getCallee().getMethodName(),
                 e -> e.getCallee().getOrigin())
             .containsExactlyInAnyOrder(
-                tuple(interfaceName, methodName, implName, methodName, MethodOrigin.DECLARED));
+                tuple(
+                    interfaceName,
+                    methodName,
+                    implName,
+                    methodName,
+                    MethodOrigin.INTERNAL_DECLARED));
       }
     }
   }

@@ -1,10 +1,10 @@
 package com.opensourcereader.core.analysis.entity;
 
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.entity.method.MethodOrigin;
@@ -63,6 +63,10 @@ public class Method extends BaseEntity {
   @Column(name = "method_origin")
   private MethodOrigin origin;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "type_id")
+  private Type type;
+
   @OneToMany(
       mappedBy = "caller",
       fetch = FetchType.LAZY,
@@ -75,11 +79,7 @@ public class Method extends BaseEntity {
       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
   private final List<MethodCallEdge> ingoingCalls = new ArrayList<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "type_id")
-  private Type type;
-
-  static Method declared(MethodInfo methodInfo, Type type) {
+  static Method internalDeclared(MethodInfo methodInfo, Type type) {
     return new Method(
         type.getTypeInternalName(),
         methodInfo.methodName(),
@@ -89,7 +89,7 @@ public class Method extends BaseEntity {
         MethodSignature.of(methodInfo),
         methodInfo.startLine(),
         methodInfo.endLine(),
-        MethodOrigin.DECLARED,
+        MethodOrigin.INTERNAL_DECLARED,
         type);
   }
 
@@ -121,18 +121,22 @@ public class Method extends BaseEntity {
         childType);
   }
 
-  public static Method external(MethodCallInfo calleeMethodInfo) {
-    return new Method(
-        calleeMethodInfo.typeInternalName(),
-        calleeMethodInfo.methodName(),
-        calleeMethodInfo.descriptor().methodReturnType(),
-        calleeMethodInfo.descriptor().argumentTypes(),
-        null,
-        MethodSignature.of(calleeMethodInfo),
-        null,
-        null,
-        MethodOrigin.EXTERNAL,
-        null);
+  static List<Method> external(List<ExternalMethodInfo> externalMethodInfos, Type type) {
+    return externalMethodInfos.stream()
+        .map(
+            externalMethodInfo ->
+                new Method(
+                    externalMethodInfo.typeInternalName(),
+                    externalMethodInfo.methodName(),
+                    externalMethodInfo.descriptor().methodReturnType(),
+                    externalMethodInfo.descriptor().argumentTypes(),
+                    null,
+                    MethodSignature.of(externalMethodInfo),
+                    null,
+                    null,
+                    MethodOrigin.EXTERNAL,
+                    type))
+        .toList();
   }
 
   private Method(

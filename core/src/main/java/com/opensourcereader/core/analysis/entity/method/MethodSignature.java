@@ -3,10 +3,11 @@ package com.opensourcereader.core.analysis.entity.method;
 import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PACKAGE_SEPARATOR;
 import static com.opensourcereader.core.analysis.entity.content.ContentNameSeparators.PATH_SEPARATOR;
 
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
@@ -14,6 +15,13 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record MethodSignature(String methodSignature) {
+
+  public static MethodSignature of(ExternalMethodInfo externalMethodInfo) {
+    return of(
+        externalMethodInfo.methodName(),
+        externalMethodInfo.descriptor().argumentTypes(),
+        externalMethodInfo.descriptor().methodReturnType());
+  }
 
   public static MethodSignature of(MethodCallInfo callee) {
     return of(

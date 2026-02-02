@@ -24,8 +24,8 @@ public class OpenSourceRepoServiceImpl implements OpenSourceRepoService {
   @Override
   public OpenSourceRepo createRepo(String cloneUri, List<TypeStructure> typeStructures) {
     validateAlreadyExist(cloneUri);
-    OpenSourceRepo opensourceRepo = OpenSourceRepo.of(cloneUri, typeStructures);
-    return opensourceRepoRepository.save(opensourceRepo);
+    OpenSourceRepo openSourceRepo = OpenSourceRepo.of(cloneUri, typeStructures);
+    return opensourceRepoRepository.save(openSourceRepo);
   }
 
   @Override

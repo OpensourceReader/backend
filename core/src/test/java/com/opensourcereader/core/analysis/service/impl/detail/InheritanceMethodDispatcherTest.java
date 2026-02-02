@@ -116,7 +116,7 @@ class InheritanceMethodDispatcherTest {
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
-              tuple(parentName, methodName, childName, methodName, MethodOrigin.DECLARED));
+              tuple(parentName, methodName, childName, methodName, MethodOrigin.INTERNAL_DECLARED));
     }
   }
 

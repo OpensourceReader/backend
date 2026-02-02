@@ -1,11 +1,12 @@
 package com.opensourcereader.core.analysis.entity;
 
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
+import com.opensourcereader.core.analysis.dto.ExternalTypeStructure;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.entity.type.TypeKind;
@@ -18,6 +19,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -34,11 +36,27 @@ public class Type extends BaseEntity {
   private String typeInternalName;
 
   @Enumerated(EnumType.STRING)
+  @Column(name = "type_kind", nullable = false)
   private TypeKind typeKind;
 
   @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "super_type_id")
   private Type superType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type_origin", nullable = false)
+  private TypeOrigin typeOrigin;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "file_id", nullable = true)
+  private OpenSourceRepoFile openSourceRepoFile;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "repo_id")
+  private OpenSourceRepo openSourceRepo;
+
+  @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  private List<Method> methods;
 
   @OneToMany(
       mappedBy = "implementedType",
@@ -52,73 +70,58 @@ public class Type extends BaseEntity {
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private List<TypeImplementation> implementations;
 
-  @OneToMany(
-      mappedBy = "type",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  private List<Method> methods;
-
-  @Enumerated(EnumType.STRING)
-  private TypeOrigin typeOrigin;
-
-  @OneToOne
-  @JoinColumn(name = "repo_content_id")
-  private OpenSourceRepoContent openSourceRepoContent;
-
-  static Type internal(
+  static Type internalDeclared(
       TypeInfo typeInfo,
       List<MethodInfo> methodInfos,
-      OpenSourceRepoContent openSourceRepoContent) {
+      OpenSourceRepoFile openSourceRepoFile,
+      OpenSourceRepo openSourceRepo) {
     if (typeInfo == null) {
       return null;
     }
-    return new Type(typeInfo, methodInfos, TypeOrigin.INTERNAL, openSourceRepoContent);
+    return new Type(typeInfo, methodInfos, TypeOrigin.INTERNAL, openSourceRepoFile, openSourceRepo);
   }
 
-  // 이게 말이 되는 거냐... 여기서 상태변경을 해준다는게
-  static Type external(
-      MethodCallInfo calleeMethodInfo, Method caller, OpenSourceRepoContent openSourceRepoContent) {
-    Method externalCallee = Method.external(calleeMethodInfo);
-    externalCallee.addIngoingCall(caller);
+  static Type external(ExternalTypeStructure externalTypeStructure, OpenSourceRepo openSourceRepo) {
     return new Type(
-        calleeMethodInfo.typeInternalName(),
+        externalTypeStructure.externalTypeInfo().typeInternalName(),
         null,
         TypeOrigin.EXTERNAL,
-        openSourceRepoContent,
-        new ArrayList<>(List.of(externalCallee)));
-  }
-
-  static Type external(String typeInternalName, OpenSourceRepoContent openSourceRepoContent) {
-    return new Type(typeInternalName, null, TypeOrigin.EXTERNAL, openSourceRepoContent, null);
+        null,
+        openSourceRepo,
+        externalTypeStructure.externalMethodInfos());
   }
 
   private Type(
       String typeInternalName,
       TypeKind typeKind,
       TypeOrigin typeOrigin,
-      OpenSourceRepoContent openSourceRepoContent,
-      List<Method> methods) {
+      OpenSourceRepoFile openSourceRepoFile,
+      OpenSourceRepo openSourceRepo,
+      List<ExternalMethodInfo> externalMethodInfos) {
     this.typeInternalName = typeInternalName;
     this.typeKind = typeKind;
     this.typeOrigin = typeOrigin;
-    this.openSourceRepoContent = openSourceRepoContent;
-    this.methods = methods;
+    this.openSourceRepoFile = openSourceRepoFile;
+    this.methods = Method.external(externalMethodInfos, this);
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
+    this.openSourceRepo = openSourceRepo;
   }
 
   private Type(
       TypeInfo typeInfo,
       List<MethodInfo> methodInfos,
       TypeOrigin typeOrigin,
-      OpenSourceRepoContent openSourceRepoContent) {
+      OpenSourceRepoFile openSourceRepoFile,
+      OpenSourceRepo openSourceRepo) {
     this.typeInternalName = extractedTypeName(typeInfo);
     this.typeKind = typeInfo.typeKind();
     this.typeOrigin = typeOrigin;
-    this.openSourceRepoContent = openSourceRepoContent;
+    this.openSourceRepoFile = openSourceRepoFile;
+    this.methods = getInternalMethods(methodInfos);
+    this.openSourceRepo = openSourceRepo;
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
-    this.methods = getCodeMethods(methodInfos);
   }
 
   private String extractedTypeName(TypeInfo typeInfo) {
@@ -128,9 +131,9 @@ public class Type extends BaseEntity {
     return typeInfo.typeInternalName();
   }
 
-  private List<Method> getCodeMethods(List<MethodInfo> methodInfos) {
+  private List<Method> getInternalMethods(List<MethodInfo> methodInfos) {
     return methodInfos.stream()
-        .map(methodInfo -> Method.declared(methodInfo, this))
+        .map(methodInfo -> Method.internalDeclared(methodInfo, this))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -230,11 +233,11 @@ public class Type extends BaseEntity {
     }
     return Objects.equals(typeInternalName, that.typeInternalName)
         && typeOrigin == that.typeOrigin
-        && Objects.equals(openSourceRepoContent, that.openSourceRepoContent);
+        && Objects.equals(openSourceRepo, that.openSourceRepo);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(typeInternalName, typeOrigin, openSourceRepoContent);
+    return Objects.hash(typeInternalName, typeOrigin, openSourceRepo);
   }
 }

@@ -6,7 +6,7 @@ import com.opensourcereader.core.analysis.entity.content.OpenSourceRepoContentNa
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class OpenSourceRepoContentNameTest {
+class OpenSourceRepoFileNameTest {
 
   @DisplayName("Path로 부터 이름을 추출합니다.")
   @Test

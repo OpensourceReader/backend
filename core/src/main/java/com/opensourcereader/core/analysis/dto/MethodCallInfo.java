@@ -9,13 +9,13 @@ public record MethodCallInfo(
 
   public static MethodCallInfo of(
       int opcode,
-      String calleeOwnerClassName,
+      String calleeTypeName,
       String calleeMethodName,
       String calleeDescriptor,
       boolean isInterface) {
     return new MethodCallInfo(
         opcode,
-        calleeOwnerClassName,
+        calleeTypeName,
         calleeMethodName,
         MethodDescriptor.from(calleeDescriptor),
         isInterface);

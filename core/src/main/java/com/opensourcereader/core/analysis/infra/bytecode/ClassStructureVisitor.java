@@ -6,8 +6,8 @@ import java.util.List;
 import aj.org.objectweb.asm.ClassVisitor;
 import aj.org.objectweb.asm.MethodVisitor;
 import aj.org.objectweb.asm.Opcodes;
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.dto.TypeStructureMeta.MethodCallInfo;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeMethodStructure;
 
