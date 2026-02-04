@@ -1,10 +1,10 @@
-package com.opensourcereader.core.analysis.domain.entity;
+package com.opensourcereader.core.analysis.domain.entity.factory;
 
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 

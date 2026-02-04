@@ -37,7 +37,7 @@ public class OpenSourceRepo extends BaseEntity {
   @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
   private List<Type> types = new ArrayList<>();
 
-  static OpenSourceRepo create(
+  public static OpenSourceRepo create(
       String cloneUrl,
       List<TypeStructure> typeStructures,
       ExternalTypeStructureFactory externalTypeStructureFactory) {

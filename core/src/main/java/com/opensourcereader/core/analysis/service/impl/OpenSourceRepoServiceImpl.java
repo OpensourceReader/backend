@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.service.methodcall.MethodCallGraphBuilder;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;

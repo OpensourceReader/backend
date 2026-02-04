@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.opensourcereader.core.analysis.domain.entity.Method;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;

@@ -8,7 +8,6 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.domain.entity.Method;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;

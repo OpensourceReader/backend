@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;

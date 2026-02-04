@@ -11,7 +11,7 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
