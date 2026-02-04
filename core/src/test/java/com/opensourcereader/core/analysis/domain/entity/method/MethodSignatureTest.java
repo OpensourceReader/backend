@@ -1,7 +1,5 @@
-package com.opensourcereader.core.analysis.entity.method;
+package com.opensourcereader.core.analysis.domain.entity.method;
 
-import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
-import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,7 +22,7 @@ class MethodSignatureTest {
     // given
     MethodInfo methodExtractResult =
         new MethodInfo(
-            "typeInternalName",
+            "calleeTypeInternalName",
             "methodName",
             EnumSet.noneOf(MethodModifier.class),
             MethodDescriptor.from(descriptor),
@@ -34,7 +32,7 @@ class MethodSignatureTest {
             null);
 
     // when
-    MethodSignature methodSignature = MethodSignature.of(methodExtractResult);
+    MethodSignature methodSignature = MethodSignature.from(methodExtractResult);
 
     // then
     Assertions.assertThat(methodSignature.methodSignature()).isEqualTo(expectedSignature);

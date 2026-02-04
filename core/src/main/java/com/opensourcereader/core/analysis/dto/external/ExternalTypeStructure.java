@@ -1,10 +1,12 @@
-package com.opensourcereader.core.analysis.dto;
+package com.opensourcereader.core.analysis.dto.external;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 
 public record ExternalTypeStructure(
     ExternalTypeInfo externalTypeInfo, List<ExternalMethodInfo> externalMethodInfos) {
@@ -37,10 +39,11 @@ public record ExternalTypeStructure(
   }
 
   private static ExternalMethoCallStructure fromMethodCall(MethodCallInfo externalMethodCall) {
-    ExternalTypeInfo externalTypeInfo = new ExternalTypeInfo(externalMethodCall.typeInternalName());
+    ExternalTypeInfo externalTypeInfo =
+        new ExternalTypeInfo(externalMethodCall.calleeTypeInternalName());
     ExternalMethodInfo externalMethodInfo =
         new ExternalMethodInfo(
-            externalMethodCall.typeInternalName(),
+            externalMethodCall.calleeTypeInternalName(),
             externalMethodCall.methodName(),
             externalMethodCall.descriptor());
     return new ExternalMethoCallStructure(externalTypeInfo, externalMethodInfo);

@@ -36,7 +36,7 @@ class ByteCodeTypeStructureMetaExtractorTest {
                         callee ->
                             tuple(
                                 ms.byteCodeDeclaredMethodInfo().className(),
-                                callee.typeInternalName(),
+                                callee.calleeTypeInternalName(),
                                 callee.methodName(),
                                 callee.descriptor().methodReturnType(),
                                 callee.descriptor().argumentTypes())))

@@ -11,7 +11,7 @@ public record MethodStructure(MethodInfo methodInfo, List<MethodCallInfo> callee
   public static MethodStructure of(
       ByteCodeMethodStructure byteCodeMethodStructure, ParsedSourceFile parsedSourceFile) {
     MethodSignature signature =
-        MethodSignature.of(byteCodeMethodStructure.byteCodeDeclaredMethodInfo());
+        MethodSignature.from(byteCodeMethodStructure.byteCodeDeclaredMethodInfo());
     MethodInfo methodInfo =
         MethodInfo.of(
             byteCodeMethodStructure.byteCodeDeclaredMethodInfo(),

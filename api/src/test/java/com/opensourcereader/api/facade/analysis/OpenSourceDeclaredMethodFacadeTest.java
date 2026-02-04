@@ -105,11 +105,11 @@
 //  }
 //
 //  private OpenSourceRepoContent saveContent(
-//      OpenSourceRepo repo, String typeInternalName, String rawText) {
-//    ClassInfo classInfo = new ClassInfo(1, 1, typeInternalName, "", "java/lang/Object",
+//      OpenSourceRepo repo, String calleeTypeInternalName, String rawText) {
+//    ClassInfo classInfo = new ClassInfo(1, 1, calleeTypeInternalName, "", "java/lang/Object",
 // List.of());
 //    ClassStructure classStructure = new ClassStructure(classInfo, List.of());
-//    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(typeInternalName + ".java", "1",
+//    OpenSourceFileInfo fileInfo = new OpenSourceFileInfo(calleeTypeInternalName + ".java", "1",
 // rawText);
 //
 //    return openSourceContentRepository.save(
@@ -136,10 +136,12 @@
 //    return codeMethodRepository.save(DeclaredMethod.internal(extract, content));
 //  }
 //
-//  private DeclaredMethod saveExternalMethod(String typeInternalName, String methodName, String
+//  private DeclaredMethod saveExternalMethod(String calleeTypeInternalName, String methodName,
+// String
 // descriptor) {
 //    MethodCallInfo callInfo =
-//        new MethodCallInfo(184, typeInternalName, methodName, MethodDescriptor.from(descriptor),
+//        new MethodCallInfo(184, calleeTypeInternalName, methodName,
+// MethodDescriptor.from(descriptor),
 // false);
 //    CodeMethodSignature sig =
 //        CodeMethodSignature.of(

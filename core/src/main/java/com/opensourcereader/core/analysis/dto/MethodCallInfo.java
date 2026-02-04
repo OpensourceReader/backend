@@ -2,7 +2,7 @@ package com.opensourcereader.core.analysis.dto;
 
 public record MethodCallInfo(
     int operationCode,
-    String typeInternalName,
+    String calleeTypeInternalName,
     String methodName,
     MethodDescriptor descriptor,
     boolean isInterface) {

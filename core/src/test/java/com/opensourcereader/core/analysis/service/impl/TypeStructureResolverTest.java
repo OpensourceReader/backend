@@ -8,14 +8,14 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.MethodStructure;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
-import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.dto.MethodDescriptor;
+import com.opensourcereader.core.analysis.dto.MethodStructure;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeMethodStructure;
@@ -83,7 +83,7 @@ class TypeStructureResolverTest {
             12);
     ParsedSourceFile parsedFile =
         new ParsedSourceFile(
-            typeInternalName, Map.of(MethodSignature.of(parseResult), parseResult));
+            typeInternalName, Map.of(MethodSignature.from(parseResult), parseResult));
     Map<String, ByteCodeClassStructure> bytecodes =
         getByteCodeClassStructure(typeInternalName, methodInternalName);
 

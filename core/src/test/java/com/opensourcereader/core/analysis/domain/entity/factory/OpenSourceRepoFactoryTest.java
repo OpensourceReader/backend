@@ -1,33 +1,38 @@
-package com.opensourcereader.core.analysis.entity;
+package com.opensourcereader.core.analysis.domain.entity.factory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import com.opensourcereader.core.analysis.domain.entity.Method;
-import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.Type;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
+import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
 import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
-import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class OpenSourceRepoTest {
+class OpenSourceRepoFactoryTest {
+
+  OpenSourceRepoFactory openSourceRepoFactory =
+      new OpenSourceRepoFactory(new InheritanceLinker(), new ExternalTypeStructureFactory());
 
   private static final int INVOKE_INTERFACE = 185;
 
   @Test
   @DisplayName("internalDeclared된 TypeMethod는 TypeStructure를 기반으로 파일과 타입을 생성한다")
-  void of_should_create_files_and_types() {
+  void create_should_create_files_and_types() {
     // given
     String typeInternalName = "com/example/A";
     TypeInfo typeInfo = new TypeInfo(9, TypeKind.CLASS, typeInternalName, null, null, List.of());
@@ -50,7 +55,8 @@ class OpenSourceRepoTest {
         new TypeStructure("src/A.java", null, "", typeInfo, List.of(methodStructure));
 
     // when
-    OpenSourceRepo repo = OpenSourceRepo.of("https://github.com/test/repo", List.of(typeStructure));
+    OpenSourceRepo repo =
+        openSourceRepoFactory.create("https://github.com/test/repo", List.of(typeStructure));
 
     // then
     assertThat(repo.getFiles()).hasSize(1);
@@ -88,7 +94,7 @@ class OpenSourceRepoTest {
         new TypeStructure("A.java", null, "", typeInfo, List.of(methodStructure));
 
     // when
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(typeStructure));
+    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(typeStructure));
 
     // then
     assertThat(repo.getTypes())
@@ -123,7 +129,8 @@ class OpenSourceRepoTest {
             new TypeInfo(9, TypeKind.CLASS, child, parent, null, List.of()),
             List.of());
 
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(parentStructure, childStructure));
+    OpenSourceRepo repo =
+        openSourceRepoFactory.create("url", List.of(parentStructure, childStructure));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName, Type::getTypeOrigin)
@@ -169,7 +176,7 @@ class OpenSourceRepoTest {
             new TypeInfo(9, TypeKind.CLASS, internalB, null, null, List.of()),
             List.of());
 
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(structureA, structureB));
+    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structureA, structureB));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName)
@@ -204,7 +211,7 @@ class OpenSourceRepoTest {
     TypeStructure structure =
         new TypeStructure("A.java", null, "", typeInfo, List.of(methodStructure));
 
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
 
     List<Type> externals =
         repo.getTypes().stream().filter(t -> t.getTypeInternalName().equals(external)).toList();
@@ -251,7 +258,7 @@ class OpenSourceRepoTest {
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()
@@ -297,7 +304,7 @@ class OpenSourceRepoTest {
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = OpenSourceRepo.of("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()

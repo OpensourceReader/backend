@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
-import com.opensourcereader.core.analysis.dto.ExternalTypeStructure;
-import com.opensourcereader.core.analysis.dto.MethodInfo;
-import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
+import com.opensourcereader.core.analysis.dto.TypeInfo;
+import com.opensourcereader.core.analysis.dto.external.ExternalMethodInfo;
+import com.opensourcereader.core.analysis.dto.external.ExternalTypeStructure;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -39,7 +40,7 @@ public class Type extends BaseEntity {
   @Column(name = "type_kind", nullable = false)
   private TypeKind typeKind;
 
-  @OneToOne(cascade = CascadeType.MERGE)
+  @OneToOne
   @JoinColumn(name = "super_type_id")
   private Type superType;
 
@@ -58,16 +59,10 @@ public class Type extends BaseEntity {
   @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<Method> methods;
 
-  @OneToMany(
-      mappedBy = "implementedType",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @OneToMany(mappedBy = "implementedType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<TypeImplementation> implementedInterfaces;
 
-  @OneToMany(
-      mappedBy = "interfaceType",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @OneToMany(mappedBy = "interfaceType", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private List<TypeImplementation> implementations;
 
   static Type internalDeclared(
@@ -135,6 +130,19 @@ public class Type extends BaseEntity {
     return methodInfos.stream()
         .map(methodInfo -> Method.internalDeclared(methodInfo, this))
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  public void addExternalInheritanceMethod(
+      MethodCallInfo methodCallInfo, Method callerMethod, Type type) {
+    if (methodCallInfo == null) {
+      return;
+    }
+    Method externalInheritedMethod = Method.inheritedExternal(methodCallInfo, type);
+    if (methods.contains(externalInheritedMethod)) {
+      return;
+    }
+    methods.add(externalInheritedMethod);
+    callerMethod.addOutgoingCall(externalInheritedMethod);
   }
 
   public void addImplementationVirtualMethod(Method interfaceMethod) {
@@ -224,6 +232,10 @@ public class Type extends BaseEntity {
       return false;
     }
     return this.typeOrigin.equals(TypeOrigin.INTERNAL);
+  }
+
+  public boolean isSameTypeKind(TypeKind kind) {
+    return this.getTypeKind().equals(kind);
   }
 
   @Override

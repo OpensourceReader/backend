@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 
 public record ByteCodeDeclaredMethodInfo(
     String className,

@@ -36,7 +36,7 @@ public class SourceFileParser {
         sourceCodeParser.extractCodeMethods(file.rawText()).stream()
             .collect(
                 Collectors.toMap(
-                    MethodSignature::of, r -> r, (a, b) -> a // 충돌 정책(원하면 throw로 바꿔도 됨)
+                    MethodSignature::from, r -> r, (a, b) -> a // 충돌 정책(원하면 throw로 바꿔도 됨)
                     ));
 
     return new ParsedSourceFile(classInternalName, methodsBySignature);

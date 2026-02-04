@@ -4,25 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.opensourcereader.core.analysis.domain.entity.Method;
 
 public interface MethodRepository extends JpaRepository<Method, Long> {
-
-  @Query(
-      """
-          SELECT m
-          FROM Method m
-          WHERE m.type.openSourceRepoFile.openSourceRepo.id = :repoId
-              AND m.type.typeInternalName = :typeInternalName
-              AND m.methodSignature.methodSignature = :methodSignature
-
-          """)
-  Optional<Method> findMethod(
-      @Param("repoId") Long repoId,
-      @Param("typeInternalName") String typeInternalName,
-      @Param("methodSignature") String methodSignature);
 
   @Query(
       """

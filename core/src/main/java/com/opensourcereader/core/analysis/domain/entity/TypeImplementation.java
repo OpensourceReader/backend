@@ -1,7 +1,6 @@
 package com.opensourcereader.core.analysis.domain.entity;
 
 import com.opensourcereader.core.shared.BaseEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -16,15 +15,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TypeImplementation extends BaseEntity {
 
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "implemented_type_id")
   private Type implementedType;
 
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "interface_type_id")
   private Type interfaceType;
 

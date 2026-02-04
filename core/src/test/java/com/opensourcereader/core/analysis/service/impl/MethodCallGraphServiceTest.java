@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.service.impl.detail;
+package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -9,17 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.opensourcereader.core.analysis.dto.MethodDescriptor;
-import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.domain.entity.Method;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.dto.MethodDescriptor;
+import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.repository.MethodRepository;
 import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
 import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.MethodCallGraphService;
-import com.opensourcereader.core.analysis.testfixture.TestRepoFixtures;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 class MethodCallGraphServiceTest {
 
+  @Autowired OpenSourceRepoFactory openSourceRepoFactory;
   @Autowired MethodCallGraphService methodCallGraphService;
   @Autowired TypeRepository typeRepository;
   @Autowired MethodRepository methodRepository;
@@ -47,32 +47,18 @@ class MethodCallGraphServiceTest {
 
     // 메서드 하나씩 해서 선언을 가능함
     TypeStructure callerType =
-        TestTypeFixtures.createTypeWithMethod(
-            "caller",
-            RepoEntryType.FILE,
-            callerTypeName,
-            callerMethodName,
-            methodDescriptor,
-            TypeKind.CLASS);
+        TestTypeFixtures.createTypeStructureWithMethod(
+            callerTypeName, null, null, callerMethodName, methodDescriptor, TypeKind.CLASS);
     TypeStructure targetType =
-        TestTypeFixtures.createTypeWithMethod(
-            "caller",
-            RepoEntryType.FILE,
-            targetTypeName,
-            targetMethodName,
-            methodDescriptor,
-            TypeKind.CLASS);
+        TestTypeFixtures.createTypeStructureWithMethod(
+            targetTypeName, null, null, targetMethodName, methodDescriptor, TypeKind.CLASS);
     TypeStructure calleeType =
-        TestTypeFixtures.createTypeWithMethod(
-            "caller",
-            RepoEntryType.FILE,
-            calleeTypeName,
-            calleeMethodName,
-            methodDescriptor,
-            TypeKind.CLASS);
+        TestTypeFixtures.createTypeStructureWithMethod(
+            calleeTypeName, null, null, calleeMethodName, methodDescriptor, TypeKind.CLASS);
     OpenSourceRepo repo =
-        TestRepoFixtures.saveRepo(
-            openSourceRepoRepository, "new-cloneUrl", List.of(callerType, targetType, calleeType));
+        openSourceRepoRepository.save(
+            openSourceRepoFactory.create(
+                "new-cloneUrl", List.of(callerType, targetType, calleeType)));
 
     Method callerMethod =
         typeRepository

@@ -1,48 +1,38 @@
-package com.opensourcereader.core.analysis.domain.service;
+package com.opensourcereader.core.analysis.domain.service.methodcall;
 
-import com.opensourcereader.core.analysis.domain.entity.Method;
-import com.opensourcereader.core.analysis.domain.entity.Type;
-import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import com.opensourcereader.core.analysis.domain.entity.Method;
+import com.opensourcereader.core.analysis.domain.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.repository.MethodRepository;
-import com.opensourcereader.core.analysis.repository.TypeRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class InterfaceMethodDispatcher {
 
   private final TypeGraphValidator typeGraphValidator;
-  private final MethodRepository methodRepository;
-  private final TypeRepository typeRepository;
 
-  public List<Method> connectInterfaceImplementations(Long repoId) {
-    List<Type> interfaces = typeRepository.findByRepoAndTypesByKind(repoId, TypeKind.INTERFACE);
+  public void connectInterfaceImplementations(List<Type> types) {
+    List<Type> interfaces =
+        types.stream().filter(type -> type.isSameTypeKind(TypeKind.INTERFACE)).toList();
 
-    Set<Method> result = new HashSet<>();
     for (Type interfaceType : interfaces) {
-      typeGraphValidator.validateCyclic(interfaceType);
-      result.addAll(connectMethodsToImplementation(interfaceType));
+      connectMethodsToImplementation(interfaceType);
     }
-
-    return methodRepository.saveAll(result);
   }
 
-  private List<Method> connectMethodsToImplementation(Type interfaceType) {
-    List<Method> result = new ArrayList<>();
+  private void connectMethodsToImplementation(Type interfaceType) {
+    typeGraphValidator.validateCyclic(interfaceType);
     Queue<Type> queue = new LinkedList<>();
     queue.add(interfaceType);
 
@@ -57,10 +47,8 @@ public class InterfaceMethodDispatcher {
             Method implMethod = implTypeMethods.get(interfaceTypeMethod.getMethodSignature());
             if (implMethod == null) {
               implType.addImplementationVirtualMethod(interfaceTypeMethod);
-              typeRepository.save(implType);
             }
             interfaceTypeMethod.addOutgoingCall(implMethod);
-            result.add(interfaceTypeMethod);
           }
           if (implType.getTypeKind().equals(TypeKind.INTERFACE)) {
             queue.add(implType);
@@ -68,8 +56,6 @@ public class InterfaceMethodDispatcher {
         }
       }
     }
-
-    return result;
   }
 
   private Map<MethodSignature, Method> indexMethodsBySignature(Type implementationType) {

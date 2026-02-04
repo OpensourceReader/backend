@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.opensourcereader.core.analysis.dto.ExternalMethodInfo;
-import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
+import com.opensourcereader.core.analysis.dto.MethodCallInfo;
+import com.opensourcereader.core.analysis.dto.MethodInfo;
+import com.opensourcereader.core.analysis.dto.external.ExternalMethodInfo;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -86,7 +87,7 @@ public class Method extends BaseEntity {
         methodInfo.methodDescriptor().methodReturnType(),
         methodInfo.methodDescriptor().argumentTypes(),
         methodInfo.methodModifiers().stream().toList(),
-        MethodSignature.of(methodInfo),
+        MethodSignature.from(methodInfo),
         methodInfo.startLine(),
         methodInfo.endLine(),
         MethodOrigin.INTERNAL_DECLARED,
@@ -103,8 +104,22 @@ public class Method extends BaseEntity {
         interfaceMethod.getMethodSignature(),
         null,
         null,
-        MethodOrigin.INHERITED_INTERNAL,
+        MethodOrigin.INTERNAL_INHERITED_VIRTUAL,
         implType);
+  }
+
+  static Method inheritedExternal(MethodCallInfo methodCallInfo, Type childType) {
+    return new Method(
+        childType.getTypeInternalName(),
+        methodCallInfo.methodName(),
+        methodCallInfo.descriptor().methodReturnType(),
+        methodCallInfo.descriptor().argumentTypes(),
+        null,
+        MethodSignature.from(methodCallInfo),
+        null,
+        null,
+        MethodOrigin.EXTERNAL_INHERITED_VIRTUAL,
+        childType);
   }
 
   static Method inheritedExternal(Method superMethod, Type childType) {
@@ -117,7 +132,7 @@ public class Method extends BaseEntity {
         superMethod.getMethodSignature(),
         null,
         null,
-        MethodOrigin.INHERITED_EXTERNAL,
+        MethodOrigin.EXTERNAL_INHERITED_VIRTUAL,
         childType);
   }
 
@@ -131,7 +146,7 @@ public class Method extends BaseEntity {
                     externalMethodInfo.descriptor().methodReturnType(),
                     externalMethodInfo.descriptor().argumentTypes(),
                     null,
-                    MethodSignature.of(externalMethodInfo),
+                    MethodSignature.from(externalMethodInfo),
                     null,
                     null,
                     MethodOrigin.EXTERNAL,

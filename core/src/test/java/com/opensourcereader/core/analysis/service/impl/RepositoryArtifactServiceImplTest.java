@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.infra.bytecode.BytecodeClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.gitrepo.GitRepositoryLoadResult;
