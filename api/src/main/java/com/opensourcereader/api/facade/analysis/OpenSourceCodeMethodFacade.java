@@ -26,7 +26,7 @@ public class OpenSourceCodeMethodFacade {
 
     return new CodeMethodResponse(
         method.getId(),
-        method.getTypeInternalName(),
+        method.getType().getTypeInternalName(),
         method.getMethodName(),
         extractRawText(method),
         method.getStartLine(),

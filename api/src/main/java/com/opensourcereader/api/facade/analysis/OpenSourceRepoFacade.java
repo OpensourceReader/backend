@@ -9,7 +9,6 @@ import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
-import com.opensourcereader.core.analysis.util.FileUtil;
 import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -29,14 +28,15 @@ public class OpenSourceRepoFacade {
 
   @Transactional
   public OpenSourceRepoResponse createRepo(OpenSourceRepoCreateRequest request) {
-    RepositoryArtifact artifact =
+    try (RepositoryArtifact artifact =
         repositoryArtifactService.create(
-            request.openSourceUri(), request.reference(), localClonePath, workingTreeDirName);
-    OpenSourceRepo openSourceRepo =
-        opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
+            request.openSourceUri(), request.reference(), localClonePath, workingTreeDirName)) {
 
-    FileUtil.removeDirectory(artifact.savedLocalRepoPath());
-    return OpenSourceRepoResponse.from(openSourceRepo);
+      OpenSourceRepo openSourceRepo =
+          opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
+
+      return OpenSourceRepoResponse.from(openSourceRepo);
+    }
   }
 
   @Transactional

@@ -10,8 +10,8 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
@@ -56,9 +56,9 @@ class InheritanceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
@@ -94,9 +94,9 @@ class InheritanceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
@@ -139,9 +139,9 @@ class InheritanceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(

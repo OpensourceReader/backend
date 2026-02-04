@@ -14,9 +14,12 @@ import com.opensourcereader.core.analysis.infra.dto.gitrepo.GitRepositoryLoadRes
 import com.opensourcereader.core.analysis.infra.git.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.infra.parser.SourceFileParser;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
+import com.opensourcereader.core.analysis.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RepositoryArtifactServiceImpl implements RepositoryArtifactService {
@@ -29,12 +32,26 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
   @Override
   public RepositoryArtifact create(
       String openSourceUri, String reference, String localClonePath, String workingTreeDirName) {
-    GitRepositoryLoadResult gitRepoLoadResult =
-        gitRepositoryLoader.downloadGitRepo(openSourceUri, reference, localClonePath);
-    List<TypeStructure> structureWithSources =
-        createTypeStructures(gitRepoLoadResult, reference, workingTreeDirName);
+    GitRepositoryLoadResult gitRepoLoadResult = null;
+    try {
+      gitRepoLoadResult =
+          gitRepositoryLoader.downloadGitRepo(openSourceUri, reference, localClonePath);
+      List<TypeStructure> structureWithSources =
+          createTypeStructures(gitRepoLoadResult, reference, workingTreeDirName);
 
-    return new RepositoryArtifact(gitRepoLoadResult.savedLocalRepoPath(), structureWithSources);
+      return new RepositoryArtifact(gitRepoLoadResult.savedLocalRepoPath(), structureWithSources);
+
+    } catch (Exception e) {
+      if (gitRepoLoadResult != null && gitRepoLoadResult.savedLocalRepoPath() != null) {
+        try {
+          FileUtil.removeDirectory(gitRepoLoadResult.savedLocalRepoPath());
+        } catch (Exception cleanupEx) {
+          log.warn("임시 레포 디렉토리 정리 실패: {}", gitRepoLoadResult.savedLocalRepoPath(), cleanupEx);
+        }
+      }
+
+      throw e;
+    }
   }
 
   private List<TypeStructure> createTypeStructures(
@@ -46,7 +63,7 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
             .collect(Collectors.toMap(bcs -> bcs.typeInfo().typeInternalName(), bcs -> bcs));
 
     return gitRepoLoadResult.files().stream()
-        .filter(sourceFile -> sourceFile.repoEntryType().isSupported())
+        .filter(sourceFile -> sourceFile.repoFileType().isSupported())
         .map(
             sourceFile ->
                 typeStructureResolver.resolve(

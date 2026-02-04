@@ -1,14 +1,13 @@
 package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
@@ -35,7 +34,7 @@ class TypeStructureResolverTest {
     // given
     OpenSourceFileInfo sourceFile =
         new OpenSourceFileInfo(
-            Path.of("/tmp/repo/A.java").toString(), RepoEntryType.FILE, "class A {}");
+            Path.of("/tmp/repo/A.java").toString(), RepoFileType.FILE, "class A {}");
 
     // when
     TypeStructure result = resolver.resolve(sourceFile, null, Map.of());
@@ -47,18 +46,22 @@ class TypeStructureResolverTest {
   }
 
   @Test
-  @DisplayName("parsedFile 결과와 매칭되는 bytecode 구조가 없으면 예외처리한다")
-  void resolve_throws_whenBytecodeNotFound() {
+  @DisplayName("parsedFile과 매칭되는 bytecode가 없으면 빈 TypeStructure를 반환한다")
+  void resolve_returnsEmptyTypeStructure_whenBytecodeNotFound() {
     // given
     OpenSourceFileInfo sourceFile =
         new OpenSourceFileInfo(
-            Path.of("/tmp/repo/A.java").toString(), RepoEntryType.FILE, "class A {}");
+            Path.of("/tmp/repo/A.java").toString(), RepoFileType.FILE, "class A {}");
 
     ParsedSourceFile parsedFile = new ParsedSourceFile("com/example/A", Map.of());
 
-    // when & then
-    assertThatThrownBy(() -> resolver.resolve(sourceFile, parsedFile, Map.of()))
-        .isInstanceOf(IllegalStateException.class);
+    // when
+    TypeStructure result = resolver.resolve(sourceFile, parsedFile, Map.of());
+
+    // then
+    assertThat(result).isNotNull();
+    assertThat(result.typeInfo()).isNull();
+    assertThat(result.methods()).isNull();
   }
 
   @Test
@@ -68,7 +71,7 @@ class TypeStructureResolverTest {
     OpenSourceFileInfo sourceFile =
         new OpenSourceFileInfo(
             Path.of("/tmp/repo/A.java").toString(),
-            RepoEntryType.FILE,
+            RepoFileType.FILE,
             "class A { String hello(){} }");
 
     String typeInternalName = "com/example/A";

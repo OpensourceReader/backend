@@ -12,7 +12,9 @@ import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.ParsedSourceFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TypeStructureResolver {
@@ -22,12 +24,13 @@ public class TypeStructureResolver {
       OpenSourceFileInfo sourceFile,
       ParsedSourceFile parsedFile,
       Map<String, ByteCodeClassStructure> byteCodeStructures) {
-    if (parsedFile == null) {
+    if (parsedFile == null || parsedFile.typeInternalName() == null) {
       return TypeStructure.of(sourceFile, null, null);
     }
     ByteCodeClassStructure structure = byteCodeStructures.get(parsedFile.typeInternalName());
     if (structure == null) {
-      throw new IllegalStateException();
+      log.debug("No bytecode found for {}", parsedFile.typeInternalName());
+      return TypeStructure.of(sourceFile, null, null);
     }
     return TypeStructure.of(
         sourceFile, structure.typeInfo(), resolveMethods(structure, parsedFile));

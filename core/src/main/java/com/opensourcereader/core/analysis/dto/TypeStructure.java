@@ -2,12 +2,12 @@ package com.opensourcereader.core.analysis.dto;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 
 public record TypeStructure(
     String path,
-    RepoEntryType repoEntryType,
+    RepoFileType repoFileType,
     String rawText,
     TypeInfo typeInfo,
     List<MethodStructure> methods) {
@@ -15,6 +15,6 @@ public record TypeStructure(
   public static TypeStructure of(
       OpenSourceFileInfo sourFile, TypeInfo typeInfo, List<MethodStructure> methods) {
     return new TypeStructure(
-        sourFile.path(), sourFile.repoEntryType(), sourFile.rawText(), typeInfo, methods);
+        sourFile.path(), sourFile.repoFileType(), sourFile.rawText(), typeInfo, methods);
   }
 }

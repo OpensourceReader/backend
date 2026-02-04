@@ -23,6 +23,6 @@ public record CodeMethodSummary(Long id, String classInternalName, String method
 
   public static CodeMethodSummary from(Method method) {
     return new CodeMethodSummary(
-        method.getId(), method.getTypeInternalName(), method.getMethodName());
+        method.getId(), method.getType().getTypeInternalName(), method.getMethodName());
   }
 }

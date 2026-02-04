@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Objects;
 
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
@@ -28,7 +28,7 @@ class InheritanceLinkerTest {
   private TypeStructure toTypeStructureWithoutMethod(
       String className, String superName, List<String> interfaceNames) {
     TypeInfo typeInfo = new TypeInfo(0, TypeKind.CLASS, className, null, superName, interfaceNames);
-    return new TypeStructure(className + "path", RepoEntryType.FILE, null, typeInfo, List.of());
+    return new TypeStructure(className + "path", RepoFileType.FILE, null, typeInfo, List.of());
   }
 
   @Test

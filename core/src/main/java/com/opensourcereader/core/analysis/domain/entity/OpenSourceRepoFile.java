@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.opensourcereader.core.analysis.domain.entity.file.Extension;
 import com.opensourcereader.core.analysis.domain.entity.file.OpenSourceRepoFileName;
 import com.opensourcereader.core.analysis.domain.entity.file.OpenSourceRepoFileOrigin;
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.Column;
@@ -35,8 +35,8 @@ public class OpenSourceRepoFile extends BaseEntity {
   private OpenSourceRepoFileName name;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "repo_entry_type", nullable = false)
-  private RepoEntryType repoEntryType;
+  @Column(name = "repo_file_type", nullable = false)
+  private RepoFileType repoFileType;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "extension")
@@ -51,14 +51,14 @@ public class OpenSourceRepoFile extends BaseEntity {
   private OpenSourceRepoFileOrigin origin;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "opensource_repository_id", nullable = false)
+  @JoinColumn(name = "opensource_repo_id", nullable = false)
   private OpenSourceRepo openSourceRepo;
 
   static OpenSourceRepoFile internalDeclared(
       TypeStructure typeStructure, OpenSourceRepo openSourceRepo) {
     return new OpenSourceRepoFile(
         typeStructure.path(),
-        typeStructure.repoEntryType(),
+        typeStructure.repoFileType(),
         OpenSourceRepoFileOrigin.INTERNAL,
         typeStructure.rawText(),
         openSourceRepo);
@@ -66,7 +66,7 @@ public class OpenSourceRepoFile extends BaseEntity {
 
   private OpenSourceRepoFile(
       String path,
-      RepoEntryType repoEntryType,
+      RepoFileType repoFileType,
       OpenSourceRepoFileOrigin origin,
       String rawText,
       OpenSourceRepo openSourceRepo) {
@@ -74,7 +74,7 @@ public class OpenSourceRepoFile extends BaseEntity {
     this.extension = Extension.resolveExtension(path);
     this.name = OpenSourceRepoFileName.from(path);
     this.origin = origin;
-    this.repoEntryType = repoEntryType;
+    this.repoFileType = repoFileType;
     this.rawText = rawText;
     this.openSourceRepo = openSourceRepo;
   }

@@ -33,11 +33,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Type extends BaseEntity {
 
-  @Column(name = "class_internal_name")
+  @Column(name = "type_internal_name", nullable = false)
   private String typeInternalName;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "type_kind", nullable = false)
+  @Column(name = "type_kind")
   private TypeKind typeKind;
 
   @OneToOne
@@ -45,15 +45,15 @@ public class Type extends BaseEntity {
   private Type superType;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "type_origin", nullable = false)
+  @Column(name = "origin", nullable = false)
   private TypeOrigin typeOrigin;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "file_id", nullable = true)
+  @JoinColumn(name = "opensource_repo_file_id", nullable = true)
   private OpenSourceRepoFile openSourceRepoFile;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "repo_id")
+  @JoinColumn(name = "opensource_repo_id")
   private OpenSourceRepo openSourceRepo;
 
   @OneToMany(mappedBy = "type", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)

@@ -45,6 +45,9 @@ public final class FileUtil {
   }
 
   public static void removeDirectory(Path localPath) {
+    if (localPath == null) {
+      return;
+    }
     Path root = FileSystems.getDefault().getRootDirectories().iterator().next().toAbsolutePath();
     if (localPath.equals(root)) {
       throw new RootDirectoryNotDeletableException();

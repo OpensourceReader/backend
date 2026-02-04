@@ -33,9 +33,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Method extends BaseEntity {
 
-  @Column(name = "type_internal_name")
-  private String typeInternalName;
-
   @Column(name = "method_name")
   private String methodName;
 
@@ -43,11 +40,11 @@ public class Method extends BaseEntity {
   private String returnType;
 
   @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "param_types", columnDefinition = "json", nullable = false)
-  private List<String> paramTypes;
+  @Column(name = "argument_types", columnDefinition = "json", nullable = false)
+  private List<String> argumentTypes;
 
   @JdbcTypeCode(SqlTypes.JSON)
-  @Column(name = "method_modifier")
+  @Column(name = "method_modifiers")
   private List<MethodModifier> methodModifiers;
 
   @Column(name = "method_signature")
@@ -61,11 +58,11 @@ public class Method extends BaseEntity {
   private Integer endLine;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "method_origin")
+  @Column(name = "origin")
   private MethodOrigin origin;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "type_id")
+  @JoinColumn(name = "type_id", nullable = false)
   private Type type;
 
   @OneToMany(
@@ -82,7 +79,6 @@ public class Method extends BaseEntity {
 
   static Method internalDeclared(MethodInfo methodInfo, Type type) {
     return new Method(
-        type.getTypeInternalName(),
         methodInfo.methodName(),
         methodInfo.methodDescriptor().methodReturnType(),
         methodInfo.methodDescriptor().argumentTypes(),
@@ -96,10 +92,9 @@ public class Method extends BaseEntity {
 
   static Method inheritedInternal(Method interfaceMethod, Type implType) {
     return new Method(
-        implType.getTypeInternalName(),
         interfaceMethod.methodName,
         interfaceMethod.returnType,
-        interfaceMethod.paramTypes,
+        interfaceMethod.argumentTypes,
         interfaceMethod.methodModifiers,
         interfaceMethod.getMethodSignature(),
         null,
@@ -110,7 +105,6 @@ public class Method extends BaseEntity {
 
   static Method inheritedExternal(MethodCallInfo methodCallInfo, Type childType) {
     return new Method(
-        childType.getTypeInternalName(),
         methodCallInfo.methodName(),
         methodCallInfo.descriptor().methodReturnType(),
         methodCallInfo.descriptor().argumentTypes(),
@@ -124,10 +118,9 @@ public class Method extends BaseEntity {
 
   static Method inheritedExternal(Method superMethod, Type childType) {
     return new Method(
-        childType.getTypeInternalName(),
         superMethod.methodName,
         superMethod.returnType,
-        superMethod.paramTypes,
+        superMethod.argumentTypes,
         superMethod.methodModifiers,
         superMethod.getMethodSignature(),
         null,
@@ -141,7 +134,6 @@ public class Method extends BaseEntity {
         .map(
             externalMethodInfo ->
                 new Method(
-                    externalMethodInfo.typeInternalName(),
                     externalMethodInfo.methodName(),
                     externalMethodInfo.descriptor().methodReturnType(),
                     externalMethodInfo.descriptor().argumentTypes(),
@@ -155,20 +147,18 @@ public class Method extends BaseEntity {
   }
 
   private Method(
-      String typeInternalName,
       String methodName,
       String returnType,
-      List<String> paramTypes,
+      List<String> argumentTypes,
       List<MethodModifier> methodModifiers,
       MethodSignature methodSignature,
       Integer startLine,
       Integer endLine,
       MethodOrigin methodOrigin,
       Type type) {
-    this.typeInternalName = typeInternalName;
     this.methodName = methodName;
     this.returnType = returnType;
-    this.paramTypes = paramTypes;
+    this.argumentTypes = argumentTypes;
     this.methodModifiers = methodModifiers;
     this.methodSignature = methodSignature;
     this.startLine = startLine;
@@ -228,13 +218,11 @@ public class Method extends BaseEntity {
     if (!(o instanceof Method that)) {
       return false;
     }
-    return Objects.equals(typeInternalName, that.typeInternalName)
-        && Objects.equals(methodSignature, that.methodSignature)
-        && Objects.equals(type, that.type);
+    return Objects.equals(methodSignature, that.methodSignature) && Objects.equals(type, that.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(typeInternalName, methodSignature, type);
+    return Objects.hash(methodSignature, type);
   }
 }

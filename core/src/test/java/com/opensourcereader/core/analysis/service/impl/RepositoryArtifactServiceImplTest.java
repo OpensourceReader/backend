@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.infra.bytecode.BytecodeClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
@@ -60,7 +60,7 @@ class RepositoryArtifactServiceImplTest {
     // given
     Path savedLocalPath = Path.of("/tmp/repo");
     OpenSourceFileInfo unsupportedFile =
-        new OpenSourceFileInfo(savedLocalPath.toString(), RepoEntryType.OTHERS, "");
+        new OpenSourceFileInfo(savedLocalPath.toString(), RepoFileType.OTHERS, "");
     GitRepositoryLoadResult loadResult =
         new GitRepositoryLoadResult(savedLocalPath, List.of(unsupportedFile));
 

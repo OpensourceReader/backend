@@ -23,8 +23,8 @@ public class CodeMethodViewPolicy {
     }
 
     if (!request.includeJdk()
-        && method.getTypeInternalName() != null
-        && method.getTypeInternalName().startsWith("java/")) {
+        && method.getType().getTypeInternalName() != null
+        && method.getType().getTypeInternalName().startsWith("java/")) {
       return false;
     }
 

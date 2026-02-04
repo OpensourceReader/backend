@@ -3,7 +3,7 @@ package com.opensourcereader.core.analysis.testfixture;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.opensourcereader.core.analysis.domain.entity.file.RepoEntryType;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.dto.MethodCallInfo;
@@ -46,7 +46,7 @@ public final class TestTypeFixtures {
 
     return new TypeStructure(
         typeInternalName + ".path",
-        RepoEntryType.FILE,
+        RepoFileType.FILE,
         null,
         typeInfo,
         List.of(
@@ -63,7 +63,7 @@ public final class TestTypeFixtures {
         new TypeInfo(33, typeKind, typeInternalName, null, superName, interfaceNames);
 
     return new TypeStructure(
-        typeInternalName + ".path", RepoEntryType.FILE, null, typeInfo, List.of());
+        typeInternalName + ".path", RepoFileType.FILE, null, typeInfo, List.of());
   }
 
   public static TypeStructure createTypeWithMethodCall(
@@ -79,7 +79,7 @@ public final class TestTypeFixtures {
 
     return new TypeStructure(
         callerTypeInternalName + "path",
-        RepoEntryType.FILE,
+        RepoFileType.FILE,
         null,
         callerTypeInfo,
         List.of(
@@ -104,7 +104,7 @@ public final class TestTypeFixtures {
         new TypeInfo(33, typeKind, typeInternalName, null, superName, interfaceNames);
 
     return new TypeStructure(
-        typeInternalName + ".path", RepoEntryType.FILE, null, typeInfo, List.of());
+        typeInternalName + ".path", RepoFileType.FILE, null, typeInfo, List.of());
   }
 
   public static TypeStructure createTypeStructureWithCallee(
@@ -124,7 +124,7 @@ public final class TestTypeFixtures {
 
     return new TypeStructure(
         typeInternalName + ".path",
-        RepoEntryType.FILE,
+        RepoFileType.FILE,
         null,
         typeInfo,
         List.of(

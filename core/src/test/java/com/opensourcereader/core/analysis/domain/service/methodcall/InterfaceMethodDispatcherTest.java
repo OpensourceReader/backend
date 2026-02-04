@@ -11,8 +11,8 @@ import java.util.List;
 
 import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
+import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
@@ -62,9 +62,9 @@ class InterfaceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              edge -> edge.getCaller().getTypeInternalName(),
+              edge -> edge.getCaller().getType().getTypeInternalName(),
               edge -> edge.getCaller().getMethodName(),
-              edge -> edge.getCallee().getTypeInternalName(),
+              edge -> edge.getCallee().getType().getTypeInternalName(),
               edge -> edge.getCallee().getMethodName())
           .containsExactlyInAnyOrder(tuple(interfaceName, methodName, implName, methodName));
     }
@@ -99,9 +99,9 @@ class InterfaceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName())
           .containsExactlyInAnyOrder(tuple(i1Name, methodName, i2Name, methodName));
     }
@@ -135,9 +135,9 @@ class InterfaceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName())
           .containsExactlyInAnyOrder(
               tuple(i1Name, methodName, i2Name, methodName),
@@ -173,9 +173,9 @@ class InterfaceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
@@ -213,9 +213,9 @@ class InterfaceMethodDispatcherTest {
       List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
       assertThat(outgoingCalls)
           .extracting(
-              e -> e.getCaller().getTypeInternalName(),
+              e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
-              e -> e.getCallee().getTypeInternalName(),
+              e -> e.getCallee().getType().getTypeInternalName(),
               e -> e.getCallee().getMethodName(),
               e -> e.getCallee().getOrigin())
           .containsExactlyInAnyOrder(
