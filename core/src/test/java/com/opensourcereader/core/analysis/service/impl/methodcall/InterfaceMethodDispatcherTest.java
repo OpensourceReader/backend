@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.service.methodcall;
+package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
@@ -9,23 +9,29 @@ import static org.assertj.core.groups.Tuple.tuple;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.analysis.service.impl.InheritanceLinkServiceImpl;
+import com.opensourcereader.core.analysis.service.impl.methodCall.InterfaceMethodDispatcher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+@Transactional
+@SpringBootTest
 class InterfaceMethodDispatcherTest {
 
-  OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
-  InterfaceMethodDispatcher dispatcher = new InterfaceMethodDispatcher(new TypeGraphValidator());
+  @Autowired OpenSourceRepoService openSourceRepoService;
+  @Autowired InterfaceMethodDispatcher dispatcher;
+  @Autowired InheritanceLinkServiceImpl inheritanceLinkService;
 
   @Nested
   @DisplayName("1. 인터페이스 기본")
@@ -52,14 +58,14 @@ class InterfaceMethodDispatcherTest {
               methodDescriptor,
               TypeKind.INTERFACE);
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(implClassType, interfaceType));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(implClassType, interfaceType));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(implClassType, interfaceType));
 
       // when
       dispatcher.connectInterfaceImplementations(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               edge -> edge.getCaller().getType().getTypeInternalName(),
               edge -> edge.getCaller().getMethodName(),
@@ -89,14 +95,14 @@ class InterfaceMethodDispatcherTest {
       TypeStructure interface2Type =
           createTypeStructureWithoutMethod(i2Name, TypeKind.INTERFACE, null, List.of(i1Name));
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(interface1Type, interface2Type));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(interface1Type, interface2Type));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(interface1Type, interface2Type));
 
       // when
       dispatcher.connectInterfaceImplementations(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -124,15 +130,16 @@ class InterfaceMethodDispatcherTest {
           createTypeStructureWithMethod(
               implAName, null, List.of(i2Name), methodName, methodDescriptor, TypeKind.CLASS);
       OpenSourceRepo repo =
-          openSourceRepoFactory.create(
+          openSourceRepoService.createRepo(
               "new-cloneUrl", List.of(implAType, interface2Type, interface1Type));
+      inheritanceLinkService.resolve(
+          repo.getTypes(), List.of(implAType, interface2Type, interface1Type));
 
       // when
       dispatcher.connectInterfaceImplementations(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -163,14 +170,14 @@ class InterfaceMethodDispatcherTest {
       TypeStructure implType =
           createTypeStructureWithoutMethod(implName, TypeKind.CLASS, null, List.of(interfaceName));
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(implType, interfaceType));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(implType, interfaceType));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(implType, interfaceType));
 
       // when
       dispatcher.connectInterfaceImplementations(repo.getTypes());
 
       // then: 엣지 1개 (I.foo -> A.foo(virtual))
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -203,14 +210,14 @@ class InterfaceMethodDispatcherTest {
           createTypeStructureWithMethod(
               implName, null, List.of(interfaceName), methodName, methodDescriptor, TypeKind.CLASS);
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(interfaceType, implType));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(interfaceType, implType));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(interfaceType, implType));
 
       // when
       dispatcher.connectInterfaceImplementations(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -244,7 +251,8 @@ class InterfaceMethodDispatcherTest {
           createTypeStructureWithMethod(
               i2Name, null, List.of(i1Name), methodName, methodDescriptor, TypeKind.INTERFACE);
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(interface2Type, interface1Type));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(interface2Type, interface1Type));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(interface2Type, interface1Type));
 
       // when + then
       assertThatThrownBy(() -> dispatcher.connectInterfaceImplementations(repo.getTypes()))

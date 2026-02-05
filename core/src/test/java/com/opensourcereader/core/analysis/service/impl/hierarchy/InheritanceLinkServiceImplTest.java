@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.service.hierarchy;
+package com.opensourcereader.core.analysis.service.impl.hierarchy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
@@ -6,23 +6,30 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
-import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.analysis.service.impl.InheritanceLinkServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class InheritanceLinkServiceTest {
+@Transactional
+@SpringBootTest
+class InheritanceLinkServiceImplTest {
 
-  private InheritanceLinkService service = new InheritanceLinkService();
-  OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
+  @Autowired InheritanceLinkServiceImpl inheritanceLinkService;
+
+  @Autowired OpenSourceRepoService openSourceRepoService;
 
   private TypeStructure toTypeStructureWithoutMethod(
       String className, String superName, List<String> interfaceNames) {
@@ -37,8 +44,8 @@ class InheritanceLinkServiceTest {
     List<TypeStructure> typeStructures = List.of();
 
     // when
-    OpenSourceRepo openSourceRepo = openSourceRepoFactory.create("", List.of());
-    service.resolve(openSourceRepo.getTypes(), typeStructures);
+    OpenSourceRepo openSourceRepo = openSourceRepoService.createRepo("", List.of());
+    inheritanceLinkService.resolve(openSourceRepo.getTypes(), typeStructures);
 
     // then
     assertThat(openSourceRepo.getTypes()).isEmpty();
@@ -55,11 +62,11 @@ class InheritanceLinkServiceTest {
     TypeStructure implementedClassStructure =
         toTypeStructureWithoutMethod(implementClassName, null, List.of(interfaceName));
     OpenSourceRepo openSourceRepo =
-        openSourceRepoFactory.create(
+        openSourceRepoService.createRepo(
             "new-Uri", List.of(interfaceStructure, implementedClassStructure));
 
     // when
-    service.resolve(
+    inheritanceLinkService.resolve(
         openSourceRepo.getTypes(), List.of(interfaceStructure, implementedClassStructure));
 
     // then
@@ -84,11 +91,11 @@ class InheritanceLinkServiceTest {
         toTypeStructureWithoutMethod(childInterfaceName, null, List.of(parentInterfaceName));
 
     OpenSourceRepo openSourceRepo =
-        openSourceRepoFactory.create(
+        openSourceRepoService.createRepo(
             "new-Uri", List.of(parentInterfaceStructure, childInterfaceStructure));
 
     // when
-    service.resolve(
+    inheritanceLinkService.resolve(
         openSourceRepo.getTypes(), List.of(parentInterfaceStructure, childInterfaceStructure));
 
     // then
@@ -113,10 +120,11 @@ class InheritanceLinkServiceTest {
     TypeStructure subStructure =
         toTypeStructureWithoutMethod(childClassName, superClassName, List.of());
     OpenSourceRepo openSourceRepo =
-        openSourceRepoFactory.create("new-Uri", List.of(superStructure, subStructure));
+        openSourceRepoService.createRepo("new-Uri", List.of(superStructure, subStructure));
 
     // when
-    service.resolve(openSourceRepo.getTypes(), List.of(superStructure, subStructure));
+    inheritanceLinkService.resolve(
+        openSourceRepo.getTypes(), List.of(superStructure, subStructure));
 
     // then
     assertThat(openSourceRepo.getTypes()).hasSize(2);
@@ -141,10 +149,11 @@ class InheritanceLinkServiceTest {
     TypeStructure typeStructure =
         toTypeStructureWithoutMethod(
             className, externalSuper, List.of(externalInterface1, externalInterface2));
-    OpenSourceRepo openSourceRepo = openSourceRepoFactory.create("new-Uri", List.of(typeStructure));
+    OpenSourceRepo openSourceRepo =
+        openSourceRepoService.createRepo("new-Uri", List.of(typeStructure));
 
     // when
-    service.resolve(openSourceRepo.getTypes(), List.of(typeStructure));
+    inheritanceLinkService.resolve(openSourceRepo.getTypes(), List.of(typeStructure));
 
     // then
     assertThat(openSourceRepo.getTypes()).hasSize(4);

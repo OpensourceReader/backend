@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.entity.factory;
+package com.opensourcereader.core.analysis.domain.factory;
 
 import java.util.ArrayList;
 import java.util.HashSet;

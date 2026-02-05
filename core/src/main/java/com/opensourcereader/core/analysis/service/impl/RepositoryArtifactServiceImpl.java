@@ -14,6 +14,7 @@ import com.opensourcereader.core.analysis.infra.dto.gitrepo.GitRepositoryLoadRes
 import com.opensourcereader.core.analysis.infra.git.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.infra.parser.SourceFileParser;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
+import com.opensourcereader.core.analysis.service.impl.repoartifact.TypeStructureResolver;
 import com.opensourcereader.core.analysis.util.FileUtil;
 
 import lombok.RequiredArgsConstructor;

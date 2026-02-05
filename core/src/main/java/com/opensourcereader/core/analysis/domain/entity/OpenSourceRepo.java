@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
+import com.opensourcereader.core.analysis.domain.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.shared.BaseEntity;
@@ -94,7 +94,7 @@ public class OpenSourceRepo extends BaseEntity {
             .collect(Collectors.toCollection(ArrayList::new));
 
     for (Type externalType : externalTypes) {
-      if (externalTypes.contains(externalType)) {
+      if (this.types.contains(externalType)) {
         return;
       }
       this.types.add(externalType);

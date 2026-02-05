@@ -21,6 +21,7 @@ import com.opensourcereader.core.analysis.infra.dto.ByteCodeMethodStructure;
 import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.ParsedSourceFile;
 import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
+import com.opensourcereader.core.analysis.service.impl.repoartifact.TypeStructureResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +43,7 @@ class TypeStructureResolverTest {
     // then
     assertThat(result).isNotNull();
     assertThat(result.typeInfo()).isNull();
-    assertThat(result.methods()).isNull();
+    assertThat(result.methods()).isEmpty();
   }
 
   @Test
@@ -61,7 +62,7 @@ class TypeStructureResolverTest {
     // then
     assertThat(result).isNotNull();
     assertThat(result.typeInfo()).isNull();
-    assertThat(result.methods()).isNull();
+    assertThat(result.methods()).isEmpty();
   }
 
   @Test

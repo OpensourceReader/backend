@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import com.opensourcereader.api.dto.OpenSourceRepoCreateRequest;
 import com.opensourcereader.api.dto.OpenSourceRepoResponse;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
+import com.opensourcereader.core.analysis.service.InheritanceLinkService;
 import com.opensourcereader.core.analysis.service.MethodCallGraphService;
 import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import com.opensourcereader.core.analysis.service.RepositoryArtifactService;
@@ -35,7 +35,6 @@ public class OpenSourceRepoFacade {
     try (RepositoryArtifact artifact =
         repositoryArtifactService.create(
             request.openSourceUri(), request.reference(), localClonePath, workingTreeDirName)) {
-      // 베스트는 여기 Type을 꺼내서 만들어준 다음에 -> 만튼 타입을 토대로, 아래에서 작업하는거임
       OpenSourceRepo openSourceRepo =
           opensourceRepoService.createRepo(request.openSourceUri(), artifact.typeStructures());
       inheritanceLinkService.resolve(openSourceRepo.getTypes(), artifact.typeStructures());

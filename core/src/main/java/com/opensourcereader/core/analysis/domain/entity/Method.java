@@ -177,19 +177,6 @@ public class Method extends BaseEntity {
     this.type = type;
   }
 
-  public void addIngoingCall(Method caller) {
-    if (caller == null) {
-      return;
-    }
-    MethodCallEdge ingoingCall = MethodCallEdge.of(caller, this);
-    if (this.ingoingCalls.contains(ingoingCall)) {
-      return;
-    }
-    this.ingoingCalls.add(ingoingCall);
-
-    caller.syncOutgoingCall(ingoingCall);
-  }
-
   public void addOutgoingCall(Method callee) {
     if (callee == null) {
       return;
@@ -211,16 +198,6 @@ public class Method extends BaseEntity {
       return;
     }
     this.ingoingCalls.add(targetOutgoingCall);
-  }
-
-  private void syncOutgoingCall(MethodCallEdge targetIngoingCall) {
-    if (targetIngoingCall == null) {
-      return;
-    }
-    if (this.outgoingCalls.contains(targetIngoingCall)) {
-      return;
-    }
-    this.outgoingCalls.add(targetIngoingCall);
   }
 
   @Override

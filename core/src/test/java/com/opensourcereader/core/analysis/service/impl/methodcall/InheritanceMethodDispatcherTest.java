@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.service.methodcall;
+package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
@@ -8,24 +8,30 @@ import static org.assertj.core.groups.Tuple.tuple;
 
 import java.util.List;
 
-import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
+import com.opensourcereader.core.analysis.service.impl.InheritanceLinkServiceImpl;
+import com.opensourcereader.core.analysis.service.impl.methodCall.InheritanceMethodDispatcher;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+@Transactional
+@SpringBootTest
 class InheritanceMethodDispatcherTest {
 
-  OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
-  InheritanceMethodDispatcher inheritanceMethodDispatcher = new InheritanceMethodDispatcher();
+  @Autowired OpenSourceRepoService openSourceRepoService;
+  @Autowired InheritanceMethodDispatcher inheritanceMethodDispatcher;
+  @Autowired InheritanceLinkServiceImpl inheritanceLinkService;
 
   @Nested
   @DisplayName("1. 클래스 상속")
@@ -46,14 +52,14 @@ class InheritanceMethodDispatcherTest {
       TypeStructure childType =
           createTypeStructureWithoutMethod(childName, TypeKind.CLASS, parentName, null);
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(childType, parentType));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(childType, parentType));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(childType, parentType));
 
       // when
       inheritanceMethodDispatcher.connectInheritance(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -84,14 +90,15 @@ class InheritanceMethodDispatcherTest {
       TypeStructure child =
           createTypeStructureWithMethod(
               childName, parentName, null, methodName, methodDescriptor, TypeKind.CLASS);
-      OpenSourceRepo repo = openSourceRepoFactory.create("new-cloneUrl", List.of(child, parent));
+      OpenSourceRepo repo =
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(child, parent));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(child, parent));
 
       // when
       inheritanceMethodDispatcher.connectInheritance(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),
@@ -129,14 +136,14 @@ class InheritanceMethodDispatcherTest {
               grandChildName, TypeKind.CLASS, childName, null);
 
       OpenSourceRepo repo =
-          openSourceRepoFactory.create("new-cloneUrl", List.of(grandChild, child, parent));
+          openSourceRepoService.createRepo("new-cloneUrl", List.of(grandChild, child, parent));
+      inheritanceLinkService.resolve(repo.getTypes(), List.of(grandChild, child, parent));
 
       // when
       inheritanceMethodDispatcher.connectInheritance(repo.getTypes());
 
       // then
-      List<MethodCallEdge> outgoingCalls = getOutgoingCallEdges(repo.getTypes());
-      assertThat(outgoingCalls)
+      assertThat(getOutgoingCallEdges(repo.getTypes()))
           .extracting(
               e -> e.getCaller().getType().getTypeInternalName(),
               e -> e.getCaller().getMethodName(),

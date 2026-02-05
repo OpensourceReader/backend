@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.service.hierarchy;
+package com.opensourcereader.core.analysis.service.impl;
 
 import java.util.List;
 import java.util.Map;
@@ -10,13 +10,15 @@ import org.springframework.stereotype.Service;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.service.InheritanceLinkService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class InheritanceLinkService {
+public class InheritanceLinkServiceImpl implements InheritanceLinkService {
 
+  @Override
   public void resolve(List<Type> types, List<TypeStructure> typeStructures) {
     if (types == null || types.isEmpty() || typeStructures == null || typeStructures.isEmpty()) {
       return;

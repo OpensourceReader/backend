@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.entity.factory;
+package com.opensourcereader.core.analysis.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -6,26 +6,32 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.opensourcereader.core.analysis.domain.entity.Method;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.Type;
+import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class OpenSourceRepoFactoryTest {
+@Transactional
+@SpringBootTest
+class OpenSourceRepoServiceImplTest {
 
-  OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
+  @Autowired OpenSourceRepoService openSourceRepoService;
 
   private static final int INVOKE_INTERFACE = 185;
 
@@ -51,11 +57,11 @@ class OpenSourceRepoFactoryTest {
     MethodStructure methodStructure = new MethodStructure(methodInfo, List.of());
 
     TypeStructure typeStructure =
-        new TypeStructure("src/A.java", null, "", typeInfo, List.of(methodStructure));
+        new TypeStructure("src/A.java", RepoFileType.FILE, "", typeInfo, List.of(methodStructure));
 
     // when
     OpenSourceRepo repo =
-        openSourceRepoFactory.create("https://github.com/test/repo", List.of(typeStructure));
+        openSourceRepoService.createRepo("https://github.com/test/repo", List.of(typeStructure));
 
     // then
     assertThat(repo.getFiles()).hasSize(1);
@@ -90,10 +96,10 @@ class OpenSourceRepoFactoryTest {
     MethodStructure methodStructure = new MethodStructure(methodInfo, List.of(calleeInfo));
 
     TypeStructure typeStructure =
-        new TypeStructure("A.java", null, "", typeInfo, List.of(methodStructure));
+        new TypeStructure("A.java", RepoFileType.FILE, "", typeInfo, List.of(methodStructure));
 
     // when
-    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(typeStructure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(typeStructure));
 
     // then
     assertThat(repo.getTypes())
@@ -115,7 +121,7 @@ class OpenSourceRepoFactoryTest {
     TypeStructure parentStructure =
         new TypeStructure(
             "Parent.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, parent, null, null, List.of()),
             List.of());
@@ -123,13 +129,13 @@ class OpenSourceRepoFactoryTest {
     TypeStructure childStructure =
         new TypeStructure(
             "Child.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, child, parent, null, List.of()),
             List.of());
 
     OpenSourceRepo repo =
-        openSourceRepoFactory.create("url", List.of(parentStructure, childStructure));
+        openSourceRepoService.createRepo("url", List.of(parentStructure, childStructure));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName, Type::getTypeOrigin)
@@ -162,7 +168,7 @@ class OpenSourceRepoFactoryTest {
     TypeStructure structureA =
         new TypeStructure(
             "A.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, internalA, null, null, List.of()),
             List.of(methodStructure));
@@ -170,12 +176,12 @@ class OpenSourceRepoFactoryTest {
     TypeStructure structureB =
         new TypeStructure(
             "B.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, internalB, null, null, List.of()),
             List.of());
 
-    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structureA, structureB));
+    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structureA, structureB));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName)
@@ -208,9 +214,9 @@ class OpenSourceRepoFactoryTest {
             List.of(call));
 
     TypeStructure structure =
-        new TypeStructure("A.java", null, "", typeInfo, List.of(methodStructure));
+        new TypeStructure("A.java", RepoFileType.FILE, "", typeInfo, List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
 
     List<Type> externals =
         repo.getTypes().stream().filter(t -> t.getTypeInternalName().equals(external)).toList();
@@ -252,12 +258,12 @@ class OpenSourceRepoFactoryTest {
     TypeStructure structure =
         new TypeStructure(
             "A.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()
@@ -298,12 +304,12 @@ class OpenSourceRepoFactoryTest {
     TypeStructure structure =
         new TypeStructure(
             "A.java",
-            null,
+            RepoFileType.FILE,
             "",
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoFactory.create("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()

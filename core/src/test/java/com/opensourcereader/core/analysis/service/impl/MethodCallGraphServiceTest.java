@@ -1,7 +1,8 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeWithMethodCall;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.groups.Tuple.tuple;
 
 import java.util.List;
 
@@ -14,82 +15,78 @@ import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
-import com.opensourcereader.core.analysis.repository.MethodRepository;
-import com.opensourcereader.core.analysis.repository.OpenSourceRepoRepository;
-import com.opensourcereader.core.analysis.repository.TypeRepository;
 import com.opensourcereader.core.analysis.service.MethodCallGraphService;
-import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
+import com.opensourcereader.core.analysis.service.OpenSourceRepoService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@Transactional
 @SpringBootTest
 class MethodCallGraphServiceTest {
 
-  @Autowired OpenSourceRepoFactory openSourceRepoFactory;
+  @Autowired OpenSourceRepoService openSourceRepoService;
   @Autowired MethodCallGraphService methodCallGraphService;
-  @Autowired TypeRepository typeRepository;
-  @Autowired MethodRepository methodRepository;
-  @Autowired OpenSourceRepoRepository openSourceRepoRepository;
 
   @Transactional
   @Test
   @DisplayName("메서드 id로 조회하면 outgoing/ingoing 그래프를 함께 가져온다 (DeclaredType + DeclaredMethod + Edge만)")
   void getCodeMethodById_edgesOnly() {
     // given
+    MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
+
     String callerTypeName = "t/Other";
     String callerMethodName = "run";
     String targetTypeName = "t/Main";
     String targetMethodName = "target";
     String calleeTypeName = "t/Util";
     String calleeMethodName = "help";
-    MethodDescriptor methodDescriptor = MethodDescriptor.from("()V");
-
-    // 메서드 하나씩 해서 선언을 가능함
     TypeStructure callerType =
-        TestTypeFixtures.createTypeStructureWithMethod(
-            callerTypeName, null, null, callerMethodName, methodDescriptor, TypeKind.CLASS);
-    TypeStructure targetType =
-        TestTypeFixtures.createTypeStructureWithMethod(
-            targetTypeName, null, null, targetMethodName, methodDescriptor, TypeKind.CLASS);
-    TypeStructure calleeType =
-        TestTypeFixtures.createTypeStructureWithMethod(
-            calleeTypeName, null, null, calleeMethodName, methodDescriptor, TypeKind.CLASS);
-    OpenSourceRepo repo =
-        openSourceRepoRepository.save(
-            openSourceRepoFactory.create(
-                "new-cloneUrl", List.of(callerType, targetType, calleeType)));
+        createTypeWithMethodCall(
+            TypeKind.CLASS,
+            callerTypeName,
+            callerMethodName,
+            methodDescriptor,
+            targetTypeName,
+            targetMethodName,
+            methodDescriptor);
 
-    Method callerMethod =
-        typeRepository
-            .findByRepoAndTypeInternalName(repo.getId(), callerTypeName)
-            .orElseThrow()
-            .getMethods()
-            .get(0);
+    TypeStructure targetType =
+        createTypeWithMethodCall(
+            TypeKind.CLASS,
+            targetTypeName,
+            targetMethodName,
+            methodDescriptor,
+            calleeTypeName,
+            calleeMethodName,
+            methodDescriptor);
+
+    TypeStructure calleeType =
+        createTypeStructureWithMethod(
+            calleeTypeName, null, List.of(), calleeMethodName, methodDescriptor, TypeKind.CLASS);
+
+    OpenSourceRepo repo =
+        openSourceRepoService.createRepo(
+            "new-cloneUrl", List.of(callerType, targetType, calleeType));
+    methodCallGraphService.create(repo.getTypes(), List.of(callerType, targetType, calleeType));
     Method targetMethod =
-        typeRepository
-            .findByRepoAndTypeInternalName(repo.getId(), targetTypeName)
-            .orElseThrow()
-            .getMethods()
-            .get(0);
-    Method calleeMethod =
-        typeRepository
-            .findByRepoAndTypeInternalName(repo.getId(), calleeTypeName)
-            .orElseThrow()
-            .getMethods()
-            .get(0);
-    targetMethod.addIngoingCall(callerMethod);
-    targetMethod.addOutgoingCall(calleeMethod);
-    methodRepository.saveAll(List.of(targetMethod, calleeMethod, callerMethod));
+        repo.getTypes().stream()
+            .flatMap(type -> type.getMethods().stream())
+            .filter(
+                method ->
+                    method.getMethodName().equals(targetMethodName)
+                        && method.getType().getTypeInternalName().equals(targetTypeName))
+            .findFirst()
+            .get();
 
     // when
     Method target = methodCallGraphService.getCodeMethodById(targetMethod.getId());
 
     // then
     assertThat(target.getOutgoingCalls())
-        .extracting(e -> e.getCallee().getId(), e -> e.getCallee().getMethodName())
-        .containsExactlyInAnyOrder(tuple(calleeMethod.getId(), calleeMethodName));
+        .extracting(e -> e.getCallee().getMethodName())
+        .containsExactlyInAnyOrder(calleeMethodName);
     assertThat(target.getIngoingCalls())
-        .extracting(e -> e.getCaller().getId(), e -> e.getCaller().getMethodName())
-        .containsExactlyInAnyOrder(tuple(callerMethod.getId(), callerMethodName));
+        .extracting(e -> e.getCaller().getMethodName())
+        .containsExactlyInAnyOrder(callerMethodName);
   }
 }

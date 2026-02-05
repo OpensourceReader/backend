@@ -1,4 +1,4 @@
-package com.opensourcereader.core.analysis.domain.service.methodcall;
+package com.opensourcereader.core.analysis.service.impl.methodCall;
 
 import java.util.HashSet;
 import java.util.Set;
