@@ -1,8 +1,8 @@
-package com.opensourcereader.api.log;
+package com.opensourcereader.api.shared.log;
 
-import static com.opensourcereader.api.log.LoggingMDCKey.REQUEST_ID;
-import static com.opensourcereader.api.log.LoggingMDCKey.REQUEST_METHOD;
-import static com.opensourcereader.api.log.LoggingMDCKey.REQUEST_URL;
+import static com.opensourcereader.api.shared.log.LoggingMDCKey.REQUEST_ID;
+import static com.opensourcereader.api.shared.log.LoggingMDCKey.REQUEST_METHOD;
+import static com.opensourcereader.api.shared.log.LoggingMDCKey.REQUEST_URL;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

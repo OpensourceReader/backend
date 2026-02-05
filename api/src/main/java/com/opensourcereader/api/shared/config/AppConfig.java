@@ -1,4 +1,4 @@
-package com.opensourcereader.api.config;
+package com.opensourcereader.api.shared.config;
 
 import org.springframework.context.annotation.Configuration;
 

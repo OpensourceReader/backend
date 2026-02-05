@@ -10,15 +10,12 @@ import lombok.Getter;
 public abstract class OpenSourceReaderException extends RuntimeException {
 
   private final Instant timestamp;
+  private final BaseErrorCode errorCode;
   private final Map<String, Object> details;
 
-  public OpenSourceReaderException(Map<String, Object> details) {
+  public OpenSourceReaderException(BaseErrorCode errorCode) {
     this.timestamp = Instant.now();
-    this.details = details;
-  }
-
-  public OpenSourceReaderException() {
-    this.timestamp = Instant.now();
+    this.errorCode = errorCode;
     this.details = new HashMap<>();
   }
 

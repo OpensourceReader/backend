@@ -1,4 +1,4 @@
-package com.opensourcereader.api.log;
+package com.opensourcereader.api.shared.log;
 
 public final class LoggingMDCKey {
 

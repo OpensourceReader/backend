@@ -2,10 +2,12 @@ package com.opensourcereader.core.analysis.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.opensourcereader.core.shared.exception.BaseErrorCode;
+
 import lombok.Getter;
 
 @Getter
-public enum OpenSourceRepoErrorCode {
+public enum OpenSourceRepoErrorCode implements BaseErrorCode {
   REPOSITORY_CLONE_FAILED(HttpStatus.BAD_GATEWAY, "원격 저장소 클론에 실패했습니다."),
   REPOSITORY_CLONE_FILE_ALREADY_EXIST(HttpStatus.INTERNAL_SERVER_ERROR, "원격 저장소 클론파일이 이미 있습니다."),
   REPOSITORY_CLONE_DIRECTORY_ALREADY_EXIST(
@@ -28,9 +30,11 @@ public enum OpenSourceRepoErrorCode {
 
   private final HttpStatus httpStatus;
   private final String message;
+  private final String name;
 
   OpenSourceRepoErrorCode(HttpStatus httpStatus, String message) {
     this.httpStatus = httpStatus;
     this.message = message;
+    this.name = this.name();
   }
 }
