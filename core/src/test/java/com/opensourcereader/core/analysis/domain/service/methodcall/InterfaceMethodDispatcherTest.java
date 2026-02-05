@@ -12,10 +12,9 @@ import java.util.List;
 import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
+import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class InterfaceMethodDispatcherTest {
 
   OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinker(), new ExternalTypeStructureFactory());
+      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
   InterfaceMethodDispatcher dispatcher = new InterfaceMethodDispatcher(new TypeGraphValidator());
 
   @Nested
@@ -184,7 +183,7 @@ class InterfaceMethodDispatcherTest {
                   methodName,
                   implName,
                   methodName,
-                  MethodOrigin.INTERNAL_INHERITED_VIRTUAL) // I.foo -> A.foo (virtual)
+                  MethodOrigin.VIRTUAL_INTERNAL_INHERITED) // I.foo -> A.foo (virtual)
               );
     }
 

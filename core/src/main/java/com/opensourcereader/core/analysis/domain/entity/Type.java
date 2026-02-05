@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
-import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.TypeInfo;
 import com.opensourcereader.core.analysis.dto.external.ExternalMethodInfo;
@@ -97,7 +96,7 @@ public class Type extends BaseEntity {
     this.typeKind = typeKind;
     this.typeOrigin = typeOrigin;
     this.openSourceRepoFile = openSourceRepoFile;
-    this.methods = Method.external(externalMethodInfos, this);
+    this.methods = new ArrayList<>(Method.external(externalMethodInfos, this));
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
     this.openSourceRepo = openSourceRepo;
@@ -113,10 +112,10 @@ public class Type extends BaseEntity {
     this.typeKind = typeInfo.typeKind();
     this.typeOrigin = typeOrigin;
     this.openSourceRepoFile = openSourceRepoFile;
-    this.methods = getInternalMethods(methodInfos);
-    this.openSourceRepo = openSourceRepo;
+    this.methods = new ArrayList<>(getInternalMethods(methodInfos));
     this.implementedInterfaces = new ArrayList<>();
     this.implementations = new ArrayList<>();
+    this.openSourceRepo = openSourceRepo;
   }
 
   private String extractedTypeName(TypeInfo typeInfo) {
@@ -132,51 +131,24 @@ public class Type extends BaseEntity {
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  public void addExternalInheritanceMethod(
-      MethodCallInfo methodCallInfo, Method callerMethod, Type type) {
-    if (methodCallInfo == null) {
+  public void addExternalInheritanceMethod(Method externalInheritedMethod) {
+    if (externalInheritedMethod == null) {
       return;
     }
-    Method externalInheritedMethod = Method.inheritedExternal(methodCallInfo, type);
     if (methods.contains(externalInheritedMethod)) {
       return;
     }
     methods.add(externalInheritedMethod);
-    callerMethod.addOutgoingCall(externalInheritedMethod);
   }
 
-  public void addImplementationVirtualMethod(Method interfaceMethod) {
-    if (interfaceMethod == null) {
+  void addVirtualMethod(Method inheritedVirtual) {
+    if (inheritedVirtual == null) {
       return;
     }
-    Method inheritedVirtual = createVirtualMethod(interfaceMethod.getType(), interfaceMethod);
     if (methods.contains(inheritedVirtual)) {
       return;
     }
     methods.add(inheritedVirtual);
-    interfaceMethod.addOutgoingCall(inheritedVirtual);
-  }
-
-  public void addChildVirtualMethod(Method superMethod) {
-    if (superMethod == null) {
-      return;
-    }
-    if (this.superType == null) {
-      return;
-    }
-    Method inheritedVirtual = createVirtualMethod(this.superType, superMethod);
-    if (methods.contains(inheritedVirtual)) {
-      return;
-    }
-    methods.add(inheritedVirtual);
-    superMethod.addOutgoingCall(inheritedVirtual);
-  }
-
-  private Method createVirtualMethod(Type upperType, Method upperMethod) {
-    if (upperType.isInternal()) {
-      return Method.inheritedInternal(upperMethod, this);
-    }
-    return Method.inheritedExternal(upperMethod, this);
   }
 
   public void updateRelations(Type newSuperType, List<Type> interfaceTypes) {
@@ -235,6 +207,9 @@ public class Type extends BaseEntity {
   }
 
   public boolean isSameTypeKind(TypeKind kind) {
+    if (kind == null || this.getTypeKind() == null) {
+      return false;
+    }
     return this.getTypeKind().equals(kind);
   }
 

@@ -65,16 +65,10 @@ public class Method extends BaseEntity {
   @JoinColumn(name = "type_id", nullable = false)
   private Type type;
 
-  @OneToMany(
-      mappedBy = "caller",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToMany(mappedBy = "caller", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private final List<MethodCallEdge> outgoingCalls = new ArrayList<>();
 
-  @OneToMany(
-      mappedBy = "callee",
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @OneToMany(mappedBy = "callee", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   private final List<MethodCallEdge> ingoingCalls = new ArrayList<>();
 
   static Method internalDeclared(MethodInfo methodInfo, Type type) {
@@ -90,43 +84,20 @@ public class Method extends BaseEntity {
         type);
   }
 
-  static Method inheritedInternal(Method interfaceMethod, Type implType) {
-    return new Method(
-        interfaceMethod.methodName,
-        interfaceMethod.returnType,
-        interfaceMethod.argumentTypes,
-        interfaceMethod.methodModifiers,
-        interfaceMethod.getMethodSignature(),
-        null,
-        null,
-        MethodOrigin.INTERNAL_INHERITED_VIRTUAL,
-        implType);
-  }
-
-  static Method inheritedExternal(MethodCallInfo methodCallInfo, Type childType) {
-    return new Method(
-        methodCallInfo.methodName(),
-        methodCallInfo.descriptor().methodReturnType(),
-        methodCallInfo.descriptor().argumentTypes(),
-        null,
-        MethodSignature.from(methodCallInfo),
-        null,
-        null,
-        MethodOrigin.EXTERNAL_INHERITED_VIRTUAL,
-        childType);
-  }
-
-  static Method inheritedExternal(Method superMethod, Type childType) {
-    return new Method(
-        superMethod.methodName,
-        superMethod.returnType,
-        superMethod.argumentTypes,
-        superMethod.methodModifiers,
-        superMethod.getMethodSignature(),
-        null,
-        null,
-        MethodOrigin.EXTERNAL_INHERITED_VIRTUAL,
-        childType);
+  public static Method inheritedExternal(MethodCallInfo methodCallInfo, Type childType) {
+    Method method =
+        new Method(
+            methodCallInfo.methodName(),
+            methodCallInfo.descriptor().methodReturnType(),
+            methodCallInfo.descriptor().argumentTypes(),
+            null,
+            MethodSignature.from(methodCallInfo),
+            null,
+            null,
+            MethodOrigin.EXTERNAL_INHERITED,
+            childType);
+    childType.addExternalInheritanceMethod(method);
+    return method;
   }
 
   static List<Method> external(List<ExternalMethodInfo> externalMethodInfos, Type type) {
@@ -144,6 +115,45 @@ public class Method extends BaseEntity {
                     MethodOrigin.EXTERNAL,
                     type))
         .toList();
+  }
+
+  public static Method createVirtual(Type upperType, Method upperMethod, Type currentType) {
+    Method inheritedVirtual = getVirtualMethod(upperType, upperMethod, currentType);
+    currentType.addVirtualMethod(inheritedVirtual);
+    return inheritedVirtual;
+  }
+
+  private static Method getVirtualMethod(Type upperType, Method upperMethod, Type currentType) {
+    if (upperType.isInternal()) {
+      return Method.virtualInheritedInternal(upperMethod, currentType);
+    }
+    return Method.virtualInheritedExternal(upperMethod, currentType);
+  }
+
+  private static Method virtualInheritedInternal(Method interfaceMethod, Type implType) {
+    return new Method(
+        interfaceMethod.methodName,
+        interfaceMethod.returnType,
+        interfaceMethod.argumentTypes,
+        interfaceMethod.methodModifiers,
+        interfaceMethod.getMethodSignature(),
+        null,
+        null,
+        MethodOrigin.VIRTUAL_INTERNAL_INHERITED,
+        implType);
+  }
+
+  private static Method virtualInheritedExternal(Method superMethod, Type childType) {
+    return new Method(
+        superMethod.methodName,
+        superMethod.returnType,
+        superMethod.argumentTypes,
+        superMethod.methodModifiers,
+        superMethod.getMethodSignature(),
+        null,
+        null,
+        MethodOrigin.VIRTUAL_EXTERNAL_INHERITED,
+        childType);
   }
 
   private Method(

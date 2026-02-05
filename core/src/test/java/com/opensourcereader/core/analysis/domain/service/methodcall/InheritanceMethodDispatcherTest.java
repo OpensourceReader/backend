@@ -11,10 +11,9 @@ import java.util.List;
 import com.opensourcereader.core.analysis.domain.entity.MethodCallEdge;
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodOrigin;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
+import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.testfixture.TestTypeFixtures;
@@ -25,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class InheritanceMethodDispatcherTest {
 
   OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinker(), new ExternalTypeStructureFactory());
+      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
   InheritanceMethodDispatcher inheritanceMethodDispatcher = new InheritanceMethodDispatcher();
 
   @Nested
@@ -67,7 +66,7 @@ class InheritanceMethodDispatcherTest {
                   methodName,
                   childName,
                   methodName,
-                  MethodOrigin.INTERNAL_INHERITED_VIRTUAL));
+                  MethodOrigin.VIRTUAL_INTERNAL_INHERITED));
     }
 
     @Test
@@ -150,13 +149,13 @@ class InheritanceMethodDispatcherTest {
                   methodName,
                   childName,
                   methodName,
-                  MethodOrigin.INTERNAL_INHERITED_VIRTUAL),
+                  MethodOrigin.VIRTUAL_INTERNAL_INHERITED),
               tuple(
                   childName,
                   methodName,
                   grandChildName,
                   methodName,
-                  MethodOrigin.INTERNAL_INHERITED_VIRTUAL));
+                  MethodOrigin.VIRTUAL_INTERNAL_INHERITED));
     }
   }
 }

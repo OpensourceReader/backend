@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class InheritanceLinker {
+public class InheritanceLinkService {
 
   public void resolve(List<Type> types, List<TypeStructure> typeStructures) {
     if (types == null || types.isEmpty() || typeStructures == null || typeStructures.isEmpty()) {
@@ -34,6 +34,6 @@ public class InheritanceLinker {
   }
 
   private List<TypeInfo> extractTypeInfos(List<TypeStructure> typeStructures) {
-    return typeStructures.stream().map(TypeStructure::typeInfo).toList();
+    return typeStructures.stream().map(TypeStructure::typeInfo).filter(Objects::nonNull).toList();
   }
 }

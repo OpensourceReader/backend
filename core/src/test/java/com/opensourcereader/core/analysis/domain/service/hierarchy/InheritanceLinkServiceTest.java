@@ -10,7 +10,6 @@ import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
 import com.opensourcereader.core.analysis.domain.entity.file.RepoFileType;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
@@ -19,11 +18,11 @@ import com.opensourcereader.core.analysis.dto.TypeStructure;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class InheritanceLinkerTest {
+class InheritanceLinkServiceTest {
 
-  private InheritanceLinker service = new InheritanceLinker();
+  private InheritanceLinkService service = new InheritanceLinkService();
   OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinker(), new ExternalTypeStructureFactory());
+      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
 
   private TypeStructure toTypeStructureWithoutMethod(
       String className, String superName, List<String> interfaceNames) {

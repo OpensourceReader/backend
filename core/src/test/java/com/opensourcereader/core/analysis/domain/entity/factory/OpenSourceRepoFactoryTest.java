@@ -12,7 +12,7 @@ import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeOrigin;
-import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinker;
+import com.opensourcereader.core.analysis.domain.service.hierarchy.InheritanceLinkService;
 import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodDescriptor;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 class OpenSourceRepoFactoryTest {
 
   OpenSourceRepoFactory openSourceRepoFactory =
-      new OpenSourceRepoFactory(new InheritanceLinker(), new ExternalTypeStructureFactory());
+      new OpenSourceRepoFactory(new InheritanceLinkService(), new ExternalTypeStructureFactory());
 
   private static final int INVOKE_INTERFACE = 185;
 

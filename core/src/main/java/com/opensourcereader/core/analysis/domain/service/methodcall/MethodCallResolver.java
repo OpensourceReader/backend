@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.domain.service.methodcall;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,12 +15,15 @@ import com.opensourcereader.core.analysis.dto.MethodCallInfo;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
 import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class MethodCallResolver {
+
+  private final MethodRepository methodRepository;
 
   public void create(List<Type> types, List<TypeStructure> typeStructures) {
     Map<String, Map<MethodSignature, Method>> typeMethods = extractTypeMethods(types);
@@ -35,17 +39,18 @@ public class MethodCallResolver {
         Method callee =
             findMethod(
                 typeMethods, calleeInfo.calleeTypeInternalName(), MethodSignature.from(calleeInfo));
-
-        if (callee != null) {
-          caller.addOutgoingCall(callee);
-        }
         if (callee == null) {
           Type type = typeByInternalName.get(calleeInfo.calleeTypeInternalName());
           if (type == null) {
             continue;
           }
-          type.addExternalInheritanceMethod(calleeInfo, caller, type);
+          callee = methodRepository.save(Method.inheritedExternal(calleeInfo, type));
+
+          typeMethods
+              .computeIfAbsent(type.getTypeInternalName(), k -> new HashMap<>())
+              .put(callee.getMethodSignature(), callee);
         }
+        caller.addOutgoingCall(callee);
       }
     }
   }

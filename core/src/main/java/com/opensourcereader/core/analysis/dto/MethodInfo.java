@@ -44,4 +44,15 @@ public record MethodInfo(
     }
     return codeParseResult.endLine();
   }
+
+  public static List<MethodInfo> from(TypeStructure typeStructure) {
+    if (typeStructure == null) {
+      return List.of();
+    }
+    if (typeStructure.methods() == null) {
+      return List.of();
+    }
+
+    return typeStructure.methods().stream().map(MethodStructure::methodInfo).toList();
+  }
 }

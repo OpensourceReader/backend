@@ -5,8 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.opensourcereader.core.analysis.domain.entity.OpenSourceRepo;
-import com.opensourcereader.core.analysis.domain.entity.factory.OpenSourceRepoFactory;
-import com.opensourcereader.core.analysis.domain.service.methodcall.MethodCallGraphBuilder;
+import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoAlreadyExistException;
 import com.opensourcereader.core.analysis.exception.opensourcerepo.OpenSourceRepoNotFoundException;
@@ -21,15 +20,14 @@ import lombok.RequiredArgsConstructor;
 public class OpenSourceRepoServiceImpl implements OpenSourceRepoService {
 
   private final OpenSourceRepoRepository opensourceRepoRepository;
-  private final OpenSourceRepoFactory openSourceRepoFactory;
-  private final MethodCallGraphBuilder methodCallGraphBuilder;
 
   @Transactional
   @Override
   public OpenSourceRepo createRepo(String cloneUri, List<TypeStructure> typeStructures) {
     validateAlreadyExist(cloneUri);
-    OpenSourceRepo openSourceRepo = openSourceRepoFactory.create(cloneUri, typeStructures);
-    methodCallGraphBuilder.analyze(openSourceRepo.getTypes(), typeStructures);
+    OpenSourceRepo openSourceRepo =
+        OpenSourceRepo.create(cloneUri, typeStructures, new ExternalTypeStructureFactory());
+
     return opensourceRepoRepository.save(openSourceRepo);
   }
 

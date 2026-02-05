@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import com.opensourcereader.core.analysis.domain.entity.factory.ExternalTypeStructureFactory;
 import com.opensourcereader.core.analysis.dto.MethodInfo;
-import com.opensourcereader.core.analysis.dto.MethodStructure;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
@@ -80,15 +79,9 @@ public class OpenSourceRepo extends BaseEntity {
                 return null;
               }
               return Type.internalDeclared(
-                  typeStructure.typeInfo(), extractMethodInfos(typeStructure), file, this);
+                  typeStructure.typeInfo(), MethodInfo.from(typeStructure), file, this);
             })
         .filter(Objects::nonNull)
-        .collect(Collectors.toCollection(ArrayList::new));
-  }
-
-  private List<MethodInfo> extractMethodInfos(TypeStructure typeStructure) {
-    return typeStructure.methods().stream()
-        .map(MethodStructure::methodInfo)
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
@@ -99,7 +92,13 @@ public class OpenSourceRepo extends BaseEntity {
         externalTypeStructureFactory.create(this.types, typeStructures).stream()
             .map(externalTypeStructure -> Type.external(externalTypeStructure, this))
             .collect(Collectors.toCollection(ArrayList::new));
-    this.types.addAll(externalTypes);
+
+    for (Type externalType : externalTypes) {
+      if (externalTypes.contains(externalType)) {
+        return;
+      }
+      this.types.add(externalType);
+    }
   }
 
   @Override

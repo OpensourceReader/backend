@@ -13,6 +13,7 @@ import com.opensourcereader.core.analysis.domain.entity.Type;
 import com.opensourcereader.core.analysis.domain.entity.TypeImplementation;
 import com.opensourcereader.core.analysis.domain.entity.method.MethodSignature;
 import com.opensourcereader.core.analysis.domain.entity.type.TypeKind;
+import com.opensourcereader.core.analysis.repository.MethodRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class InterfaceMethodDispatcher {
 
   private final TypeGraphValidator typeGraphValidator;
+  private final MethodRepository methodRepository;
 
   public void connectInterfaceImplementations(List<Type> types) {
     List<Type> interfaces =
@@ -44,10 +46,14 @@ public class InterfaceMethodDispatcher {
           Type implType = implEdge.getImplementedType();
           Map<MethodSignature, Method> implTypeMethods = indexMethodsBySignature(implType);
           for (Method interfaceTypeMethod : polledInterfaceType.getMethods()) {
-            Method implMethod = implTypeMethods.get(interfaceTypeMethod.getMethodSignature());
-            if (implMethod == null) {
-              implType.addImplementationVirtualMethod(interfaceTypeMethod);
-            }
+            MethodSignature signature = interfaceTypeMethod.getMethodSignature();
+            Method implMethod =
+                implTypeMethods.computeIfAbsent(
+                    signature,
+                    sig ->
+                        methodRepository.save(
+                            Method.createVirtual(
+                                interfaceTypeMethod.getType(), interfaceTypeMethod, implType)));
             interfaceTypeMethod.addOutgoingCall(implMethod);
           }
           if (implType.getTypeKind().equals(TypeKind.INTERFACE)) {

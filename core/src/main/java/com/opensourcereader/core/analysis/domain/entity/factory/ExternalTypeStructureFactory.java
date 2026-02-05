@@ -38,8 +38,11 @@ public class ExternalTypeStructureFactory {
 
   private Set<String> collectParentTypeNames(List<TypeStructure> typeStructures) {
     Set<String> result = new HashSet<>();
-    for (TypeStructure ts : typeStructures) {
-      TypeInfo info = ts.typeInfo();
+    for (TypeStructure typeStructure : typeStructures) {
+      TypeInfo info = typeStructure.typeInfo();
+      if (info == null) {
+        continue;
+      }
 
       if (info.superName() != null) {
         result.add(info.superName());
