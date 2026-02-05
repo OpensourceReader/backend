@@ -18,8 +18,7 @@ public class BytecodeClassStructureExtractor {
   private final GitWorktreeManagerCli gitWorktreeManagerCli;
   private final BuildExecutor buildExecutor;
   private final BuildArtifactCollector buildArtifactCollector;
-  private final com.opensourcereader.core.analysis.infra.bytecode.ClassStructureExtractor
-      classStructureExtractor;
+  private final ClassStructureExtractor classStructureExtractor;
 
   public List<ByteCodeClassStructure> extract(
       Path savedLocalPath, String reference, String workingTreeDirName) {

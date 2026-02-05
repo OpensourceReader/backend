@@ -33,12 +33,7 @@ jwt:
   access-token-expiration: 600 # 10 분
   refresh-token-expiration: 604800 # 7일
 
-#logging:
-#  level:
-#    root: info
-
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
+    root: info
 

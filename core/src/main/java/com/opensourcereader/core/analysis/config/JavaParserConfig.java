@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.ParserConfiguration.LanguageLevel;
 
 @Configuration
 public class JavaParserConfig {
@@ -13,7 +12,7 @@ public class JavaParserConfig {
   @Bean
   public JavaParser javaParser() {
     ParserConfiguration parserConfiguration =
-        new ParserConfiguration().setLanguageLevel(LanguageLevel.JAVA_17);
+        new ParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.BLEEDING_EDGE);
     return new JavaParser(parserConfiguration);
   }
 }

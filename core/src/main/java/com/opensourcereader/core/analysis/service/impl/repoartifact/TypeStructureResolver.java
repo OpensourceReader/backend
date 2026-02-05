@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TypeStructureResolver {
 
-  // 마지막 리턴타입에서, String 말고, com.ex. 같은 커스텀 타입도 검증 필요 -> 클래스 분리 필요
   public TypeStructure resolve(
       OpenSourceFileInfo sourceFile,
       ParsedSourceFile parsedFile,
