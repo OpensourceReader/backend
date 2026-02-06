@@ -13,6 +13,7 @@ import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.shared.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
@@ -27,6 +28,8 @@ public class OpenSourceRepo extends BaseEntity {
 
   @Column(name = "clone_url")
   private String cloneUrl;
+
+  @Embedded private RepoIdentifier repoIdentifier;
 
   @Getter(AccessLevel.NONE)
   @OneToMany(mappedBy = "openSourceRepo", cascade = CascadeType.PERSIST)
@@ -55,6 +58,7 @@ public class OpenSourceRepo extends BaseEntity {
 
   private OpenSourceRepo(String cloneUrl, List<TypeStructure> typeStructures) {
     this.cloneUrl = cloneUrl;
+    this.repoIdentifier = RepoIdentifier.of(cloneUrl);
     this.files = createOpenSourceRepoFiles(typeStructures);
     this.types = createTypes(this.files, typeStructures);
   }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.entity.RefreshToken;
-import com.opensourcereader.core.security.service.JwtService;
+import com.opensourcereader.core.security.infra.JwtTokenProvider;
 import com.opensourcereader.core.security.service.RefreshTokenService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -25,7 +25,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final ObjectMapper objectMapper;
   private final RefreshTokenService refreshTokenService;
-  private final JwtService jwtService;
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Override
   public void onAuthenticationSuccess(
@@ -36,7 +36,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     // TODO 중복 로그인 파트: 기기 1개당 1개 로그인 가능 -> 추후 동시에 몇 개의 로그인까지 가능할 지 협의 필요
     refreshTokenService.invalidate(nickname);
-    String accessToken = jwtService.encoder(principal.getName(), nickname);
+    String accessToken = jwtTokenProvider.encoder(principal.getName(), nickname);
     RefreshToken refreshToken = refreshTokenService.createRefreshToken(nickname);
 
     // refresh 쿠키 설정

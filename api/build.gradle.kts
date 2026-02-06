@@ -2,6 +2,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 dependencies {
     implementation(project(":core"))
+    implementation("org.apache.httpcomponents.client5:httpclient5")
 
     // DB
     implementation("com.mysql:mysql-connector-j:8.0.33")

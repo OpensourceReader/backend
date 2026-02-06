@@ -1,6 +1,7 @@
 package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithoutMethod;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +53,7 @@ class InheritanceMethodDispatcherTest {
       TypeStructure childType =
           createTypeStructureWithoutMethod(childName, TypeKind.CLASS, parentName, null);
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(childType, parentType));
+          openSourceRepoService.createRepo(REPO_URL, List.of(childType, parentType));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(childType, parentType));
 
       // when
@@ -90,8 +91,7 @@ class InheritanceMethodDispatcherTest {
       TypeStructure child =
           createTypeStructureWithMethod(
               childName, parentName, null, methodName, methodDescriptor, TypeKind.CLASS);
-      OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(child, parent));
+      OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(child, parent));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(child, parent));
 
       // when
@@ -136,7 +136,7 @@ class InheritanceMethodDispatcherTest {
               grandChildName, TypeKind.CLASS, childName, null);
 
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(grandChild, child, parent));
+          openSourceRepoService.createRepo(REPO_URL, List.of(grandChild, child, parent));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(grandChild, child, parent));
 
       // when

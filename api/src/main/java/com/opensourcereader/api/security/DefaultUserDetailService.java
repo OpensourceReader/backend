@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.opensourcereader.api.security.login.OSRUser;
 import com.opensourcereader.core.security.dto.UserConnection;
 import com.opensourcereader.core.user.entity.User;
-import com.opensourcereader.core.user.service.UserService;
+import com.opensourcereader.core.user.service.UserRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DefaultUserDetailService implements UserDetailsService {
 
-  private final UserService userService;
+  private final UserRetrieveService userRetrieveService;
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    final User user = userService.findByEmail(email);
+    final User user = userRetrieveService.findByEmail(email);
 
     UserConnection userConnection = new UserConnection(user, Instant.now());
 

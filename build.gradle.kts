@@ -68,6 +68,8 @@ subprojects {
 
         // auth
         implementation("com.auth0:java-jwt:4.4.0")
+
+        testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.1.15")
     }
 
     tasks.withType<Test> {

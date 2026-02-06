@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.opensourcereader.api.security.DefaultUserDetailService;
 import com.opensourcereader.api.security.SecurityConfigurer;
 import com.opensourcereader.api.security.jwt.AuthTokenFilter;
-import com.opensourcereader.core.security.service.JwtService;
+import com.opensourcereader.core.security.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FilterConfigurer {
 
-  private final JwtService jwtService;
+  private final TokenProvider tokenProvider;
   private final DefaultUserDetailService userDetailsService;
 
   @Bean
@@ -25,7 +25,7 @@ public class FilterConfigurer {
     return http -> {
       try {
         http.addFilterBefore(
-            new AuthTokenFilter(jwtService, userDetailsService),
+            new AuthTokenFilter(tokenProvider, userDetailsService),
             UsernamePasswordAuthenticationFilter.class);
       } catch (Exception e) {
         throw new RuntimeException("Http Request Error", e);

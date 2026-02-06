@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.opensourcereader.api.controller.user.request.UserGetRequest;
 import com.opensourcereader.core.user.dto.UserDto;
 import com.opensourcereader.core.user.entity.User;
-import com.opensourcereader.core.user.service.UserService;
+import com.opensourcereader.core.user.service.UserRetrieveService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,12 +14,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserFacadeService {
 
-  private final UserService userService;
+  private final UserRetrieveService userRetrieveService;
 
   @Transactional(readOnly = true)
   public UserDto getUser(final UserGetRequest req) {
-    User user = userService.findByNickname(req.nickname());
+    User user = userRetrieveService.findByNickname(req.nickname());
 
-    return UserDto.of(user).build();
+    return UserDto.from(user);
   }
 }

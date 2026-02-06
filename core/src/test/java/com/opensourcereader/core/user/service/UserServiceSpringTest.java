@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +15,7 @@ import org.junit.jupiter.api.Test;
 @SpringBootTest
 public class UserServiceSpringTest {
 
-  @Autowired private UserServiceImpl userService;
+  @Autowired private UserRetrieveService userRetrieveService;
 
   @Autowired private UserRepository userRepository;
 
@@ -25,10 +26,12 @@ public class UserServiceSpringTest {
   void test() {
     // given
     String encode = passwordEncoder.encode("test123");
-    User user = User.of("test", "test@github.no-email", encode).build();
+    UserSignUpCommand command = UserSignUpCommand.of("test@github.no-email", "test123", "test");
+    User user = User.from(command);
+    user.updatePassword(encode);
     userRepository.save(user);
     // when
-    User result = userService.findByEmail("test@github.no-email");
+    User result = userRetrieveService.findByEmail("test@github.no-email");
     // then
     assertThat(result).isNotNull();
   }

@@ -3,15 +3,14 @@ package com.opensourcereader.core.security.service;
 import java.time.Instant;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.opensourcereader.core.security.entity.RefreshToken;
-import com.opensourcereader.core.security.exception.TokenRefreshException;
 import com.opensourcereader.core.security.repository.RefreshTokenRepository;
-import com.opensourcereader.core.shared.exception.OSRServerException;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.exception.UserNotFoundException;
 import com.opensourcereader.core.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,11 +31,9 @@ public class RefreshTokenService {
 
   // TODO 유저가 토큰을 삭제시키거하 하는 등의 작업을 할 수 없게 만들어야한다.
   @Transactional
-  public RefreshToken createRefreshToken(String nickname) {
+  public RefreshToken createRefreshToken(String loginName) {
     User user =
-        userRepository
-            .findFirstByNickname(nickname)
-            .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
+        userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
 
     Instant expiryDate = Instant.now().plusSeconds(refreshTokenExpireSeconds);
 
@@ -48,17 +45,15 @@ public class RefreshTokenService {
   public RefreshToken verifyExpiration(RefreshToken token) {
     if (token.isExpired()) {
       refreshTokenRepository.delete(token);
-      throw new TokenRefreshException("Token Expired");
+      throw new TokenExpiredException("토큰이 만료되었습니다.", Instant.now());
     }
     return token;
   }
 
   @Transactional
-  public void invalidate(String nickname) {
+  public void invalidate(String loginName) {
     User user =
-        userRepository
-            .findFirstByNickname(nickname)
-            .orElseThrow(() -> new OSRServerException(HttpStatus.NOT_FOUND));
+        userRepository.findFirstByLoginName(loginName).orElseThrow(UserNotFoundException::new);
 
     refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
   }

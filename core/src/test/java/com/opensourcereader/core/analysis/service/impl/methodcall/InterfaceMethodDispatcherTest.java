@@ -1,6 +1,7 @@
 package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithoutMethod;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +59,7 @@ class InterfaceMethodDispatcherTest {
               methodDescriptor,
               TypeKind.INTERFACE);
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(implClassType, interfaceType));
+          openSourceRepoService.createRepo(REPO_URL, List.of(implClassType, interfaceType));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(implClassType, interfaceType));
 
       // when
@@ -95,7 +96,7 @@ class InterfaceMethodDispatcherTest {
       TypeStructure interface2Type =
           createTypeStructureWithoutMethod(i2Name, TypeKind.INTERFACE, null, List.of(i1Name));
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(interface1Type, interface2Type));
+          openSourceRepoService.createRepo(REPO_URL, List.of(interface1Type, interface2Type));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(interface1Type, interface2Type));
 
       // when
@@ -131,7 +132,7 @@ class InterfaceMethodDispatcherTest {
               implAName, null, List.of(i2Name), methodName, methodDescriptor, TypeKind.CLASS);
       OpenSourceRepo repo =
           openSourceRepoService.createRepo(
-              "new-cloneUrl", List.of(implAType, interface2Type, interface1Type));
+              REPO_URL, List.of(implAType, interface2Type, interface1Type));
       inheritanceLinkService.resolve(
           repo.getTypes(), List.of(implAType, interface2Type, interface1Type));
 
@@ -170,7 +171,7 @@ class InterfaceMethodDispatcherTest {
       TypeStructure implType =
           createTypeStructureWithoutMethod(implName, TypeKind.CLASS, null, List.of(interfaceName));
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(implType, interfaceType));
+          openSourceRepoService.createRepo(REPO_URL, List.of(implType, interfaceType));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(implType, interfaceType));
 
       // when
@@ -210,7 +211,7 @@ class InterfaceMethodDispatcherTest {
           createTypeStructureWithMethod(
               implName, null, List.of(interfaceName), methodName, methodDescriptor, TypeKind.CLASS);
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(interfaceType, implType));
+          openSourceRepoService.createRepo(REPO_URL, List.of(interfaceType, implType));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(interfaceType, implType));
 
       // when
@@ -251,7 +252,7 @@ class InterfaceMethodDispatcherTest {
           createTypeStructureWithMethod(
               i2Name, null, List.of(i1Name), methodName, methodDescriptor, TypeKind.INTERFACE);
       OpenSourceRepo repo =
-          openSourceRepoService.createRepo("new-cloneUrl", List.of(interface2Type, interface1Type));
+          openSourceRepoService.createRepo(REPO_URL, List.of(interface2Type, interface1Type));
       inheritanceLinkService.resolve(repo.getTypes(), List.of(interface2Type, interface1Type));
 
       // when + then

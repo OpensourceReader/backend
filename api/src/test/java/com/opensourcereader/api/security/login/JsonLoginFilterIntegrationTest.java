@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opensourcereader.api.controller.auth.request.LoginRequest;
+import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
 import com.opensourcereader.core.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,9 @@ public class JsonLoginFilterIntegrationTest {
   @BeforeEach
   void setUp() {
     String encodedPassword = passwordEncoder.encode("password123");
-    User user = User.of("testuser", "test@email.com", encodedPassword).build();
+    UserSignUpCommand command = UserSignUpCommand.of("test@email.com", "testuser", encodedPassword);
+    User user = User.from(command);
+    user.updatePassword(encodedPassword);
     userRepository.save(user);
   }
 

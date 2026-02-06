@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeWithMethodCall;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,8 +66,7 @@ class MethodCallGraphServiceTest {
             calleeTypeName, null, List.of(), calleeMethodName, methodDescriptor, TypeKind.CLASS);
 
     OpenSourceRepo repo =
-        openSourceRepoService.createRepo(
-            "new-cloneUrl", List.of(callerType, targetType, calleeType));
+        openSourceRepoService.createRepo(REPO_URL, List.of(callerType, targetType, calleeType));
     methodCallGraphService.create(repo.getTypes(), List.of(callerType, targetType, calleeType));
     Method targetMethod =
         repo.getTypes().stream()

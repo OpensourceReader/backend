@@ -1,6 +1,8 @@
 CREATE TABLE open_source_repo
 (
     id         BIGINT       NOT NULL AUTO_INCREMENT,
+    owner_name VARCHAR(512) NOT NULL,
+    repo_name  VARCHAR(512) NOT NULL,
     created_at TIMESTAMP(6) NOT NULL,
     updated_at TIMESTAMP(6),
     clone_url  VARCHAR(512) NOT NULL,
@@ -10,7 +12,7 @@ CREATE TABLE open_source_repo
 
 CREATE TABLE open_source_repo_file
 (
-    id         BIGINT       NOT NULL AUTO_INCREMENT,
+    id                 BIGINT       NOT NULL AUTO_INCREMENT,
     created_at         TIMESTAMP(6) NOT NULL,
     updated_at         TIMESTAMP(6),
     path               VARCHAR(512) NOT NULL,
@@ -19,7 +21,7 @@ CREATE TABLE open_source_repo_file
     extension          VARCHAR(200) NOT NULL DEFAULT '',
     raw_text           LONGTEXT,
     origin             VARCHAR(100),
-    opensource_repo_id BIGINT     NOT NULL,
+    opensource_repo_id BIGINT       NOT NULL,
 
     PRIMARY KEY (id),
 
@@ -38,7 +40,7 @@ CREATE TABLE type
     super_type_id           BIGINT,
     origin                  VARCHAR(255) NOT NULL,
     opensource_repo_file_id BIGINT,
-    opensource_repo_id      BIGINT      NOT NULL,
+    opensource_repo_id      BIGINT       NOT NULL,
 
     PRIMARY KEY (id),
 
@@ -57,11 +59,11 @@ CREATE TABLE type
 
 CREATE TABLE type_implementation
 (
-    id                   BIGINT       NOT NULL AUTO_INCREMENT,
-    created_at           TIMESTAMP(6) NOT NULL,
-    updated_at           TIMESTAMP(6),
-    implemented_type_id  BIGINT      NOT NULL,
-    interface_type_id    BIGINT      NOT NULL,
+    id                  BIGINT       NOT NULL AUTO_INCREMENT,
+    created_at          TIMESTAMP(6) NOT NULL,
+    updated_at          TIMESTAMP(6),
+    implemented_type_id BIGINT       NOT NULL,
+    interface_type_id   BIGINT       NOT NULL,
 
     PRIMARY KEY (id),
 
@@ -87,7 +89,7 @@ CREATE TABLE method
     start_line       INT,
     end_line         INT,
     origin           VARCHAR(300),
-    type_id          BIGINT     NOT NULL,
+    type_id          BIGINT       NOT NULL,
 
     PRIMARY KEY (id),
 
@@ -104,7 +106,7 @@ CREATE TABLE method_call_edge
     created_at TIMESTAMP(6) NOT NULL,
     updated_at TIMESTAMP(6),
     caller_id  BIGINT       NOT NULL,
-    callee_id  BIGINT      NOT NULL,
+    callee_id  BIGINT       NOT NULL,
 
     PRIMARY KEY (id),
 

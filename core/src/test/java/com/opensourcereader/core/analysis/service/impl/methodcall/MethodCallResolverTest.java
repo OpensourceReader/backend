@@ -1,6 +1,7 @@
-package com.opensourcereader.core.analysis.domain.service.methodcall;
+package com.opensourcereader.core.analysis.service.impl.methodcall;
 
 import static com.opensourcereader.core.analysis.testfixture.CallGraphTestSupport.getOutgoingCallEdges;
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeStructureWithMethod;
 import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.createTypeWithMethodCall;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,7 +64,7 @@ class MethodCallResolverTest {
             calleeMethodDescriptor);
     OpenSourceRepo openSourceRepo =
         openSourceRepoService.createRepo(
-            "new-cloneUrl", List.of(callerTypeStructure, calleeTypeStructure));
+            REPO_URL, List.of(callerTypeStructure, calleeTypeStructure));
 
     // when
     methodCallResolver.create(
@@ -104,7 +105,7 @@ class MethodCallResolverTest {
             List.of(callInfo),
             TypeKind.CLASS);
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("cloneUrl", List.of(type, callerType));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(type, callerType));
 
     // 상속/인터페이스 먼저 연결 (내부 world 완성 단계)
     interfaceMethodDispatcher.connectInterfaceImplementations(repo.getTypes());
@@ -149,7 +150,7 @@ class MethodCallResolverTest {
             List.of(callInfo),
             TypeKind.CLASS);
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("cloneUrl", List.of(type, callerType));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(type, callerType));
 
     interfaceMethodDispatcher.connectInterfaceImplementations(repo.getTypes());
     inheritanceMethodDispatcher.connectInheritance(repo.getTypes());

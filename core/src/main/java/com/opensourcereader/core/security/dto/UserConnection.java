@@ -16,12 +16,12 @@ public class UserConnection {
 
   private final Role role;
 
-  private final String providerUserId;
+  private final Long providerUserId;
 
   private final Instant updatedAt;
 
   public UserConnection(User user, Instant updatedAt) {
-    this.nickname = user.getNickname();
+    this.nickname = user.getLoginName();
     this.email = user.getEmail();
     this.role = user.getRole();
     this.providerUserId = user.getProviderId();

@@ -39,6 +39,13 @@ public class OpenSourceRepoServiceImpl implements OpenSourceRepoService {
   }
 
   @Override
+  public OpenSourceRepo getRepoByOwnerNameAndRepoName(String ownerName, String repoName) {
+    return opensourceRepoRepository
+        .findByOwnerAndRepo(ownerName, repoName)
+        .orElseThrow(OpenSourceRepoNotFoundException::new);
+  }
+
+  @Override
   public void deleteRepoById(Long repositoryId) {
     opensourceRepoRepository.deleteById(repositoryId);
   }

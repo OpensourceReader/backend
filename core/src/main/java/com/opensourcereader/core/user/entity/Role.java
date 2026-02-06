@@ -2,5 +2,7 @@ package com.opensourcereader.core.user.entity;
 
 public enum Role {
   ADMIN,
-  USER
+  USER,
+  OAUTH2,
+  FAKE
 }

@@ -1,10 +1,10 @@
 CREATE TABLE users
 (
     id          BIGINT       NOT NULL AUTO_INCREMENT,
-    provider_id VARCHAR(255),
+    provider_id BIGINT,
     role        VARCHAR(50),
-    username    VARCHAR(100),
-    nickname    VARCHAR(100),
+    user_name   VARCHAR(100),
+    login_name  VARCHAR(100),
     email       VARCHAR(255),
     password    VARCHAR(255),
     avatar_url  VARCHAR(500),
@@ -12,8 +12,7 @@ CREATE TABLE users
     created_at  TIMESTAMP(6) NOT NULL,
     updated_at  TIMESTAMP(6),
 
-    CONSTRAINT pk_users PRIMARY KEY (id),
-    CONSTRAINT uq_users_email UNIQUE (email)
+    CONSTRAINT pk_users PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 

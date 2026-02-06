@@ -17,6 +17,8 @@ public final class TestTypeFixtures {
 
   private TestTypeFixtures() {}
 
+  public static final String REPO_URL = "https://github.com/test-owner/test-repo.git";
+
   private static MethodInfo createMethodInfo(
       String typeInternalName, String methodName, MethodDescriptor methodDescriptor) {
     return new MethodInfo(

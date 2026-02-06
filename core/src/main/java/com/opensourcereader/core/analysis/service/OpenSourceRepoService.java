@@ -11,5 +11,7 @@ public interface OpenSourceRepoService {
 
   OpenSourceRepo getRepoById(Long repositoryId);
 
+  OpenSourceRepo getRepoByOwnerNameAndRepoName(String ownerName, String title);
+
   void deleteRepoById(Long repositoryId);
 }

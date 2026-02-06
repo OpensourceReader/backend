@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl.hierarchy;
 
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
@@ -44,7 +45,7 @@ class InheritanceLinkServiceImplTest {
     List<TypeStructure> typeStructures = List.of();
 
     // when
-    OpenSourceRepo openSourceRepo = openSourceRepoService.createRepo("", List.of());
+    OpenSourceRepo openSourceRepo = openSourceRepoService.createRepo(REPO_URL, List.of());
     inheritanceLinkService.resolve(openSourceRepo.getTypes(), typeStructures);
 
     // then
@@ -63,7 +64,7 @@ class InheritanceLinkServiceImplTest {
         toTypeStructureWithoutMethod(implementClassName, null, List.of(interfaceName));
     OpenSourceRepo openSourceRepo =
         openSourceRepoService.createRepo(
-            "new-Uri", List.of(interfaceStructure, implementedClassStructure));
+            REPO_URL, List.of(interfaceStructure, implementedClassStructure));
 
     // when
     inheritanceLinkService.resolve(
@@ -92,7 +93,7 @@ class InheritanceLinkServiceImplTest {
 
     OpenSourceRepo openSourceRepo =
         openSourceRepoService.createRepo(
-            "new-Uri", List.of(parentInterfaceStructure, childInterfaceStructure));
+            REPO_URL, List.of(parentInterfaceStructure, childInterfaceStructure));
 
     // when
     inheritanceLinkService.resolve(
@@ -120,7 +121,7 @@ class InheritanceLinkServiceImplTest {
     TypeStructure subStructure =
         toTypeStructureWithoutMethod(childClassName, superClassName, List.of());
     OpenSourceRepo openSourceRepo =
-        openSourceRepoService.createRepo("new-Uri", List.of(superStructure, subStructure));
+        openSourceRepoService.createRepo(REPO_URL, List.of(superStructure, subStructure));
 
     // when
     inheritanceLinkService.resolve(
@@ -150,7 +151,7 @@ class InheritanceLinkServiceImplTest {
         toTypeStructureWithoutMethod(
             className, externalSuper, List.of(externalInterface1, externalInterface2));
     OpenSourceRepo openSourceRepo =
-        openSourceRepoService.createRepo("new-Uri", List.of(typeStructure));
+        openSourceRepoService.createRepo(REPO_URL, List.of(typeStructure));
 
     // when
     inheritanceLinkService.resolve(openSourceRepo.getTypes(), List.of(typeStructure));

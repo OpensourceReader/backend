@@ -1,5 +1,6 @@
 package com.opensourcereader.core.analysis.service.impl;
 
+import static com.opensourcereader.core.analysis.testfixture.TestTypeFixtures.REPO_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -99,7 +100,7 @@ class OpenSourceRepoServiceImplTest {
         new TypeStructure("A.java", RepoFileType.FILE, "", typeInfo, List.of(methodStructure));
 
     // when
-    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(typeStructure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(typeStructure));
 
     // then
     assertThat(repo.getTypes())
@@ -135,7 +136,7 @@ class OpenSourceRepoServiceImplTest {
             List.of());
 
     OpenSourceRepo repo =
-        openSourceRepoService.createRepo("url", List.of(parentStructure, childStructure));
+        openSourceRepoService.createRepo(REPO_URL, List.of(parentStructure, childStructure));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName, Type::getTypeOrigin)
@@ -181,7 +182,8 @@ class OpenSourceRepoServiceImplTest {
             new TypeInfo(9, TypeKind.CLASS, internalB, null, null, List.of()),
             List.of());
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structureA, structureB));
+    OpenSourceRepo repo =
+        openSourceRepoService.createRepo(REPO_URL, List.of(structureA, structureB));
 
     assertThat(repo.getTypes())
         .extracting(Type::getTypeInternalName)
@@ -216,7 +218,7 @@ class OpenSourceRepoServiceImplTest {
     TypeStructure structure =
         new TypeStructure("A.java", RepoFileType.FILE, "", typeInfo, List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(structure));
 
     List<Type> externals =
         repo.getTypes().stream().filter(t -> t.getTypeInternalName().equals(external)).toList();
@@ -263,7 +265,7 @@ class OpenSourceRepoServiceImplTest {
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()
@@ -309,7 +311,7 @@ class OpenSourceRepoServiceImplTest {
             new TypeInfo(9, TypeKind.CLASS, internal, null, null, List.of()),
             List.of(methodStructure));
 
-    OpenSourceRepo repo = openSourceRepoService.createRepo("url", List.of(structure));
+    OpenSourceRepo repo = openSourceRepoService.createRepo(REPO_URL, List.of(structure));
 
     Type externalType =
         repo.getTypes().stream()

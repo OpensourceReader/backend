@@ -4,10 +4,11 @@ import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
-import com.opensourcereader.core.security.dto.SignUpCommand;
+import com.opensourcereader.api.controller.auth.request.SignUpRequest;
 import com.opensourcereader.core.security.dto.UserConnection;
-import com.opensourcereader.core.security.service.AuthService;
+import com.opensourcereader.core.user.dto.UserSignUpCommand;
 import com.opensourcereader.core.user.entity.User;
+import com.opensourcereader.core.user.service.UserSignUpService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,10 +16,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthFacadeService {
 
-  private final AuthService authService;
+  private final UserSignUpService signUpService;
 
-  public UserConnection signup(SignUpCommand command) {
-    User user = authService.signup(command);
+  public UserConnection signup(SignUpRequest request) {
+    UserSignUpCommand command =
+        new UserSignUpCommand(request.email(), request.password(), request.loginName(), null, null);
+    User user = signUpService.signup(command);
     return new UserConnection(user, Instant.now());
   }
 }
