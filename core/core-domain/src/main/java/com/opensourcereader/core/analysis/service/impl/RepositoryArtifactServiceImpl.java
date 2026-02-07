@@ -10,6 +10,7 @@ import com.opensourcereader.core.analysis.dto.RepositoryArtifact;
 import com.opensourcereader.core.analysis.dto.TypeStructure;
 import com.opensourcereader.core.analysis.infra.bytecode.BytecodeClassStructureExtractor;
 import com.opensourcereader.core.analysis.infra.dto.ByteCodeClassStructure;
+import com.opensourcereader.core.analysis.infra.dto.OpenSourceFileInfo;
 import com.opensourcereader.core.analysis.infra.dto.gitrepo.GitRepositoryLoadResult;
 import com.opensourcereader.core.analysis.infra.git.GitRepositoryLoader;
 import com.opensourcereader.core.analysis.infra.parser.SourceFileParser;
@@ -38,7 +39,7 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
       gitRepoLoadResult =
           gitRepositoryLoader.downloadGitRepo(openSourceUri, reference, localClonePath);
       List<TypeStructure> structureWithSources =
-          createTypeStructures(gitRepoLoadResult, reference, workingTreeDirName);
+          createTypeStructureWithSourceText(gitRepoLoadResult, reference, workingTreeDirName);
 
       return new RepositoryArtifact(gitRepoLoadResult.savedLocalRepoPath(), structureWithSources);
 
@@ -55,7 +56,7 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
     }
   }
 
-  private List<TypeStructure> createTypeStructures(
+  private List<TypeStructure> createTypeStructureWithSourceText(
       GitRepositoryLoadResult gitRepoLoadResult, String reference, String workingTreeDirName) {
     Map<String, ByteCodeClassStructure> byteCodeStructures =
         bytecodeClassStructureExtractor
@@ -65,6 +66,7 @@ public class RepositoryArtifactServiceImpl implements RepositoryArtifactService 
 
     return gitRepoLoadResult.files().stream()
         .filter(sourceFile -> sourceFile.repoFileType().isSupported())
+        .filter(OpenSourceFileInfo::isSafeText)
         .map(
             sourceFile ->
                 typeStructureResolver.resolve(

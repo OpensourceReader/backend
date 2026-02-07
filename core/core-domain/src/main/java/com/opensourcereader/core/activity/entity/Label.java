@@ -7,7 +7,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,11 +19,7 @@ import lombok.NoArgsConstructor;
 
 @Deprecated
 @Entity
-@Table(
-    name = "labels",
-    indexes = {
-      @Index(name = "idx_label_repository_id", columnList = "repository_id"),
-    })
+@Table(name = "labels")
 @Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

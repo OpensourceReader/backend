@@ -5,16 +5,16 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5")
 
     // DB
-    implementation("com.mysql:mysql-connector-j:8.0.33")
+    implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-mysql")
+    implementation("org.flywaydb:flyway-database-postgresql")
 
     // auth
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     // testcontainer
     testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mysql")
+    testImplementation("org.testcontainers:postgresql")
 
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 }

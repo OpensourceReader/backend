@@ -15,7 +15,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 import lombok.AccessLevel;
@@ -42,8 +41,7 @@ public class OpenSourceRepoFile extends BaseEntity {
   @Column(name = "extension")
   private Extension extension;
 
-  @Lob
-  @Column(name = "raw_text", columnDefinition = "LONGTEXT")
+  @Column(name = "raw_text")
   private String rawText;
 
   @Enumerated(EnumType.STRING)
