@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":core:core-domain"))
     implementation("org.apache.httpcomponents.client5:httpclient5")
 
     // DB

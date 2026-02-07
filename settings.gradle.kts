@@ -1,4 +1,4 @@
 rootProject.name = "OpenSourceReader"
 
-include(":api")
-include(":core")
+include("core:core-api")
+include("core:core-domain")
