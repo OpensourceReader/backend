@@ -19,9 +19,9 @@ import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitra
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
 import com.opensourcereader.api.client.GithubClient;
 import com.opensourcereader.api.client.request.GithubRepoRequest;
-import com.opensourcereader.core.activity.service.IssueSyncService;
 import com.opensourcereader.core.analysis.entity.OpenSourceRepo;
 import com.opensourcereader.core.analysis.service.impl.LocalOpenSourceRepoService;
+import com.opensourcereader.core.collaboration.service.IssueSyncService;
 import com.opensourcereader.core.user.service.UserRetrieveService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

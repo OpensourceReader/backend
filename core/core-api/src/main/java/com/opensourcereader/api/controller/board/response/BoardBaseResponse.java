@@ -1,7 +1,7 @@
 package com.opensourcereader.api.controller.board.response;
 
-import com.opensourcereader.core.activity.entity.Issue;
-import com.opensourcereader.core.activity.entity.Pull;
+import com.opensourcereader.core.collaboration.entity.Issue;
+import com.opensourcereader.core.collaboration.entity.Pull;
 import com.opensourcereader.core.user.dto.UserDto;
 
 import lombok.Builder;

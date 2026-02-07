@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.opensourcereader.api.controller.board.request.BoardGetRequest;
 import com.opensourcereader.api.controller.board.response.BoardBaseResponse;
 import com.opensourcereader.api.controller.board.response.BoardPreviewResponse;
-import com.opensourcereader.api.facade.board.BoardFacadeService;
+import com.opensourcereader.api.facade.collaboration.BoardFacadeService;
 
 import lombok.RequiredArgsConstructor;
 
