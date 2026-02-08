@@ -1,15 +1,22 @@
+import org.gradle.api.Project.DEFAULT_VERSION
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-plugins {
-    java
-    id("org.springframework.boot") version "3.5.8"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("com.diffplug.spotless") version "6.20.0"
+/** --- configuration functions --- */
+fun getGitHash(): String {
+    return runCatching {
+        providers.exec {
+            commandLine("git", "rev-parse", "--short", "HEAD")
+        }.standardOutput.asText.get().trim()
+    }.getOrElse { "init" }
 }
 
-group = "com.opensourcereader"
-version = "0.0.1-SNAPSHOT"
-description = "OpenSourceReader"
+/** --- project configurations --- */
+plugins {
+    java
+    id("org.springframework.boot") apply false
+    id("io.spring.dependency-management")
+    id("com.diffplug.spotless") version "6.20.0"
+}
 
 java {
     toolchain {
@@ -17,17 +24,12 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
 allprojects {
-    apply(plugin = "com.diffplug.spotless")
+    val projectGroup: String by project
+    group = projectGroup
+    version = if (version == DEFAULT_VERSION) getGitHash() else version
 
-    repositories {
-        mavenCentral()
-    }
+    apply(plugin = "com.diffplug.spotless")
 
     spotless {
         lineEndings = com.diffplug.spotless.LineEnding.UNIX
@@ -48,6 +50,9 @@ allprojects {
             trimTrailingWhitespace()
         }
     }
+    repositories {
+        mavenCentral()
+    }
 }
 
 subprojects {
@@ -64,12 +69,22 @@ subprojects {
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testRuntimeOnly("com.h2database:h2")
-        implementation("org.eclipse.jgit:org.eclipse.jgit:6.9.0.202403050737-r")
 
         // auth
         implementation("com.auth0:java-jwt:4.4.0")
-
         testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.1.15")
+    }
+
+    tasks.withType(Jar::class) { enabled = true }
+    tasks.withType(BootJar::class) { enabled = false }
+
+    configure(allprojects.filter { it.path == ":core:core-api" }) {
+        tasks.withType<Jar> {
+            enabled = false
+        }
+        tasks.withType<BootJar> {
+            enabled = true
+        }
     }
 
     tasks.withType<Test> {
@@ -77,14 +92,9 @@ subprojects {
     }
 }
 
-tasks.named<BootJar>("bootJar") {
-    enabled = false
-}
-
-tasks.named<Jar>("jar") {
-    enabled = false
-}
-
 tasks.named("build") {
     dependsOn("spotlessApply")
 }
+
+// module-container 는 task 를 실행하지 않도록 한다.
+project("core") { tasks.configureEach { enabled = false } }
