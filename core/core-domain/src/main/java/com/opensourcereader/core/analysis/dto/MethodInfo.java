@@ -1,0 +1,58 @@
+package com.opensourcereader.core.analysis.dto;
+
+import java.util.EnumSet;
+import java.util.List;
+
+import com.opensourcereader.core.analysis.domain.entity.method.MethodModifier;
+import com.opensourcereader.core.analysis.infra.dto.ByteCodeDeclaredMethodInfo;
+import com.opensourcereader.core.analysis.infra.dto.SourceCodeParseResult;
+
+public record MethodInfo(
+    String typeInternalName,
+    String methodName,
+    EnumSet<MethodModifier> methodModifiers,
+    MethodDescriptor methodDescriptor,
+    String genericSignature,
+    List<String> exceptions,
+    Integer startLine,
+    Integer endLine) {
+
+  public static MethodInfo of(
+      ByteCodeDeclaredMethodInfo byteCodeDeclaredMethodInfo,
+      SourceCodeParseResult codeParseResult) {
+    return new MethodInfo(
+        byteCodeDeclaredMethodInfo.className(),
+        byteCodeDeclaredMethodInfo.methodName(),
+        byteCodeDeclaredMethodInfo.methodModifiers(),
+        byteCodeDeclaredMethodInfo.methodDescriptor(),
+        byteCodeDeclaredMethodInfo.genericSignature(),
+        byteCodeDeclaredMethodInfo.exceptions(),
+        getStartLine(codeParseResult),
+        getEndLine(codeParseResult));
+  }
+
+  private static Integer getStartLine(SourceCodeParseResult codeParseResult) {
+    if (codeParseResult == null) {
+      return null;
+    }
+    return codeParseResult.startLine();
+  }
+
+  private static Integer getEndLine(SourceCodeParseResult codeParseResult) {
+    if (codeParseResult == null) {
+      return null;
+    }
+    return codeParseResult.endLine();
+  }
+
+  public static List<MethodInfo> from(TypeStructure typeStructure) {
+    if (typeStructure == null) {
+      return List.of();
+    }
+    if (typeStructure.methods() == null) {
+      return List.of();
+    }
+
+    return typeStructure.methods().stream().map(MethodStructure::methodInfo).toList();
+  }
+}

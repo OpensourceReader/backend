@@ -1,0 +1,42 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  flyway:
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  security.oauth2.client.registration:
+    github:
+      client-id: ${GITHUB_CLIENT_ID}
+      client-secret: ${GITHUB_CLIENT_SECRET}
+      scope:
+        - read:user
+        - user:email
+
+opensource-reader:
+  local-clone-path:  ${OSSR_CLONE_PATH:${user.home}/local-clone-repos}
+  work-tree-name:  ${OSSR_WORK_TREE_NAME:work-tree-name}
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  access-token-expiration: 600 # 10 분
+  refresh-token-expiration: 604800 # 7일
+
+github:
+  token: ${GITHUB_TOKEN:test123}
+
+logging:
+  level:
+    root: info
+
